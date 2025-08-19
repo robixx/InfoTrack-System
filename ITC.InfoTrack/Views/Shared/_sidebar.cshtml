@@ -1,0 +1,63 @@
+﻿ @using ITC.InfoTrack.Model.Interface
+<!-- ========== Left Sidebar Start ========== -->
+@inject IMenuSet menuSet
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    // long userid = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId") ?? 0;
+    ViewBag.userRoles = await menuSet.getMenuList();
+}
+<style>
+    .vertical-menu {
+    width: 256px !important;
+    }
+
+    .navbar-brand-box {
+    width: 256px ;
+    }
+
+    .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+    width: 98% !important;
+    }
+</style>
+
+<div class="vertical-menu">
+
+    <div data-simplebar class="h-100">
+
+        <!--- Sidemenu -->
+        <div id="sidebar-menu">
+            <!-- Left Menu Start -->
+            <ul class="metismenu list-unstyled" id="side-menu">
+                <li class="menu-title">Menu</li>
+
+                <li>
+                    <a href=@Url.Action("Index", "Dashboard", new{area="Dashboard"}) class="waves-effect">
+                        <i class="ri-dashboard-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-title">Components</li>
+                @foreach (var item in @ViewBag.userRoles)
+                {
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ri-store-2-line"></i>
+                            <span>@item.MenuName</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            @foreach (var subitem in item.subMenu)
+                            {
+                                <li><a href="@subitem.RouteName">@subitem.MenuName</a></li>
+                            }                          
+                            
+                        </ul>
+                    </li>
+                }
+
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->

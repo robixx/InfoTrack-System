@@ -1,0 +1,275 @@
+﻿@model List<ITC.InfoTrack.Model.ViewModel.MetaElementInsertDto>
+
+@{
+    ViewBag.pTitle = "Metadata Title";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Metadata Title";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+</style>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Metadata Group Title</h5>
+                <a class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2" id="metedataAdd">
+                    <i class="fa fa-plus"></i>
+                    Add Meta
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="noticeMessage" class="alert alert-dismissible fade d-none" role="alert">
+                    <span id="noticeText"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="row mt-2">
+                    <table id="datatable" class="table table-striped dt-responsive nowrap table-hover scheduleTable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead style=" background-color:#c9ccd3; font-weight:600;">
+                            <tr>
+                                <th>SL</th>
+                                <th>Element Name</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var status = item.isActive == true ? "Active" : "InActive";
+                                var badgeClass = item.isActive == true ? "badge bg-success" : "badge bg-danger";
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.element</td>
+                                    <td>@item.description</td>
+                                    <td>
+                                        <span class="@badgeClass">@status</span>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0);" class="btn-edit" data-id="@item.metaId"><i class="fa fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+<!--  Modal content for the above example -->
+<div class="modal fade bs-example" id="metaModals" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div id="modaldata"></div>
+                </div>
+                <div id="modalData"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="SaveChange" class="btn btn-sm btn-primary waves-effect waves-light"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+
+    }
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+        $(document).ready(function () {
+        const message = localStorage.getItem('metaSuccessMessage');
+
+        if (message) {
+            const notice = $('#noticeMessage');
+            const text = $('#noticeText');
+
+            // ✅ Show the alert
+            text.text(message);
+            notice.removeClass('d-none fade alert-danger');
+            notice.addClass('alert alert-success show');
+
+            // ✅ Remove message after showing
+            localStorage.removeItem('metaSuccessMessage');
+        }
+    });
+
+    $('#metedataAdd').on('click', function(){
+        $('#myModalLabel').text('Add Metadata Group Title');
+        $('#SaveChange').text('Save');
+        metadataInsertDesign();
+        $('#metaModals').modal('show');
+
+    });
+
+
+    function metadataInsertDesign(){
+
+        var fielddata=document.getElementById('modalData');
+        var htmltext='';
+        htmltext +=`<div class="mb-3">
+                        <label for="metaelementTitle" class="form-label">Group Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="metaelementTitle" id="metaelementTitle" required/>
+                        <input type="hidden" id="metaId" name="metaId"/>
+                    </div>`;
+             htmltext +=`<div class="mb-3">
+                        <label for="metaelementdes" class="form-label">Description</label>
+                        <input type="text" class="form-control" name="metaelementdes" id="metaelementdes"/>
+                    </div>`;
+             htmltext +=`<div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" name="metaelementcheck" id="metaelementcheck"/>
+                        <label class="form-check-label" for="metaelementcheck">Is Active</label>
+                    </div>`;
+       fielddata.innerHTML=htmltext;
+
+    };
+
+    $('#SaveChange').on('click', function(){
+        var metaId=$('#metaId').val().trim()===''?0:$('#metaId').val().trim();
+        var element=$('#metaelementTitle').val().trim();
+        var description=$('#metaelementdes').val().trim();
+        var isActive=$('#metaelementcheck').is(':checked');
+        var model={
+                    metaId :metaId,
+                    element:element,
+                    description:description,
+                    isActive:isActive,
+                };
+         $.ajax({
+               url: '/Security/Security/MetaElementSave',
+               type: 'POST',
+               contentType: 'application/json',
+               data: JSON.stringify(model),
+               success: function (res) {
+                   const notice= $('#noticeMessage');
+                   const text=$('#noticeText');
+                   notice.removeClass('alert-success alert-danger');
+                if(!res.status){
+
+                        text.text(res.message);
+                        $('#noticeMessage').removeClass('d-none fade').addClass('alert-danger show');
+
+                 }else{
+                       localStorage.setItem('metaSuccessMessage', res.message);
+                        // ✅ Reload the page
+                        location.reload();
+                 }
+                     $('#metaModals').modal('hide');
+                 },
+                 error: function (err) {
+                        alert('Error while saving.');
+               }
+         });
+
+    });
+     $(".btn-edit").click(function () {
+      var metadata = $(this).data("id");
+       $('#myModalLabel').text('Edit Metadata Group Title');
+        $('#SaveChange').text('Update');
+        metadataInsertDesign();
+         EditMetaData(metadata);
+        $('#metaModals').modal('show');
+
+
+     });
+
+
+     function EditMetaData(id){
+
+       $.ajax({
+          url: '/Security/Security/MetaElementEdit',
+          type: 'GET',
+          contentType: 'application/json',
+          data: {metaId:id},
+          success: function (res) {
+              if(res.status){
+                  $('#metaId').val(res.data.metaId);
+                $('#metaelementTitle').val(res.data.element);
+                $('#metaelementdes').val(res.data.description);
+                $('#metaelementcheck').prop('checked', res.data.isActive);
+                  
+              }
+          },
+              error: function (err) {
+               alert('Error while saving.');
+           }
+        });
+
+     }
+
+</script>

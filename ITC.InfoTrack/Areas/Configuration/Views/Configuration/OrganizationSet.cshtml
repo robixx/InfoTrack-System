@@ -1,0 +1,836 @@
+﻿@{
+    ViewBag.pTitle = "Organization Configure";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Organization Configure";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="~/libs/spectrum-colorpicker2/spectrum.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css/select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    /*  .hierarchy-tree {
+                                font-family: Arial, sans-serif;
+                            } */
+
+    .tree-node {
+        margin-left: 25px;
+        border-left: 1px solid #ddd;
+        padding-left: 15px;
+        margin-top: 8px;
+    }
+
+    .tree-item {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 5px 0;
+        background: #fff;
+    }
+
+        .tree-item:hover {
+            background: #f8f9fa;
+        }
+
+    .level-0 {
+        font-weight: bold;
+    }
+
+    .level-1 {
+        padding-left: 10px;
+    }
+
+    .level-2 {
+        padding-left: 20px;
+    }
+
+    .level-3 {
+        padding-left: 30px;
+    }
+
+    .level-4 {
+        padding-left: 40px;
+    }
+
+    .bg-light {
+        --bs-bg-opacity: 1;
+        background-color: rgb(234 235 241) !important;
+    }
+
+    .border {
+        border: var(--bs-border-width) var(--bs-border-style) #277850 !important;
+    }
+
+    .img_color {
+        color: #930f26;
+    }
+</style>
+
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="noticeMessage" class="alert alert-dismissible fade d-none" role="alert">
+            <span id="noticeText"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class=" mt-2">
+            <!-- Main Content -->
+            <div class="row">
+                <!-- Add New Item Form -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fa fa-plus"></i> Add New Item</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="addItemForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Type <span style="color:red;">*</span></label>
+                                    <select class="form-control " id="itemType" required>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Parent</label>
+                                    <select class="form-control select2" id="parentSelect" onchange="GetLoadData()">
+                                        <option value="0">No Parent (Root Lebel)</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Name <span style="color:red;">*</span></label>
+                                    <select class="form-control select2 " id="itemName">
+                                        <option value=""> Select Name </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3" id="addressFields" style="display: none;">
+                                    <label class="form-label">Address Details</label>
+                                    <textarea class="form-control" id="addressDetails" rows="3"
+                                              placeholder="Enter full address"></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="text" class="form-control" id="phone"
+                                           placeholder="Phone number">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email"
+                                           placeholder="Email address">
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="clearForm()">
+                                    <i class="fa fa-times"></i>   Clear Form
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fa fa-plus"></i> Add Item
+                                </button>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hierarchy Display -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-sitemap"></i> Organization Configuration</h5>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm" onclick="loadSampleData()">
+                                    Load Sample
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="clearAllData()">
+                                    Clear All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="hierarchyContainer" class="hierarchy-tree">
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-info-circle"></i>
+                                    No data available. Add items or load sample data.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Summary -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-bar"></i> Data Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row" id="summaryContainer">
+                                <div class="col-md-2 text-center">
+                                    <div class="border rounded p-2">
+                                        <h6>Organizations</h6>
+                                        <span class="badge bg-secondary" id="orgCount">0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="border rounded p-2">
+                                        <h6>Branches</h6>
+                                        <span class="badge bg-secondary" id="branchCount">0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="border rounded p-2">
+                                        <h6>Sub-Branches</h6>
+                                        <span class="badge bg-secondary" id="subbranchCount">0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="border rounded p-2">
+                                        <h6>Booths</h6>
+                                        <span class="badge bg-secondary" id="boothCount">0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="border rounded p-2">
+                                        <h6>Addresses</h6>
+                                        <span class="badge bg-secondary" id="addressCount">0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="border rounded p-2">
+                                        <h6>Total Items</h6>
+                                        <span class="badge bg-primary" id="totalCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+<!-- Modal for Edit -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editItemId">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editItemName" disabled required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="editPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail">
+                    </div>
+                    <div class="mb-3" id="editAddressFields" style="display: none;">
+                        <label class="form-label">Address Details</label>
+                        <textarea class="form-control" id="editAddressDetails" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--  Modal content for the above example -->
+<div class="modal fade bs-example" id="dynamicModals" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div id="modaldata"></div>
+                </div>
+                <div id="modalData"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="SaveChange" class="btn btn-sm btn-primary waves-effect waves-light"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@section scripts {
+
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/select2/js/select2.min.js"></script>
+    <script src="~/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/libs/spectrum-colorpicker2/spectrum.min.js"></script>
+    <script src="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="~/libs/admin-resources/bootstrap-filestyle/bootstrap-filestyle.min.js"></script>
+    <script src="~/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+    <script src="~/js/pages/form-advanced.init.js"></script>
+    <script src="~/js/app.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+
+
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+        // Data storage
+        let hierarchyData = [];
+        let typeHierarchy=[];
+        let nextId = 1;
+        // Type icons
+        const typeIcons = {
+            Organization: 'fas fa-building',
+            Branch: 'fas fa-code-branch ',
+            SubBranch: 'fas fa-share-alt',
+            District:'fas fa-city',
+            Division:'fas fa-project-diagram',
+            Booth: 'fas fa-store',
+            Location: 'fas fa-map-marker-alt'
+        };
+
+
+         LoadType();
+         LoadtypeHierarchy();
+
+         function LoadtypeHierarchy(){
+             $.ajax({
+                 url:"/Configuration/Configuration/GettypeHierarchyData",
+                 type:"GET",
+                 contentType: 'application/json',
+                 success: function (res){
+                     typeHierarchy = res;
+                 }
+                // Convert object to array of objects
+
+             });
+         }
+
+        // const typeHierarchy = {
+        //     '4': null,   // Organization → no parent
+        //     '5': '4',    // Branch → Organization
+        //     '6': '5',    // Sub Branch → Branch
+        //     '7': '6',    // Booth → Sub Branch
+        //     '3': '7'     // Asset → Booth
+        // };
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.getElementById('addItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                //addNewItem();
+                addNewItemData();
+            });
+
+            // Type change handler
+            document.getElementById('itemType').addEventListener('change', function() {
+
+                 const dropdown = $('#itemName');
+                 dropdown.empty();
+                 dropdown.append('<option value="">Select Name</option>');
+                 const selectedType = this.value;
+                 const allowedParentType = typeHierarchy[selectedType];
+                 const parentSelect = document.getElementById('parentSelect');
+                 const itemvalue= document.getElementById('itemType').value
+                 parentSelect.innerHTML = '';
+
+
+                if (!allowedParentType) {
+                    // Root-level item
+                    parentSelect.innerHTML = '<option value="">No Parent (Root Level)</option>';
+                    LoadParentData(itemvalue);
+                    return;
+                }
+
+                LoadRootData(allowedParentType);
+            });
+
+            updateSummary();
+        });
+
+
+        function  LoadParentData(allowedParentType)
+        {
+
+             $.ajax({
+                 url:"/Configuration/Configuration/GetLoadRootData",
+                 type:"GET",
+                 contentType: 'application/json',
+                 data:{type: allowedParentType},
+                 success: function (res){
+                     if(res.group.length>0){
+                         const dropdown = $('#itemName');
+                         dropdown.empty();
+                         dropdown.append('<option value="">Select Name</option>');
+                         res.group.forEach(item => {
+                             dropdown.append(`<option value="${item.value}">${item.text}</option>`);
+                         });
+                     }else{
+                         const dropdown = $('#itemName');
+                         dropdown.empty();
+                         dropdown.append('<option value=""> Select Name</option>');
+                     }
+
+                 }
+             });
+
+        }
+
+        function LoadRootData(allowedParentType)
+        {
+           $.ajax({
+                 url:"/Configuration/Configuration/GetLoadRootData",
+                 type:"GET",
+                 contentType: 'application/json',
+                 data:{type: allowedParentType},
+                 success: function (res){
+                     if(res.group.length>0){
+                         const dropdown = $('#parentSelect');
+                         dropdown.empty();
+                         dropdown.append('<option value="">No Parent (Root Level)</option>');
+                         res.group.forEach(item => {
+                             dropdown.append(`<option value="${item.value}">${item.text}</option>`);
+                         });
+                     }else{
+                         const dropdown = $('#parentSelect');
+                         dropdown.empty();
+                         dropdown.append('<option value=""> No Parent (Root Level) </option>');
+                     }
+
+                 }
+             });
+        }
+
+        function GetLoadData(){
+              debugger;
+                 const selectedType = document.getElementById('parentSelect').value;
+                 LoadParentChildData(selectedType);
+
+         };
+
+         function LoadParentChildData(selectedType)
+         {
+             $.ajax({
+                 url:"/Configuration/Configuration/GetLoadChildenData",
+                 type:"GET",
+                 contentType: 'application/json',
+                 data:{type: selectedType},
+                 success: function (res){
+                     if(res.group.length>0){
+                         const dropdown = $('#itemName');
+                         dropdown.empty();
+                         dropdown.append('<option value="">Select Name</option>');
+                         res.group.forEach(item => {
+                             dropdown.append(`<option value="${item.value}">${item.text}</option>`);
+                         });
+                     }else{
+                         const dropdown = $('#itemName');
+                         dropdown.empty();
+                         dropdown.append('<option value=""> Select Name</option>');
+                     }
+
+                 }
+             });
+         }
+
+         function addNewItemData()
+         {
+             const itemname = document.getElementById('itemType')
+             const typename = itemname.options[itemname.selectedIndex].text;
+             const typeid=itemname.value.trim(); // this type id
+             const type=typename.split(' ')[0]; // type name like as orgnization, branch etc..
+             const parentId = document.getElementById('parentSelect').value || null; // parent id
+             const name = document.getElementById('itemName').value.trim(); // name id
+             const phone = document.getElementById('phone').value.trim();
+             const email = document.getElementById('email').value.trim();
+            if (!name || !type) {
+                showAlert('Please fill in required fields', 'warning');
+                return;
+            }
+
+            const newItem = {
+                SetupId: typeid,
+                Type: type,
+                NameId:name,
+                ParentId: parentId ? parseInt(parentId) : null,
+                phone: phone || null,
+                email: email || null,
+
+            };
+
+            $.ajax({
+                 url:"/Configuration/Configuration/ConfigurationSave",
+                 type:"POST",
+                 contentType: 'application/json',
+                 data:JSON.stringify(newItem),
+                 success: function (res){
+                     if(res.status){
+                        loadSampleData()
+                         showAlert('Data added successfully!', 'success');
+                     }else{
+                        alert('faild');
+                     }
+
+                 }
+             });
+         }
+
+        function toggleAddressFields(type) {
+            const addressFields = document.getElementById('addressFields');
+            addressFields.style.display = (type === 'address') ? 'block' : 'none';
+        }
+
+        function calculateLevel(parentId) {
+            if (!parentId) return 0;
+            const parent = hierarchyData.find(item => item.id == parentId);
+            return parent ? parent.level + 1 : 0;
+        }
+
+        function updateParentOptions() {
+            const parentSelect = document.getElementById('parentSelect');
+            const itemType = document.getElementById('itemType').value;
+            parentSelect.innerHTML = '<option value="">No Parent (Root Level)</option>';
+
+            const validParents = {
+                organization: [],
+                branch: ['organization'],
+                subbranch: ['branch'],
+                booth: ['branch', 'subbranch'],
+                address: ['booth']
+            };
+
+            if (validParents[itemType]) {
+                const eligibleParents = hierarchyData.filter(item =>
+                    validParents[itemType].includes(item.type)
+                );
+
+                eligibleParents.forEach(parent => {
+                    const option = document.createElement('option');
+                    option.value = parent.id;
+                    option.textContent = `${parent.name} (${parent.type})`;
+                    parentSelect.appendChild(option);
+                });
+            }
+        }
+
+        function renderHierarchy() {
+            const container = document.getElementById('hierarchyContainer');
+
+            if (hierarchyData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-info-circle"></i>
+                        No data available. Add items or load sample data.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            const rootItems = hierarchyData.filter(item => item.parentId === null);
+            rootItems.forEach(item => {
+                container.appendChild(createTreeNode(item));
+            });
+        }
+
+        function createTreeNode(item) {
+            const node = document.createElement('div');
+            node.className = `tree-item level-${item.level}`;
+            let contactInfo = '';
+            if (item.phone || item.email) {
+                contactInfo = '<div class="small text-muted mt-1">';
+                if (item.phone) contactInfo += `<i class="fas fa-phone img_color"></i> ${item.phone} `;
+                if (item.email) contactInfo += `<i class="fas fa-envelope img_color"></i> ${item.email}`;
+                contactInfo += '</div>';
+            }
+
+            let addressInfo = '';
+            if (item.address) {
+                addressInfo = `<div class="small text-muted mt-1">
+                    <i class="fas fa-map-marker-alt"></i> ${item.address}
+                </div>`;
+            }
+
+            node.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center">
+                            <i class="${typeIcons[item.type]} img_color me-2"></i>
+                            <strong>${item.name}</strong>
+                            <span class="badge bg-light text-dark ms-2">${item.type}</span>
+                        </div>
+                        ${addressInfo}
+                        ${contactInfo}
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" onclick="editItem(${item.id})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="deleteItem(${item.id})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Add children
+            const children = hierarchyData.filter(child => child.parentId === item.id);
+            if (children.length > 0) {
+                const childContainer = document.createElement('div');
+                childContainer.className = 'tree-node';
+                children.forEach(child => {
+                    childContainer.appendChild(createTreeNode(child));
+                });
+                node.appendChild(childContainer);
+            }
+
+            return node;
+        }
+
+        function editItem(id) {
+            const item = hierarchyData.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('editItemId').value = item.id;
+            document.getElementById('editItemName').value = item.name;
+            document.getElementById('editPhone').value = item.phone || '';
+            document.getElementById('editEmail').value = item.email || '';
+            document.getElementById('editAddressDetails').value = item.address || '';
+
+            const editAddressFields = document.getElementById('editAddressFields');
+            editAddressFields.style.display = (item.type === 'address') ? 'block' : 'none';
+
+            new bootstrap.Modal(document.getElementById('editModal')).show();
+        }
+
+        function saveEdit() {
+            const id = parseInt(document.getElementById('editItemId').value);
+            const item = hierarchyData.find(i => i.id === id);
+
+            if (item) {
+                item.name = document.getElementById('editItemName').value.trim();
+                item.phone = document.getElementById('editPhone').value.trim() || null;
+                item.email = document.getElementById('editEmail').value.trim() || null;
+                if (item.type === 'address') {
+                    item.address_details = document.getElementById('editAddressDetails').value.trim() || null;
+                }
+
+                renderHierarchy();
+                updateParentOptions();
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                showAlert('Item updated successfully!', 'success');
+            }
+        }
+
+        function deleteItem(id) {
+            if (!confirm('Are you sure you want to delete this item and all its children?')) {
+                return;
+            }
+            getAllDescendants(id, function (isSuccess) {
+                if (isSuccess) {
+                    renderHierarchy();
+                    updateParentOptions();
+                    updateSummary();
+                    showAlert(message || 'Item deleted successfully!', 'success');
+                } else {
+                   showAlert(message || 'Item deletion failed!', 'warning');
+                }
+            });
+
+        }
+
+        function getAllDescendants(parentId, callback) {
+            $.ajax({
+                url: "/Configuration/Configuration/ConfigurationDataDelete",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({ id: parentId }), // Must stringify and wrap in object
+                success: function (res) {
+                    if(res.status){
+                      callback(res.status, res.message);
+                    }
+                    else{
+                     callback(false, res.message);
+                    }
+
+                },
+                error: function () {
+                    callback(false);
+                }
+            });
+        }
+
+        function updateSummary() {
+            const counts = {
+                Organization: 0,
+                Branch: 0,
+                SubBranch: 0,
+                Booth: 0,
+                Location: 0
+            };
+
+            hierarchyData.forEach(item => {
+                if (counts.hasOwnProperty(item.type)) {
+                    counts[item.type]++;
+                }
+            });
+
+            document.getElementById('orgCount').textContent = counts.Organization;
+            document.getElementById('branchCount').textContent = counts.Branch;
+            document.getElementById('subbranchCount').textContent = counts.SubBranch;
+            document.getElementById('boothCount').textContent = counts.Booth;
+            document.getElementById('addressCount').textContent = counts.Location;
+            document.getElementById('totalCount').textContent = hierarchyData.length;
+        }
+
+        function clearForm() {
+            document.getElementById('addItemForm').reset();
+            document.getElementById('addressFields').style.display = 'none';
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                hierarchyData = [];
+                nextId = 1;
+                renderHierarchy();
+                updateParentOptions();
+                updateSummary();
+                showAlert('All data cleared!', 'info');
+            }
+        }
+
+        function loadSampleData() {
+            $.ajax({
+                 url:"/Configuration/Configuration/GetConfigurationData",
+                 type:"GET",
+                 contentType: 'application/json',
+                 success: function (res){
+                    if(res.result.length>0)
+                    {
+                        hierarchyData=res.result;
+
+                        renderHierarchy();
+                        updateParentOptions();
+                        updateSummary();
+                        clearForm();
+                        showAlert('Sample data loaded successfully!', 'success');
+                    }
+
+                 }
+             });
+
+        }
+
+        function LoadType()
+        {
+
+             $.ajax({
+                 url:"/Configuration/Configuration/GetTypeRootData",
+                 type:"GET",
+                 contentType: 'application/json',
+                 success: function (res){
+                     if(res.group.length>0){
+                         const dropdown = $('#itemType');
+                         dropdown.empty();
+                         dropdown.append('<option value="0"> Select Type </option>');
+                         res.group.forEach(item => {
+                             dropdown.append(`<option value="${item.value}">${item.text}</option>`);
+                         });
+                     }else{
+                         const dropdown = $('#itemType');
+                         dropdown.empty();
+                         dropdown.append('<option value="0">  Select Type </option>');
+                     }
+
+                 }
+             });
+
+        }
+
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 4000);
+        }
+</script>

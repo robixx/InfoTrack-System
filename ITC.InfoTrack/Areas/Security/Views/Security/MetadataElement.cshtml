@@ -1,0 +1,354 @@
+﻿@model List<ITC.InfoTrack.Model.ViewModel.MetaDataPropertyElementGetDto>
+@{
+    ViewBag.pTitle = "Metadata Element";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Metadata Element";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="~/libs/spectrum-colorpicker2/spectrum.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css/select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+</style>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Metadata Group Wise Element</h5>
+                <a class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2" id="metedataElementAdd">
+                    <i class="fa fa-plus"></i>
+                    Add Meta Element
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="noticeMessage" class="alert alert-dismissible fade d-none" role="alert">
+                    <span id="noticeText"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+               
+                <div class="row mt-2">
+                    <table id="datatable" class="table table-striped dt-responsive nowrap table-hover scheduleTable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead style=" background-color:#c9ccd3; font-weight:600;">
+                            <tr>
+                                <th>SL</th>
+                                <th>Element Name</th>
+                                <th>Property Name</th>
+                                <th>Parent Value</th>
+                                <th>View Order</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var status = item.isActive == true ? "Active" : "InActive";
+                                var badgeClass = item.isActive == true ? "badge bg-success" : "badge bg-danger";
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.MetaElement</td>
+                                    <td>@item.PropertyName</td>
+                                    <td>@item.ParentData</td>
+                                    <td>@item.ViewOrder</td>
+                                    <td>
+                                        <span class="@badgeClass">@status</span>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0);" class="btn-edit" data-id="@item.DataElementId"><i class="fa fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+<!--  Modal content for the above example -->
+<div class="modal fade bs-example" id="metaModals" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div id="modaldata"></div>
+                </div>
+                <div id="modalData"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="SaveChange" class="btn btn-sm btn-primary waves-effect waves-light"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    @*  <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script> *@
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    @*  <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script> *@
+    <script src="~/libs/select2/js/select2.min.js"></script>
+    <script src="~/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/libs/spectrum-colorpicker2/spectrum.min.js"></script>
+    <script src="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="~/libs/admin-resources/bootstrap-filestyle/bootstrap-filestyle.min.js"></script>
+    <script src="~/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+
+    <script src="~/js/pages/form-advanced.init.js"></script>
+    <script src="~/js/app.js"></script>
+    @*  <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script> *@
+    @*  <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script> *@
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+
+
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+        $(document).ready(function () {
+        const message = localStorage.getItem('metaSuccessMessage');
+
+        if (message) {
+            const notice = $('#noticeMessage');
+            const text = $('#noticeText');
+
+            // ✅ Show the alert
+            text.text(message);
+            notice.removeClass('d-none fade alert-danger');
+            notice.addClass('alert alert-success show');
+
+            // ✅ Remove message after showing
+            localStorage.removeItem('metaSuccessMessage');
+        }
+    });
+
+    $('#metedataElementAdd').on('click', function(){
+        $('#myModalLabel').text('Add Meta Data Element Title');
+        $('#SaveChange').text('Save');
+        metadataInsertDesign();
+        metaElementDropdown();
+        $('#metaModals').modal('show');
+
+    });
+
+
+    function metadataInsertDesign(){
+
+        var fielddata=document.getElementById('modalData');
+        var htmltext='';
+        htmltext +=`<div class="mb-3">
+                        <label for="metaelementTitle" class="form-label">Group Title</label>
+                         <select class="form-control select2" name="metaelementTitle" id="metaelementTitle">
+                        </select>
+                        <input type="hidden" id="dataelementId" name="dataelementId"/>
+                    </div>`;
+        htmltext +=`<div class="mb-3">
+                        <label for="parentValue" class="form-label">Parent Element Name</label>
+                         <select class="form-control select2" name="parentValue" id="parentValue">
+
+                        </select>
+                    </div>`;
+        htmltext +=`<div class="mb-3">
+                        <label for="propertyName" class="form-label">Property Value <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="propertyName" id="propertyName"/>
+                    </div>`;
+        htmltext +=`<div class="mb-3">
+                        <label for="orderview" class="form-label">Order View<span class="text-danger">*</span></label>
+                        <input type="number" min="1" value="1" class="form-control" name="orderview" id="orderview"/>
+                    </div>`;
+        htmltext +=`<div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" name="metaelementcheck" id="metaelementcheck"/>
+                        <label class="form-check-label" for="metaelementcheck">Is Active</label>
+                    </div>`;
+       fielddata.innerHTML=htmltext;
+
+         
+       $('.select2').select2({
+            dropdownParent: $('#metaModals'), // replace with your actual modal ID (e.g. #exampleModal)
+            width: '100%',
+            placeholder: 'Select option'
+       });
+    };
+
+    $('#SaveChange').on('click', function(){
+        var dataElementId=$('#dataelementId').val().trim()===''?0:$('#dataelementId').val().trim();
+        var groupId=$('#metaelementTitle').val().trim();
+        var parentValueId=$('#parentValue').val().trim();
+        var propertyName=$('#propertyName').val().trim();
+        var orderview=$('#orderview').val().trim();
+        var isActive=$('#metaelementcheck').is(':checked');
+        var model={
+                    dataElementId :dataElementId,
+                    groupId:groupId,
+                    parentValueId:parentValueId,
+                    propertyName:propertyName,
+                    orderview:orderview,
+                    isActive:isActive,
+                };
+         $.ajax({
+               url: '/Security/Security/MetaElementPropertySave',
+               type: 'POST',
+               contentType: 'application/json',
+               data: JSON.stringify(model),
+               success: function (res) {
+                   const notice= $('#noticeMessage');
+                   const text=$('#noticeText');
+                   notice.removeClass('alert-success alert-danger');
+                if(!res.status){
+
+                        text.text(res.message);
+                        $('#noticeMessage').removeClass('d-none fade').addClass('alert-danger show');
+
+                 }else{
+                       localStorage.setItem('metaSuccessMessage', res.message);
+                        // ✅ Reload the page
+                        location.reload();
+                 }
+                     $('#metaModals').modal('hide');
+                 },
+                 error: function (err) {
+                        alert('Error while saving.');
+               }
+         });
+
+    });
+
+
+     $(".btn-edit").click(function () {
+      var metadata = $(this).data("id");
+       $('#myModalLabel').text('Edit Metadata Property Element Title');
+        $('#SaveChange').text('Update');
+         metadataInsertDesign();
+         EditMetaData(metadata);
+        $('#metaModals').modal('show');
+
+
+     });
+
+
+     function EditMetaData(id){
+
+       $.ajax({
+          url: '/Security/Security/MetadataPropertyElementEdit',
+          type: 'GET',
+          contentType: 'application/json',
+          data: {dataelementid:id},
+          success: function (res) {
+              if(res.status){
+                $('#dataelementId').val(res.data.dataElementId);
+                $('#metaelementTitle').val(res.data.groupId);
+                $('#parentValue').val(res.data.parentValueId);
+                $('#propertyName').val(res.data.propertyName);
+                $('#orderview').val(res.data.orderview);
+                $('#metaelementcheck').prop('checked', res.data.isActive);
+                metaElementDropdown(res.data.groupId, res.data.parentValueId);
+              }
+          },
+              error: function (err) {
+               alert('Error while saving.');
+           }
+        });
+
+     };
+
+     function metaElementDropdown(selectedGroupId = 0, selectedParentId = 0){
+         $.ajax({
+             url:"/Security/Security/GetMetaElement",
+             type:"GET",
+             contentType: 'application/json',
+             success: function (res){
+                 if(res.group.length>0){
+                     const dropdown = $('#metaelementTitle');
+                     dropdown.empty();
+                     dropdown.append('<option value="0"> Select Group Element </option>');
+                     res.group.forEach(item => {
+                         const selected = item.value == selectedGroupId ? 'selected' : '';
+                         dropdown.append(`<option value="${item.value}" ${selected}>${item.text}</option>`);
+                     });
+                 }else{
+                     const dropdown = $('#metaelementTitle');
+                     dropdown.empty();
+                     dropdown.append('<option value="0"> Select Group Element</option>');
+                 }
+                 if(res.parent.length>0){
+                     const dropdown = $('#parentValue');
+                     dropdown.empty();
+                     dropdown.append('<option value="0">Root</option>');
+                     res.parent.forEach(item => {
+                         const selected = item.value == selectedParentId ? 'selected' : '';
+                         dropdown.append(`<option value="${item.value}" ${selected}>${item.text}</option>`);
+                     });
+                 }else{
+                       const dropdown = $('#parentValue');
+                         dropdown.empty();
+                         dropdown.append('<option value="0">Root</option>');
+                 }
+             }
+         });
+
+     };
+
+
+
+
+</script>

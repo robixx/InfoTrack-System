@@ -1,0 +1,1919 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Bank - Data Collection System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="~/css/worker-custom.css" rel="stylesheet" />
+    <style>
+        :root {
+            --city-red: #9f2b2b;
+            --city-red-dark: #c82333;
+            --city-green: #28a745;
+            --city-blue: #007bff;
+            --city-gray: #6c757d;
+            --city-light-gray: #f8f9fa;
+            --city-border: #dee2e6;
+            --city-white: #ffffff;
+            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            --border-radius: 0.375rem;
+            --bgcustom: #f5f6fa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1eeef ;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .header-section {
+            /* background: linear-gradient(135deg, var(--city-red) 0%, var(--city-red-dark) 100%);
+                                    color: var(--city-white); */
+            background: linear-gradient(135deg, #fffbfb 0%, #f8f9fa 100%);
+            color: #9f2b2b;
+            padding: 0.5rem 0;
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .logo-container img {
+            height: 50px;
+            /* filter: brightness(0) invert(1); */
+        }
+
+        .header-text h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        small {
+            font-size: 0.5rem !important;
+        }
+
+        .header-text p {
+            font-size: 0.7rem;
+            margin: 0;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Success Badge */
+        .success-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--city-green);
+            color: var(--city-white);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Form Sections */
+        .form-section {
+            background: var(--city-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            border: 1px solid var(--city-border);
+            overflow: visible; /* Changed from hidden to visible for dropdowns */
+            position: relative;
+        }
+
+        .section-header {
+            background: var(--city-light-gray);
+            padding: 0.5rem 1rem !important;
+            border-bottom: 1px solid var(--city-border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .section-header h5 {
+                margin: 0;
+                font-weight: 600;
+                color: var(--city-red);
+                font-size: 0.8rem;
+            }
+
+            .section-header i {
+                color: var(--city-red);
+                font-size: 1.2rem;
+            }
+
+        .section-body {
+            padding: 2rem 1.5rem;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.7rem !important;
+        }
+
+            .form-label i {
+                color: var(--city-red);
+                font-size: 0.9rem;
+            }
+
+        .required {
+            color: var(--city-red);
+            margin-left: 0.25rem;
+        }
+
+        /* Custom Dropdown Styles - CORRECTED */
+        .custom-dropdown {
+            position: relative;
+            z-index: 10;
+        }
+
+            .custom-dropdown.active {
+                z-index: 1060; /* Higher z-index when active */
+            }
+
+        .dropdown-input {
+            width: 100%;
+            /*  padding: 0.75rem 2.5rem 0.75rem 1rem; */
+            padding: 0.4rem 0.4rem 0.4rem 1rem;
+            border: 1px solid var(--city-border);
+            border-radius: var(--border-radius);
+            background: var(--city-white);
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+            .dropdown-input:hover:not(:disabled) {
+                border-color: var(--city-red);
+            }
+
+            .dropdown-input:focus,
+            .dropdown-input.active {
+                border-color: var(--city-red);
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+                outline: none;
+            }
+
+            .dropdown-input:disabled {
+                background-color: #f8f9fa;
+                color: var(--city-gray);
+                cursor: not-allowed;
+                border-color: var(--city-border);
+            }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--city-gray);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .custom-dropdown.active .dropdown-arrow {
+            transform: translateY(-50%) rotate(180deg);
+            color: var(--city-red);
+        }
+
+        /* Dropdown Menu - CORRECTED */
+        .dropdown-menu-custom {
+            position: absolute;
+            top: calc(100% + 0.25rem);
+            left: 0;
+            right: 0;
+            background: var(--city-white);
+            border: 1px solid var(--city-red);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1070;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 350px;
+            overflow: hidden;
+            min-width: 100%;
+        }
+
+            .dropdown-menu-custom.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+        .dropdown-search {
+            padding: 0.7rem;
+            border-bottom: 1px solid var(--city-border);
+            background: var(--city-light-gray);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+            .dropdown-search input {
+                width: 100%;
+                padding: 0.4rem 0.4rem;
+                border: 1px solid var(--city-border);
+                border-radius: calc(var(--border-radius) - 1px);
+                font-size: 0.7rem;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+                .dropdown-search input:focus {
+                    border-color: var(--city-red);
+                    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+                }
+
+        .dropdown-list {
+            max-height: 250px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .dropdown-item-custom {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+            .dropdown-item-custom:hover {
+                background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+                color: var(--city-red);
+            }
+
+            .dropdown-item-custom:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-item-custom i {
+                color: var(--city-red);
+                font-size: 0.85rem;
+                flex-shrink: 0;
+            }
+
+            .dropdown-item-custom.no-results {
+                color: var(--city-gray);
+                font-style: italic;
+                cursor: default;
+            }
+
+                .dropdown-item-custom.no-results:hover {
+                    background: none;
+                    color: var(--city-gray);
+                }
+
+        /* Textarea */
+        .form-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 1px solid var(--city-border);
+            border-radius: var(--border-radius);
+            background: var(--city-white);
+            font-size: 0.7rem;
+            color: #2c3e50;
+            resize: vertical;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: inherit;
+        }
+
+            .form-textarea:focus {
+                border-color: var(--city-red);
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            }
+
+            .form-textarea::placeholder {
+                color: var(--city-gray);
+            }
+
+        .form-text {
+            font-size: 0.6rem;
+            color: var(--city-gray);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Upload Section */
+        .upload-zone {
+            border: 1px dashed var(--city-border);
+            border-radius: var(--border-radius);
+           /*  padding: 1.2rem; */
+            text-align: center;
+            background: var(--city-light-gray);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+
+            .upload-zone:hover {
+                border-color: var(--city-red);
+                background: rgba(220, 53, 69, 0.05);
+            }
+
+            .upload-zone.dragover {
+                border-color: var(--city-green);
+                background: rgba(40, 167, 69, 0.1);
+                transform: scale(1.02);
+            }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: var(--city-red);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            font-size: 0.7rem;
+            color: var(--city-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--city-red) 0%, var(--city-red-dark) 100%);
+            border: none;
+            color: var(--city-white);
+            padding: 0.4rem 1.5rem;
+            font-size: 0.8rem !important;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-primary-custom:hover {
+                background: linear-gradient(135deg, var(--city-red-dark) 0%, #a71e2a 100%);
+                transform: translateY(-1px);
+                box-shadow: var(--shadow);
+                color: var(--city-white);
+            }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid var(--city-red);
+            color: var(--city-red);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-outline-custom:hover {
+                background: var(--city-red);
+                color: var(--city-white);
+                transform: translateY(-1px);
+            }
+
+        /* File Preview */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: var(--city-light-gray);
+            border: 2px solid var(--city-border);
+            transition: all 0.3s ease;
+            aspect-ratio: 1;
+        }
+
+            .preview-item:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow);
+                border-color: var(--city-red);
+            }
+
+        .preview-image,
+        .preview-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-file {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--city-red);
+            color: var(--city-white);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .remove-file:hover {
+                background: var(--city-red-dark);
+                transform: scale(1.1);
+            }
+
+        /* Submit Section */
+        .submit-section {
+            text-align: center;
+            padding: 1rem;
+            background: var(--city-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--city-border);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--city-green) 0%, #20c997 100%);
+            border: none;
+            color: var(--city-white);
+            padding: 0.4rem 0.4rem;
+            border-radius: var(--border-radius);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+            .btn-submit:hover {
+                background: linear-gradient(135deg, #ac5035 0%, #9c1f34 100%);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow);
+                color: var(--city-white);
+            }
+
+            .btn-submit:disabled {
+                background: var(--city-gray);
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+        /* Progress Bar */
+        .upload-progress {
+            margin-top: 0.7rem;
+            display: none;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(220, 53, 69, 0.1);
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--city-red), var(--city-red-dark));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+        /* Custom Scrollbar */
+        .dropdown-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .dropdown-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .dropdown-list::-webkit-scrollbar-thumb {
+            background: var(--city-red);
+            border-radius: 3px;
+        }
+
+            .dropdown-list::-webkit-scrollbar-thumb:hover {
+                background: var(--city-red-dark);
+            }
+
+        /* Dropdown overlay for mobile */
+        .dropdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 1050;
+            display: none;
+        }
+
+            .dropdown-overlay.show {
+                display: block;
+            }
+
+        .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%; /* Position below the username */
+            min-width: 160px;
+            z-index: 1000;
+            background-color: white;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0.25rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+            display: none; /* Hidden by default */
+            opacity: 0; /* For smooth fade-in */
+            transition: opacity 0.3s ease-in-out;
+            padding-top: 0.5rem; /* Adjust padding for better look */
+            padding-bottom: 0.5rem; /* Adjust padding for better look */
+        }
+
+            .user-dropdown-menu.show {
+                display: block;
+                opacity: 1;
+            }
+
+        .user-dropdown-toggle {
+            cursor: pointer;
+        }
+
+        /* Style for the dropdown items to include icons */
+        .user-dropdown-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem; /* Consistent padding */
+        }
+
+            .user-dropdown-menu .dropdown-item i {
+                margin-right: 0.5rem; /* Space between icon and text */
+                font-size: 1.1em; /* Slightly larger icon */
+                color: #9f2b2b; /* Muted color for icons */
+            }
+
+        /* Style for the dropdown header */
+        .user-dropdown-menu .dropdown-header {
+            padding: 0.5rem 1rem;
+            font-size: 0.875em; /* Slightly smaller text */
+            color: #6c757d; /* Muted color */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.075); /* Subtle line below header */
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .user-dropdown-menu .dropdown-item:hover{
+            background: #fbe0e0;
+            border-left:1px solid red;
+        }
+
+        .header-logo {
+            max-height: 40px; /* Adjust as needed */
+            width: auto;
+        }
+
+        .design-user{
+            color: #2c3e50;
+        }
+        .design-user:hover{
+            color: darkred;
+            
+        }
+    </style>
+</head>
+<body>
+    <!-- Dropdown Overlay for Mobile -->
+    <div class="dropdown-overlay" id="dropdownOverlay"></div>
+
+    <!-- Header Section -->
+    
+    <header class="navbar navbar-expand-lg navbar-light bg-light shadow-sm py-3">
+        <div class="container">
+            <div class="d-flex flex-grow-1 align-items-center justify-content-between justify-content-lg-start">
+                <a class="navbar-brand d-flex align-items-center flex-column flex-lg-row navbar-brand-stacked" href="#">
+                    <img src="~/images/logo.png" alt="City Bank Logo" class="header-logo">
+                    <span class="fw-bold fs-5 header-title mt-2 mt-lg-0 ms-lg-2" style="color:darkred;">City Bank Data Collection</span>
+                </a>
+
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse justify-content-lg-end" id="navbarNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown position-relative">
+                        <a class="nav-link user-dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" aria-expanded="false">
+                            <span class="me-2 design-user" style="font-size:0.8rem; font-weight:600;">Wellcome, Jaks Sparo</span>
+                            <img src="https://placehold.co/40x40/2ecc71/ffffff?text=JS" width="25" alt="User Avatar" class="rounded-circle">
+                        </a>
+                        <div class="user-dropdown-menu" aria-labelledby="navbarDropdown" style="font-size:0.8rem;">
+                            <h6 class="dropdown-header">Logged in as Jaks Sparo</h6>
+                            <a class="dropdown-item" href="#">
+                                <i class="bi bi-person-circle"></i> Profile
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <i class="bi bi-gear-fill"></i> Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <form id="bankDataForm" enctype="multipart/form-data">
+            <!-- Banking Information Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-building"></i>
+                    <h5>Banking Information</h5>
+                </div>
+                <div class="section-body">
+                    <div class="row g-4">
+                        <!-- Bank Selection -->
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-bank"></i>
+                                    Select Bank <span class="required">*</span>
+                                </label>
+                                <div class="custom-dropdown" id="bankDropdown">
+                                    <input type="text" class="dropdown-input" id="bankInput"
+                                           placeholder="Choose Bank..." readonly required>
+                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
+                                    <div class="dropdown-menu-custom" id="bankMenu">
+                                        <div class="dropdown-search">
+                                            <input type="text" id="bankSearch" placeholder="Search banks...">
+                                        </div>
+                                        <div class="dropdown-list" id="bankList"></div>
+                                    </div>
+                                    <input type="hidden" id="selectedBank" name="bank">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Branch Selection -->
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Select Branch <span class="required">*</span>
+                                </label>
+                                <div class="custom-dropdown" id="branchDropdown">
+                                    <input type="text" class="dropdown-input" id="branchInput"
+                                           placeholder="Choose Branch..." readonly disabled required>
+                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
+                                    <div class="dropdown-menu-custom" id="branchMenu">
+                                        <div class="dropdown-search">
+                                            <input type="text" id="branchSearch" placeholder="Search branches...">
+                                        </div>
+                                        <div class="dropdown-list" id="branchList"></div>
+                                    </div>
+                                    <input type="hidden" id="selectedBranch" name="branch">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-Branch Selection -->
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-diagram-3"></i>
+                                    Select Sub-Branch
+                                </label>
+                                <div class="custom-dropdown" id="subBranchDropdown">
+                                    <input type="text" class="dropdown-input" id="subBranchInput"
+                                           placeholder="Choose Sub-Branch..." readonly disabled>
+                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
+                                    <div class="dropdown-menu-custom" id="subBranchMenu">
+                                        <div class="dropdown-search">
+                                            <input type="text" id="subBranchSearch" placeholder="Search sub-branches...">
+                                        </div>
+                                        <div class="dropdown-list" id="subBranchList"></div>
+                                    </div>
+                                    <input type="hidden" id="selectedSubBranch" name="subBranch">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Booth Selection -->
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-shop"></i>
+                                    Select Booth
+                                </label>
+                                <div class="custom-dropdown" id="boothDropdown">
+                                    <input type="text" class="dropdown-input" id="boothInput"
+                                           placeholder="Choose Booth..." readonly disabled>
+                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
+                                    <div class="dropdown-menu-custom" id="boothMenu">
+                                        <div class="dropdown-search">
+                                            <input type="text" id="boothSearch" placeholder="Search booths...">
+                                        </div>
+                                        <div class="dropdown-list" id="boothList"></div>
+                                    </div>
+                                    <input type="hidden" id="selectedBooth" name="booth">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-chat-text"></i>
+                    <h5>Comments & Observations</h5>
+                </div>
+                <div class="section-body">
+                    <div class="form-group">
+                        <label for="comments" class="form-label">
+                            <i class="bi bi-pencil-square"></i>
+                            Detailed Comments
+                        </label>
+                        <textarea class="form-textarea" id="comments" rows="4"
+                                  placeholder="Enter your detailed comments, observations, notes or any important information..."></textarea>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Provide comprehensive information about reason.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Upload Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-camera"></i>
+                    <h5>Photos & Media Files</h5>
+                </div>
+                <div class="section-body">
+                    <!-- File Upload Area -->
+                    <div class="upload-zone" id="uploadArea">
+                        <i class="bi bi-cloud-upload upload-icon"></i>
+                        <div class="upload-text">Drag & Drop Files Here</div>
+                        <div class="upload-subtext">or click to browse and select files</div>
+                        <div class="upload-subtext">
+                            <strong>Supported Formats:</strong> JPG, PNG, GIF, MP4, MOV, AVI (Max: 50MB each)
+                        </div>
+                        <input type="file" id="fileInput" class="d-none" multiple
+                               accept="image/*,video/*" capture="environment">
+                    </div>
+
+                    <!-- Camera Controls -->
+                    <div class="row g-3 mb-4">
+                        <div class="offset-md-2 col-md-4">
+                            <button type="button" class="btn-primary-custom w-100" id="takePhotoBtn">
+                                <i class="bi bi-camera-fill"></i>
+                                Take Photo
+                            </button>
+                        </div>
+                        <div class="col-md-4 d-none">
+                            <button type="button" class="btn-primary-custom w-100" id="recordVideoBtn">
+                                <i class="bi bi-camera-video-fill"></i>
+                                Record Video
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn-primary-custom w-100" id="selectFilesBtn">
+                                <i class="bi bi-folder2-open"></i>
+                                Browse Files
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Video Preview -->
+                    <div class="text-center mb-4">
+                        <video id="videoPreview" controls class="d-none rounded" style="max-width: 100%; max-height: 300px;"></video>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted fw-semibold">Uploading files...</small>
+                            <small class="text-muted fw-semibold" id="progressText">0%</small>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- File Preview -->
+                    <div class="d-none" id="filePreview">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-images me-2"></i>
+                            Selected Files (<span id="fileCount">0</span>)
+                        </h6>
+                        <div class="preview-grid" id="previewGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Section -->
+            <div class="submit-section">
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="bi bi-send-fill me-2"></i>
+                    Submit Data
+                    <div class="spinner-border spinner-border-sm ms-2 d-none" id="loadingSpinner"></div>
+                </button>
+                <div class="mt-3">
+                    <small class="text-muted fw-semibold">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Your data is securely encrypted and protected
+                    </small>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+         document.addEventListener('DOMContentLoaded', function () {
+            const userDropdownToggle = document.querySelector('.user-dropdown-toggle');
+            const userDropdownMenu = document.querySelector('.user-dropdown-menu');
+
+            if (userDropdownToggle && userDropdownMenu) {
+                userDropdownToggle.addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent default link behavior
+                    userDropdownMenu.classList.toggle('show');
+                });
+
+                // Close the dropdown if the user clicks outside of it
+                document.addEventListener('click', function (event) {
+                    if (!userDropdownToggle.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+                        userDropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+        });
+
+
+
+
+
+        // Enhanced Bangladesh Bank Data Structure
+        const bankData = {
+            'city-bank': {
+                name: 'City Bank Limited',
+                branches: {
+                    'dhaka-main': {
+                        name: 'Dhaka Main Branch',
+                        subBranches: {
+                            'gulshan': {
+                                name: 'Gulshan Sub Branch',
+                                booths: ['ATM Booth 1', 'ATM Booth 2', 'Customer Service Booth', 'Cash Deposit Machine', 'Mobile Banking Booth']
+                            },
+                            'dhanmondi': {
+                                name: 'Dhanmondi Sub Branch',
+                                booths: ['ATM Booth 3', 'ATM Booth 4', 'Priority Banking Booth', 'Loan Service Booth']
+                            },
+                            'uttara': {
+                                name: 'Uttara Sub Branch',
+                                booths: ['ATM Booth 5', 'ATM Booth 6', 'Corporate Banking Booth', 'Investment Booth']
+                            },
+                            'motijheel': {
+                                name: 'Motijheel Sub Branch',
+                                booths: ['ATM Booth 7', 'Foreign Exchange Booth', 'Trade Finance Booth', 'SME Banking Booth']
+                            },
+                            'banani': {
+                                name: 'Banani Sub Branch',
+                                booths: ['ATM Booth 8', 'Premium Banking Booth', 'Digital Banking Booth']
+                            }
+                        }
+                    },
+                    'chittagong': {
+                        name: 'Chittagong Branch',
+                        subBranches: {
+                            'agrabad': {
+                                name: 'Agrabad Sub Branch',
+                                booths: ['ATM Booth 9', 'ATM Booth 10', 'Trade Finance Booth', 'Export-Import Booth']
+                            },
+                            'nasirabad': {
+                                name: 'Nasirabad Sub Branch',
+                                booths: ['ATM Booth 11', 'SME Banking Booth', 'Rural Banking Booth']
+                            },
+                            'gec': {
+                                name: 'GEC Sub Branch',
+                                booths: ['ATM Booth 12', 'Student Banking Booth', 'Agent Banking Booth']
+                            },
+                            'pahartali': {
+                                name: 'Pahartali Sub Branch',
+                                booths: ['ATM Booth 13', 'Micro Finance Booth']
+                            }
+                        }
+                    },
+                    'sylhet': {
+                        name: 'Sylhet Branch',
+                        subBranches: {
+                            'zindabazar': {
+                                name: 'Zindabazar Sub Branch',
+                                booths: ['ATM Booth 14', 'ATM Booth 15', 'Remittance Booth', 'Islamic Banking Booth']
+                            },
+                            'amberkhana': {
+                                name: 'Amberkhana Sub Branch',
+                                booths: ['ATM Booth 16', 'Women Banking Booth', 'School Banking Booth']
+                            },
+                            'upashahar': {
+                                name: 'Upashahar Sub Branch',
+                                booths: ['ATM Booth 17', 'Agent Banking Booth']
+                            }
+                        }
+                    },
+                    'rajshahi': {
+                        name: 'Rajshahi Branch',
+                        subBranches: {
+                            'shaheb-bazar': {
+                                name: 'Shaheb Bazar Sub Branch',
+                                booths: ['ATM Booth 18', 'Agricultural Banking Booth', 'Rural Development Booth']
+                            },
+                            'new-market': {
+                                name: 'New Market Sub Branch',
+                                booths: ['ATM Booth 19', 'Digital Banking Booth', 'SME Service Booth']
+                            }
+                        }
+                    }
+                }
+            },
+            'dutch-bangla-bank': {
+                name: 'Dutch Bangla Bank Limited',
+                branches: {
+                    'dhaka-corporate': {
+                        name: 'Dhaka Corporate Branch',
+                        subBranches: {
+                            'panthapath': {
+                                name: 'Panthapath Sub Branch',
+                                booths: ['ATM Booth 20', 'ATM Booth 21', 'Fast Track Booth', 'Corporate Banking Booth']
+                            },
+                            'wari': {
+                                name: 'Wari Sub Branch',
+                                booths: ['ATM Booth 22', 'Priority Banking Booth', 'Business Banking Booth']
+                            },
+                            'tejgaon': {
+                                name: 'Tejgaon Sub Branch',
+                                booths: ['ATM Booth 23', 'Industrial Banking Booth', 'Trade Finance Booth']
+                            }
+                        }
+                    },
+                    'chittagong-port': {
+                        name: 'Chittagong Port Branch',
+                        subBranches: {
+                            'khatunganj': {
+                                name: 'Khatunganj Sub Branch',
+                                booths: ['ATM Booth 24', 'Export-Import Booth', 'Merchant Banking Booth']
+                            },
+                            'chawkbazar': {
+                                name: 'Chawkbazar Sub Branch',
+                                booths: ['ATM Booth 25', 'Trade Finance Booth', 'SME Banking Booth']
+                            }
+                        }
+                    }
+                }
+            },
+            'brac-bank': {
+                name: 'BRAC Bank Limited',
+                branches: {
+                    'dhaka-business': {
+                        name: 'Dhaka Business Branch',
+                        subBranches: {
+                            'karwan-bazar': {
+                                name: 'Karwan Bazar Sub Branch',
+                                booths: ['ATM Booth 26', 'ATM Booth 27', 'SME Service Booth', 'Business Banking Booth']
+                            },
+                            'elephant-road': {
+                                name: 'Elephant Road Sub Branch',
+                                booths: ['ATM Booth 28', 'Retail Banking Booth', 'Micro Finance Booth']
+                            },
+                            'mirpur': {
+                                name: 'Mirpur Sub Branch',
+                                booths: ['ATM Booth 29', 'Agent Banking Booth', 'Women Banking Booth']
+                            }
+                        }
+                    },
+                    'sylhet-business': {
+                        name: 'Sylhet Business Branch',
+                        subBranches: {
+                            'bondor-bazar': {
+                                name: 'Bondor Bazar Sub Branch',
+                                booths: ['ATM Booth 30', 'Agent Banking Booth', 'School Banking Booth']
+                            },
+                            'chowhatta': {
+                                name: 'Chowhatta Sub Branch',
+                                booths: ['ATM Booth 31', 'Rural Banking Booth']
+                            }
+                        }
+                    }
+                }
+            },
+            'standard-chartered': {
+                name: 'Standard Chartered Bank',
+                branches: {
+                    'dhaka-premium': {
+                        name: 'Dhaka Premium Branch',
+                        subBranches: {
+                            'motijheel-premium': {
+                                name: 'Motijheel Premium Sub Branch',
+                                booths: ['Premium ATM 1', 'Premium Banking Booth', 'International Banking Booth', 'Private Banking Booth']
+                            },
+                            'gulshan-premium': {
+                                name: 'Gulshan Premium Sub Branch',
+                                booths: ['Premium ATM 2', 'Wealth Management Booth', 'Corporate Banking Booth']
+                            }
+                        }
+                    }
+                }
+            },
+            'hsbc-bangladesh': {
+                name: 'HSBC Bangladesh',
+                branches: {
+                    'dhaka-corporate': {
+                        name: 'Dhaka Corporate Branch',
+                        subBranches: {
+                            'dilkusha': {
+                                name: 'Dilkusha Sub Branch',
+                                booths: ['Corporate ATM 1', 'Corporate Banking Booth', 'Private Banking Booth', 'International Trade Booth']
+                            },
+                            'gulshan-corporate': {
+                                name: 'Gulshan Corporate Sub Branch',
+                                booths: ['Corporate ATM 2', 'Investment Banking Booth']
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Global variables
+        let selectedFiles = [];
+        let mediaStream = null;
+        let isRecording = false;
+        let mediaRecorder = null;
+        let activeDropdown = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeDropdowns();
+            initializeEventListeners();
+            initializeDragAndDrop();
+            updateFileCount();
+        });
+
+        // Initialize all dropdowns - CORRECTED FOR SELECTION
+        function initializeDropdowns() {
+            // Initialize bank dropdown
+            const bankKeys = Object.keys(bankData);
+            populateDropdown('bank', bankKeys);
+            setupDropdownEvents('bank', bankKeys, selectBank);
+        }
+
+        // Setup dropdown events - CORRECTED FOR SELECTION
+        function setupDropdownEvents(type, options, onSelect) {
+            const dropdown = document.getElementById(`${type}Dropdown`);
+            const input = document.getElementById(`${type}Input`);
+            const menu = document.getElementById(`${type}Menu`);
+            const searchInput = document.getElementById(`${type}Search`);
+            const overlay = document.getElementById('dropdownOverlay');
+
+            // Toggle dropdown on input click
+            input.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!this.disabled) {
+                    toggleDropdown(type);
+                }
+            });
+
+            // Search functionality
+            if (searchInput) {
+                searchInput.addEventListener('input', function (e) {
+                    e.stopPropagation();
+                    const query = this.value.toLowerCase();
+                    filterDropdownOptions(type, options, query, onSelect);
+                });
+
+                searchInput.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+
+                // Clear search on dropdown open
+                searchInput.addEventListener('focus', function() {
+                    this.select();
+                });
+            }
+
+            // Close dropdown when clicking overlay
+            overlay.addEventListener('click', function() {
+                closeAllDropdowns();
+            });
+        }
+
+        // Populate dropdown with options - CORRECTED FOR SELECTION
+        function populateDropdown(type, options, onSelect = null) {
+            const list = document.getElementById(`${type}List`);
+            if (!list) return;
+
+            list.innerHTML = '';
+
+            if (!options || options.length === 0) {
+                const noResultsItem = document.createElement('div');
+                noResultsItem.className = 'dropdown-item-custom no-results';
+                noResultsItem.innerHTML = '<i class="bi bi-info-circle"></i>No options available';
+                list.appendChild(noResultsItem);
+                return;
+            }
+
+            options.forEach(option => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item-custom';
+                item.setAttribute('data-value', option);
+                const displayText = getDisplayText(option, type);
+                const icon = getIconForType(type);
+
+                item.innerHTML = `<i class="bi bi-${icon}"></i><span>${displayText}</span>`;
+
+                // Add click event listener for selection
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Determine which selection function to call
+                    if (type === 'bank') {
+                        selectBank(option);
+                    } else if (type === 'branch') {
+                        selectBranch(option);
+                    } else if (type === 'subBranch') {
+                        selectSubBranch(option);
+                    } else if (type === 'booth') {
+                        selectBooth(option);
+                    }
+
+                    closeAllDropdowns();
+                });
+
+                list.appendChild(item);
+            });
+        }
+
+        // Filter dropdown options based on search - CORRECTED FOR SELECTION
+        function filterDropdownOptions(type, allOptions, query, onSelect) {
+            if (!query.trim()) {
+                populateDropdown(type, allOptions, onSelect);
+                return;
+            }
+
+            const filteredOptions = allOptions.filter(option => {
+                const displayText = getDisplayText(option, type);
+                return displayText.toLowerCase().includes(query);
+            });
+
+            // Use the same populateDropdown function which now handles selection properly
+            populateDropdown(type, filteredOptions, onSelect);
+        }
+
+        // Get display text for option
+        function getDisplayText(option, type) {
+            try {
+                if (type === 'bank') {
+                    return bankData[option]?.name || option;
+                } else if (type === 'branch') {
+                    const bankKey = document.getElementById('selectedBank').value;
+                    return bankData[bankKey]?.branches[option]?.name || option;
+                } else if (type === 'subBranch') {
+                    const bankKey = document.getElementById('selectedBank').value;
+                    const branchKey = document.getElementById('selectedBranch').value;
+                    return bankData[bankKey]?.branches[branchKey]?.subBranches[option]?.name || option;
+                } else if (type === 'booth') {
+                    return option;
+                }
+                return option;
+            } catch (error) {
+                console.error('Error getting display text:', error);
+                return option;
+            }
+        }
+
+        // Selection handlers
+        function selectBank(bankKey) {
+            try {
+                const bankInfo = bankData[bankKey];
+                if (!bankInfo) return;
+
+                document.getElementById('selectedBank').value = bankKey;
+                document.getElementById('bankInput').value = bankInfo.name;
+
+                // Enable and populate branch dropdown
+                const branchKeys = Object.keys(bankInfo.branches);
+                enableDropdown('branch');
+                populateDropdown('branch', branchKeys, selectBranch);
+                setupDropdownEvents('branch', branchKeys, selectBranch);
+
+                // Reset dependent dropdowns
+                resetDropdown('subBranch');
+                resetDropdown('booth');
+
+                showToast(`Selected: ${bankInfo.name}`, 'success');
+                updateSuccessBadge(`Selected: ${bankInfo.name}`);
+            } catch (error) {
+                console.error('Error selecting bank:', error);
+                showToast('Error selecting bank', 'danger');
+            }
+        }
+
+        function selectBranch(branchKey) {
+            try {
+                const bankKey = document.getElementById('selectedBank').value;
+                const branchInfo = bankData[bankKey]?.branches[branchKey];
+                if (!branchInfo) return;
+
+                document.getElementById('selectedBranch').value = branchKey;
+                document.getElementById('branchInput').value = branchInfo.name;
+
+                // Enable and populate sub-branch dropdown
+                const subBranchKeys = Object.keys(branchInfo.subBranches);
+                enableDropdown('subBranch');
+                populateDropdown('subBranch', subBranchKeys, selectSubBranch);
+                setupDropdownEvents('subBranch', subBranchKeys, selectSubBranch);
+
+                // Reset booth dropdown
+                resetDropdown('booth');
+
+                showToast(`Selected: ${branchInfo.name}`, 'success');
+                updateSuccessBadge(`Selected: ${branchInfo.name}`);
+            } catch (error) {
+                console.error('Error selecting branch:', error);
+                showToast('Error selecting branch', 'danger');
+            }
+        }
+
+        function selectSubBranch(subBranchKey) {
+            try {
+                const bankKey = document.getElementById('selectedBank').value;
+                const branchKey = document.getElementById('selectedBranch').value;
+                const subBranchInfo = bankData[bankKey]?.branches[branchKey]?.subBranches[subBranchKey];
+                if (!subBranchInfo) return;
+
+                document.getElementById('selectedSubBranch').value = subBranchKey;
+                document.getElementById('subBranchInput').value = subBranchInfo.name;
+
+                // Enable and populate booth dropdown
+                const booths = subBranchInfo.booths;
+                enableDropdown('booth');
+                populateDropdown('booth', booths, selectBooth);
+                setupDropdownEvents('booth', booths, selectBooth);
+
+                showToast(`Selected: ${subBranchInfo.name}`, 'success');
+                updateSuccessBadge(`Selected: ${subBranchInfo.name}`);
+            } catch (error) {
+                console.error('Error selecting sub-branch:', error);
+                showToast('Error selecting sub-branch', 'danger');
+            }
+        }
+
+        function selectBooth(boothName) {
+            try {
+                document.getElementById('selectedBooth').value = boothName;
+                document.getElementById('boothInput').value = boothName;
+
+                showToast(`Selected: ${boothName}`, 'success');
+                updateSuccessBadge(`Selected: ${boothName}`);
+            } catch (error) {
+                console.error('Error selecting booth:', error);
+                showToast('Error selecting booth', 'danger');
+            }
+        }
+
+        // Update success badge
+        function updateSuccessBadge(text) {
+            const badge = document.getElementById('successBadge');
+            const badgeText = document.getElementById('successText');
+            if (badge && badgeText) {
+                badgeText.textContent = text;
+                badge.classList.remove('d-none');
+            }
+        }
+
+        // Enable dropdown
+        function enableDropdown(type) {
+            const input = document.getElementById(`${type}Input`);
+            const searchInput = document.getElementById(`${type}Search`);
+
+            if (input) {
+                input.disabled = false;
+                input.value = '';
+            }
+            if (searchInput) {
+                searchInput.value = '';
+            }
+
+            const hiddenInput = document.getElementById(`selected${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (hiddenInput) {
+                hiddenInput.value = '';
+            }
+        }
+
+        // Reset dropdown
+        function resetDropdown(type) {
+            const input = document.getElementById(`${type}Input`);
+            const searchInput = document.getElementById(`${type}Search`);
+            const list = document.getElementById(`${type}List`);
+
+            if (input) {
+                input.disabled = true;
+                input.value = '';
+            }
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            if (list) {
+                list.innerHTML = '';
+            }
+
+            const hiddenInput = document.getElementById(`selected${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (hiddenInput) {
+                hiddenInput.value = '';
+            }
+
+            closeDropdown(type);
+        }
+
+        // Toggle dropdown
+        function toggleDropdown(type) {
+            const dropdown = document.getElementById(`${type}Dropdown`);
+            const menu = document.getElementById(`${type}Menu`);
+            const overlay = document.getElementById('dropdownOverlay');
+
+            if (!dropdown || !menu) return;
+
+            const isOpen = dropdown.classList.contains('active');
+
+            // Close all dropdowns first
+            closeAllDropdowns();
+
+            if (!isOpen) {
+                activeDropdown = type;
+                dropdown.classList.add('active');
+                menu.classList.add('show');
+                overlay.classList.add('show');
+
+                // Focus search input after animation
+                setTimeout(() => {
+                    const searchInput = document.getElementById(`${type}Search`);
+                    if (searchInput) {
+                        searchInput.focus();
+                    }
+                }, 150);
+            }
+        }
+
+        // Close specific dropdown
+        function closeDropdown(type) {
+            const dropdown = document.getElementById(`${type}Dropdown`);
+            const menu = document.getElementById(`${type}Menu`);
+
+            if (dropdown) dropdown.classList.remove('active');
+            if (menu) menu.classList.remove('show');
+
+            if (activeDropdown === type) {
+                activeDropdown = null;
+                const overlay = document.getElementById('dropdownOverlay');
+                if (overlay) overlay.classList.remove('show');
+            }
+        }
+
+        // Close all dropdowns
+        function closeAllDropdowns() {
+            ['bank', 'branch', 'subBranch', 'booth'].forEach(type => {
+                closeDropdown(type);
+            });
+
+            activeDropdown = null;
+            const overlay = document.getElementById('dropdownOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        // Get icon for dropdown type
+        function getIconForType(type) {
+            const icons = {
+                bank: 'bank',
+                branch: 'geo-alt',
+                subBranch: 'diagram-3',
+                booth: 'shop'
+            };
+            return icons[type] || 'circle';
+        }
+
+        // Initialize event listeners
+        function initializeEventListeners() {
+            // File input
+            const fileInput = document.getElementById('fileInput');
+            const selectFilesBtn = document.getElementById('selectFilesBtn');
+
+            if (fileInput) fileInput.addEventListener('change', handleFileSelect);
+            if (selectFilesBtn) selectFilesBtn.addEventListener('click', () => fileInput?.click());
+
+            // Camera controls
+            const takePhotoBtn = document.getElementById('takePhotoBtn');
+            const recordVideoBtn = document.getElementById('recordVideoBtn');
+
+            if (takePhotoBtn) takePhotoBtn.addEventListener('click', takePhoto);
+            if (recordVideoBtn) recordVideoBtn.addEventListener('click', toggleVideoRecording);
+
+            // Upload area click
+            const uploadArea = document.getElementById('uploadArea');
+            if (uploadArea) uploadArea.addEventListener('click', () => fileInput?.click());
+
+            // Form submission
+            const bankDataForm = document.getElementById('bankDataForm');
+            if (bankDataForm) bankDataForm.addEventListener('submit', handleFormSubmit);
+
+            // Global click handler to close dropdowns
+            document.addEventListener('click', function(e) {
+                if (activeDropdown && !e.target.closest('.custom-dropdown')) {
+                    closeAllDropdowns();
+                }
+            });
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                if (uploadArea) {
+                    uploadArea.addEventListener(eventName, preventDefaults, false);
+                }
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+        }
+
+        // Initialize drag and drop
+        function initializeDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            if (!uploadArea) return;
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.remove('dragover');
+                }, false);
+            });
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+        }
+
+        // Prevent default drag behaviors
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Handle file drop
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // Handle file selection
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        // Handle files (from input or drag & drop)
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (validateFile(file)) {
+                    selectedFiles.push(file);
+                    createFilePreview(file);
+                }
+            });
+            updateFileCount();
+            showFilePreview();
+        }
+
+        // Validate file
+        function validateFile(file) {
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'video/mp4', 'video/mov', 'video/avi'];
+
+            if (file.size > maxSize) {
+                showToast('File size must be less than 50MB', 'danger');
+                return false;
+            }
+
+            if (!allowedTypes.includes(file.type)) {
+                showToast('File type not supported', 'danger');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Create file preview
+        function createFilePreview(file) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-file';
+            removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+            removeBtn.onclick = () => removeFile(file, previewItem);
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.className = 'preview-image';
+                img.src = URL.createObjectURL(file);
+                img.alt = file.name;
+                previewItem.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.className = 'preview-video';
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.muted = true;
+                previewItem.appendChild(video);
+            } else {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'd-flex flex-column align-items-center justify-content-center h-100 text-danger p-2';
+                fileDiv.innerHTML = `
+                    <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
+                    <small class="text-center fw-semibold mt-1" style="font-size: 0.5rem;">${file.name}</small>
+                `;
+                previewItem.appendChild(fileDiv);
+            }
+
+            previewItem.appendChild(removeBtn);
+            const previewGrid = document.getElementById('previewGrid');
+            if (previewGrid) previewGrid.appendChild(previewItem);
+        }
+
+        // Remove file
+        function removeFile(file, previewItem) {
+            const index = selectedFiles.indexOf(file);
+            if (index > -1) {
+                selectedFiles.splice(index, 1);
+                previewItem.remove();
+                updateFileCount();
+
+                if (selectedFiles.length === 0) {
+                    hideFilePreview();
+                }
+                showToast('File removed', 'warning');
+            }
+        }
+
+        // Update file count
+        function updateFileCount() {
+            const fileCountEl = document.getElementById('fileCount');
+            if (fileCountEl) fileCountEl.textContent = selectedFiles.length;
+        }
+
+        // Show file preview
+        function showFilePreview() {
+            if (selectedFiles.length > 0) {
+                const filePreview = document.getElementById('filePreview');
+                if (filePreview) filePreview.classList.remove('d-none');
+            }
+        }
+
+        // Hide file preview
+        function hideFilePreview() {
+            const filePreview = document.getElementById('filePreview');
+            if (filePreview) filePreview.classList.add('d-none');
+        }
+
+        // Take photo using camera
+        async function takePhoto() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
+                });
+
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+
+                video.addEventListener('loadedmetadata', () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+
+                    canvas.toBlob(blob => {
+                        const file = new File([blob], `photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                        selectedFiles.push(file);
+                        createFilePreview(file);
+                        updateFileCount();
+                        showFilePreview();
+
+                        // Stop camera
+                        stream.getTracks().forEach(track => track.stop());
+                        showToast('Photo captured successfully!', 'success');
+                    }, 'image/jpeg', 0.9);
+                });
+            } catch (error) {
+                console.error('Camera error:', error);
+                showToast('Camera access denied or not available', 'danger');
+            }
+        }
+
+        // Toggle video recording
+        async function toggleVideoRecording() {
+            const btn = document.getElementById('recordVideoBtn');
+            if (!btn) return;
+
+            if (!isRecording) {
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment' },
+                        audio: true
+                    });
+
+                    const videoPreview = document.getElementById('videoPreview');
+                    if (videoPreview) {
+                        videoPreview.srcObject = mediaStream;
+                        videoPreview.classList.remove('d-none');
+                        videoPreview.play();
+                    }
+
+                    mediaRecorder = new MediaRecorder(mediaStream);
+                    const chunks = [];
+
+                    mediaRecorder.ondataavailable = (e) => {
+                        chunks.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: 'video/mp4' });
+                        const file = new File([blob], `video_${Date.now()}.mp4`, { type: 'video/mp4' });
+                        selectedFiles.push(file);
+                        createFilePreview(file);
+                        updateFileCount();
+                        showFilePreview();
+
+                        if (videoPreview) videoPreview.classList.add('d-none');
+                        if (mediaStream) {
+                            mediaStream.getTracks().forEach(track => track.stop());
+                        }
+                        showToast('Video recorded successfully!', 'success');
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    btn.innerHTML = '<i class="bi bi-stop-fill"></i> Stop Recording';
+                    btn.style.background = 'linear-gradient(135deg, #ffc107 0%, #fd7e14 100%)';
+                } catch (error) {
+                    console.error('Video recording error:', error);
+                    showToast('Camera/microphone access denied or not available', 'danger');
+                }
+            } else {
+                if (mediaRecorder) mediaRecorder.stop();
+                isRecording = false;
+                btn.innerHTML = '<i class="bi bi-camera-video-fill"></i> Record Video';
+                btn.style.background = 'linear-gradient(135deg, var(--city-red) 0%, var(--city-red-dark) 100%)';
+            }
+        }
+
+        // Handle form submission
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            // Validate required fields
+            if (!document.getElementById('selectedBank').value || !document.getElementById('selectedBranch').value) {
+                showToast('Please select bank and branch', 'danger');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            if (submitBtn) submitBtn.disabled = true;
+            if (loadingSpinner) loadingSpinner.classList.remove('d-none');
+
+            try {
+                // Simulate upload progress
+                await simulateUpload();
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('bank', document.getElementById('selectedBank').value);
+                formData.append('branch', document.getElementById('selectedBranch').value);
+                formData.append('subBranch', document.getElementById('selectedSubBranch').value || '');
+                formData.append('booth', document.getElementById('selectedBooth').value || '');
+                formData.append('comments', document.getElementById('comments').value || '');
+
+                // Add files
+                selectedFiles.forEach((file, index) => {
+                    formData.append(`file_${index}`, file);
+                });
+
+                // Here you would normally send the data to your server
+                // await fetch('/api/submit-bank-data', { method: 'POST', body: formData });
+
+                showToast('Data submitted successfully!', 'success');
+                resetForm();
+            } catch (error) {
+                console.error('Submission error:', error);
+                showToast('Submission failed. Please try again.', 'danger');
+            } finally {
+                // Hide loading state
+                if (submitBtn) submitBtn.disabled = false;
+                if (loadingSpinner) loadingSpinner.classList.add('d-none');
+            }
+        }
+
+        // Simulate upload progress
+        function simulateUpload() {
+            return new Promise((resolve) => {
+                const progressContainer = document.getElementById('uploadProgress');
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+
+                if (progressContainer) progressContainer.style.display = 'block';
+                let progress = 0;
+
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            if (progressContainer) progressContainer.style.display = 'none';
+                            resolve();
+                        }, 500);
+                    }
+
+                    if (progressBar) progressBar.style.width = progress + '%';
+                    if (progressText) progressText.textContent = Math.round(progress) + '%';
+                }, 200);
+            });
+        }
+
+        // Reset form
+        function resetForm() {
+            const form = document.getElementById('bankDataForm');
+            if (form) form.reset();
+
+            selectedFiles = [];
+            const previewGrid = document.getElementById('previewGrid');
+            if (previewGrid) previewGrid.innerHTML = '';
+
+            hideFilePreview();
+            updateFileCount();
+
+            // Reset all dropdowns
+            resetDropdown('branch');
+            resetDropdown('subBranch');
+            resetDropdown('booth');
+
+            // Reset bank dropdown
+            const bankInput = document.getElementById('bankInput');
+            const selectedBank = document.getElementById('selectedBank');
+            if (bankInput) bankInput.value = '';
+            if (selectedBank) selectedBank.value = '';
+
+            // Hide success badge
+            const successBadge = document.getElementById('successBadge');
+            if (successBadge) successBadge.classList.add('d-none');
+
+            // Re-initialize dropdowns
+            setTimeout(() => {
+                initializeDropdowns();
+            }, 100);
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) return;
+
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-bg-${type} border-0`;
+            toastEl.setAttribute('role', 'alert');
+
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body fw-semibold">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+            toastContainer.appendChild(toastEl);
+
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 4000
+            });
+            toast.show();
+
+            // Remove element after hiding
+            toastEl.addEventListener('hidden.bs.toast', () => {
+                toastEl.remove();
+            });
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            // Ctrl/Cmd + Enter to submit
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn && !submitBtn.disabled) {
+                    const form = document.getElementById('bankDataForm');
+                    if (form) form.dispatchEvent(new Event('submit'));
+                }
+            }
+
+            // Escape to close dropdowns
+            if (e.key === 'Escape') {
+                closeAllDropdowns();
+            }
+        });
+    </script>
+</body>
+</html>

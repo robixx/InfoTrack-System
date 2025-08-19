@@ -1,0 +1,303 @@
+﻿@model List<ITC.InfoTrack.Model.Entity.CorporateOffice>
+
+@{
+    ViewBag.pTitle = "CorporateOfficeRegister";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Corporate Office Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+</style>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Office Create</h5>
+            </div>
+            <div class="card-body">
+                <button type="button" id="addSave" class="btn btn-sm bg-color waves-effect waves-light">Add Office</button>
+                <div class="row mt-4" style="margin-top:25px;">
+                    <table id="datatable" class="table table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead style=" background-color:#c9ccd3; font-weight:600;">
+                            <tr style="font-size:14px;">
+                                <th>SL.</th>
+                                <th>Office Name</th>
+                                <th>Email</th>
+                                <th>Contact No </th>
+                                <th>Address</th>
+                                <th>CreateDate</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+
+                                <tr style="font-size:12px;">
+                                    <td>@i</td>
+                                    <td>@item.CorpName</td>
+                                    <td>@item.CorpEmail</td>
+                                    <td>@item.CorpContactNumber</td>
+                                    <td>@item.CorpAddress</td>
+                                    <td>
+                                        @item.CreateDate.ToString("dd-MMM-yyyy")
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0);" class="btn-edit" data-id="@item.CorpId">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+
+<!--  Modal content for the above example -->
+<div class="modal fade bs-example-modal-xl" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myExtraLargeModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="noticeMessage" class="alert alert-danger alert-dismissible fade d-none" role="alert">
+                    <span id="noticeText"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div id="modalData"></div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="SaveChange" class="btn btn-sm btn-primary waves-effect waves-light"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+    }
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+         $(document).ready(function () {
+             //add button for modal open and show input field
+            $('#addSave').on('click', function () {
+            // Set dynamic title
+            $('#myExtraLargeModalLabel').text('Add Corporate Office');
+            $('#SaveChange').text('Save Change');
+            insertDataDesign();
+            $('#dynamicModal').modal('show');
+        });      
+
+     /// modal button Office information Save
+
+         $('#SaveChange').on('click', function(){
+             
+             if($('#CorpName').val()==='' || $('#CorpEmail').val().trim()==='' ){
+                  $('#noticeText').text('Input Field is Requried.');
+                 $('#noticeMessage').removeClass('d-none fade').addClass('show');
+                    setTimeout(function () {
+                         $('#noticeMessage').addClass('d-none').removeClass('show fade');
+                    }, 5000); // hides after 5 seconds
+                return;
+             }
+             
+             var id=$('#CorpId').val().trim()===''?0:$('#CorpId').val().trim();
+             var corpname= $('#CorpName').val().trim();
+             var email= $('#CorpEmail').val().trim();
+             var contact= $('#CorpContactNumber').val().trim();
+             var officetype= $('#CorpType').val().trim();
+             var location= $('#CorpAddress').val().trim();
+                var model={
+                    CorpId :id,
+                    CorpName:corpname,
+                    CorpAddress:location,
+                    CorpContactNumber:contact,
+                    CorpEmail:email,
+                    CorpType:officetype,
+                };
+                
+               $.ajax({
+                    url: '/Corporate/Corporate/OfficeDataSave',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(model),
+                    success: function (res) {
+                        debugger;
+                       if(!res.status){
+                           $('#noticeText').text(res.message);
+                             $('#noticeMessage').removeClass('d-none fade').addClass('show');
+                                setTimeout(function () {
+                                     $('#noticeMessage').addClass('d-none').removeClass('show fade');
+                                }, 5000); // hides after 5 seconds
+                           
+                       }
+                    },
+                    error: function (err) {        
+                        alert('Error while saving.');
+                        
+                    }
+                });
+         });
+    });
+
+     $(".btn-edit").click(function () {
+      var corpId = $(this).data("id");
+     
+     $('#myExtraLargeModalLabel').text('Edit Corporate Office');
+            $('#SaveChange').text('Update');
+            insertDataDesign();
+            EditData(corpId);
+            $('#dynamicModal').modal('show');
+     
+     });
+
+
+
+      // function for design
+        function insertDataDesign(){
+
+            var fieldinsert= document.getElementById('modalData');
+            var HtemlText='';
+
+            HtemlText +=` <div class="row">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-group">
+                                <label for="corpName">Company Name</label>
+                                <input type="text" class="form-control" id="CorpName" name="CorpName" placeholder="Office Name" required />
+                                <input type="hidden" id="CorpId" name="CorpId"/>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-group">
+                                <label for="CorpEmail">Email</label>
+                                <input type="email" class="form-control" id="CorpEmail" name="CorpEmail" placeholder="xxxx@gmail.com" required />
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-group">
+                                <label for="ContactNo">Contact No</label>
+                                <input type="tel" class="form-control" id="CorpContactNumber" name="CorpContactNumber"  placeholder="Contact No" />
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-group">
+                                <label for="OfficeType">Office Type</label>
+                                <input type="text" class="form-control" id="CorpType" name="CorpType" placeholder="Office Type" />
+                            </div>
+                        </div>
+                    </div>`;
+             HtemlText +=` <div class="row mt-2">
+                        <div class="col-md-6 col-ms-6">
+                            <div class="form-group">
+                                <label for="location">Office Location</label>
+                                <textarea type="tel" class="form-control" name="CorpAddress" id="CorpAddress"  placeholder="Office Location "></textarea>
+                            </div>
+                        </div>
+                    </div>`;
+            fieldinsert.innerHTML=HtemlText;
+
+        };
+
+        function  EditData(corpId){
+
+            $.ajax({
+                    url: '/Corporate/Corporate/OfficeDataEdit',
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: {corpId:corpId},
+                    success: function (res) {
+                        if(res.status){
+                            LoadGrid(res.data);
+                        }
+                       
+                    },
+                    error: function (err) {
+                        alert('Error while saving.');
+
+                    }
+                });
+        };
+
+
+        function LoadGrid(data){
+          debugger;
+            $('#CorpId').val(data.corpId);
+            $('#CorpName').val(data.corpName);
+            $('#CorpEmail').val(data.corpEmail);
+            $('#CorpContactNumber').val(data.corpContactNumber);
+            $('#CorpType').val(data.corpType);
+            $('#CorpAddress').val(data.corpAddress.trim());
+
+
+        };
+
+</script>

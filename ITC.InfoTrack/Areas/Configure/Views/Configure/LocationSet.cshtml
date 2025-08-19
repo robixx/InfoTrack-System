@@ -1,0 +1,338 @@
+﻿
+@model List<ITC.InfoTrack.Model.ViewModel.LocationShowDto>
+@{
+    ViewBag.pTitle = "LocationSet";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Organization Location";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Organization Location Setup</h5>
+                <a class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2" id="addOrg">
+                    <i class="fa fa-plus"></i>
+                    Create Location
+                </a>
+            </div>
+
+            <div class="card-body">
+                <div id="noticeMessage" class="alert alert-dismissible fade d-none" role="alert">
+                    <span id="noticeText"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="row mt-2">
+                    <table id="datatable" class="table table-striped dt-responsive nowrap table-hover scheduleTable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead style=" background-color:#c9ccd3; font-weight:600;">
+                            <tr>                               
+                                <th>SL</th>
+                                <th>Organization</th>
+                                <th>Location Type</th>                                                            
+                                <th>Name</th>                                                            
+                                <th>Address</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var item in Model)
+                            {
+                                var colors = item.IsActive == 1 ? "bg-success" : "bg-danger";
+                                var st = item.IsActive == 1 ? "Active" : "InActive";
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.Organization</td>
+                                    <td>@item.LocationTypeName</td>
+                                    <td>@item.BranchName</td>
+                                    <td>@item.LocationAddress</td>
+                                    <td>
+                                        <span class="badge text-white rounded-pill @colors">@st</span>
+                                        </td>
+                                    <td>
+                                        <a href="javascript:void(0);" class="btn-edit" data-id="@item.LocationId"><i class="fa fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+<!--  Modal content for the above example -->
+<div class="modal fade bs-example" id="dynamicModals" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div id="modaldata"></div>
+                </div>
+                <div id="modalData"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="SaveChange" class="btn btn-sm btn-primary waves-effect waves-light"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+
+    }
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+
+      $(document).ready(function () {
+        const message = localStorage.getItem('metaSuccessMessage');
+
+        if (message) {
+            const notice = $('#noticeMessage');
+            const text = $('#noticeText');
+
+            // ✅ Show the alert
+            text.text(message);
+            notice.removeClass('d-none fade alert-danger');
+            notice.addClass('alert alert-success show');
+
+            // ✅ Remove message after showing
+            localStorage.removeItem('metaSuccessMessage');
+        }
+    });
+
+    $('#addOrg').on('click', function(){
+        $('#myModalLabel').text('Add Organization Location');
+        $('#SaveChange').text('Save');
+        OrgInsertData();
+        OrgLocationDropDown();
+        $('#dynamicModals').modal('show');
+
+    });
+    function OrgInsertData()
+    {
+         var fielddata=document.getElementById('modalData');
+         var htmltext='';
+          htmltext +=`<div class="row"><div class="col-md-6 mb-3">
+                        <label for="metaelementTitle" class="form-label">Organization Name<span class="text-danger">*</span></label>
+                        <select class="form-select" name="organizationname" id="organizationname">
+                        </select>
+                        <input type="hidden" id="locationId" name="locationId"/></div>
+                        <div class="col-md-6 mb-3">
+                        <label for="metaelementTitle" class="form-label">Location Type<span class="text-danger">*</span></label>
+                        <select class="form-select" name="locationtype" id="locationtype">
+                        </select></div></div>`;
+
+           htmltext +=`<div class="row"><div class="col-md-6 mb-3">
+                        <label for="metaelementTitle" class="form-label">Type Wise Name </label>
+                        <select class="form-select" name="customdataid" id="customdataid">
+                        <option value="">-- Select Type Wise Name --</option>
+                        </select>
+                        </div>
+                        <div class="col-md-6 mb-3 d-flex align-items-center">
+                        <div class="form-check" style="margin-top:15px;">
+                            <input type="checkbox" class="form-check-input" name="isStatus" id="isStatus" />
+                            <label class="form-check-label" for="metaelementcheck">Is Active</label>
+                        </div></div></div>`;
+
+           htmltext +=`<div class="row"><div class="col-md-8 mb-3">
+                        <label for="metaelementTitle" class="form-label">Address </label>
+                        <textarea type="text" placeholder="Please Write Address ..." class="form-control" name="orgAddress" id="orgAddress"></textarea>
+                        </div></div>`;
+
+
+          fielddata.innerHTML=htmltext;
+    }
+
+
+     $('#SaveChange').on('click', function(){
+        var locationId=$('#locationId').val().trim()===''?0:$('#locationId').val().trim();
+        var orgName=$('#organizationname').val().trim();
+        var CustomIddata=$('#customdataid').val().trim();
+        var orgName=$('#organizationname').val().trim();
+        var locationType=$('#locationtype').val().trim();
+        var orgaddress=$('#orgAddress').val().trim();        
+        var isActive=$('#isStatus').is(':checked');
+        var model={
+                    locationId :locationId,
+                    orgId:orgName,
+                    customId:CustomIddata,
+                    locationType:locationType,
+                    orgaddress:orgaddress,                    
+                    isActive:isActive,
+                };
+         $.ajax({
+               url: '/Configure/Configure/OrgLocationSave',
+               type: 'POST',
+               contentType: 'application/json',
+               data: JSON.stringify(model),
+               success: function (res) {
+                   const notice= $('#noticeMessage');
+                   const text=$('#noticeText');
+                   notice.removeClass('alert-success alert-danger');
+                    if(!res.status){
+
+                            text.text(res.message);
+                            $('#noticeMessage').removeClass('d-none fade').addClass('alert-danger show');
+
+                     }else{
+                           localStorage.setItem('metaSuccessMessage', res.message);
+                            // ✅ Reload the page
+                            location.reload();
+                     }
+                         $('#metaModals').modal('hide');
+                     },
+                     error: function (err) {
+                            alert('Error while saving.');
+                   }
+         });
+
+    });
+
+
+    function OrgLocationDropDown(selectedGroupId =0, selectedParentId=0)
+    {
+        $.ajax({
+             url:"/Configure/Configure/GetCoreLocation",
+             type:"GET",
+             contentType: 'application/json',
+             success: function (res){
+                 if(res.group.length>0){
+                     const dropdown = $('#organizationname');
+                     dropdown.empty();
+                     dropdown.append('<option value="0">-- Select Organization Name --</option>');
+                     res.group.forEach(item => {
+                         const selected = item.value == selectedGroupId ? 'selected' : '';
+                         dropdown.append(`<option value="${item.value}" ${selected}>${item.text}</option>`);
+                     });
+                 }else{
+                     const dropdown = $('#organizationname');
+                     dropdown.empty();
+                     dropdown.append('<option value="0">-- Select Organization Name --</option>');
+                 }
+                 if(res.parent.length>0){
+                     const dropdown = $('#locationtype');
+                     dropdown.empty();
+                     dropdown.append('<option value="0">--Select Location Type--</option>');
+                     res.parent.forEach(item => {
+                         const selected = item.value == selectedParentId ? 'selected' : '';
+                         dropdown.append(`<option value="${item.value}" ${selected}>${item.text}</option>`);
+                     });
+                 }else{
+                       const dropdown = $('#locationtype');
+                         dropdown.empty();
+                         dropdown.append('<option value="0">--Select Location Type--</option>');
+                 }
+             }
+         });
+    }
+
+    $(document).on('change', '#locationtype', function() {
+        var selectedValue = $(this).val();
+        var orgid = $('#organizationname').val();
+        var $customSelect = $('#customdataid');
+        $customSelect.empty();
+        debugger;
+        $customSelect.append('<option value="">-- Select Type Wise Name --</option>');
+
+        $.ajax({
+            url: '/Configure/Configure/GetCustomLocation', // Replace with your actual endpoint
+            type: 'GET',
+            data: { locationTypeId: selectedValue, orgId: orgid },
+            success: function(data) {
+                if (data && data.length > 0) {
+                    data.forEach(function(item) {
+                        $customSelect.append(`<option value="${item.value}">${item.text}</option>`);
+                    });
+                } else {
+                    $customSelect.append('<option value="">--Select Type Wise Name--</option>');
+                }
+            },
+            error: function() {
+                $customSelect.empty();
+                $customSelect.append('<option value="">Failed to load data</option>');
+            }
+        });
+    });
+
+
+
+
+</script>

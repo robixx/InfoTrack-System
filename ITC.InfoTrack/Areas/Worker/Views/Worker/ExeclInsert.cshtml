@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel File Upload</title>
+    <!-- Tailwind CSS CDN for utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons CDN for icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure it takes full viewport height */
+        }
+
+        .upload-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px; /* Max width for the upload box */
+            text-align: center;
+        }
+
+            .upload-container h2 {
+                color: #2c3e50;
+                margin-bottom: 25px;
+                font-weight: 600;
+            }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+            .file-input-wrapper input[type=file] {
+                position: absolute;
+                left: 0;
+                top: 0;
+                opacity: 0;
+                cursor: pointer;
+                width: 100%;
+                height: 100%;
+                z-index: 10;
+            }
+
+        .file-input-display {
+            background-color: #ecf0f1;
+            border: 2px dashed #bdc3c7;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+            .file-input-display:hover {
+                background-color: #e0e6e7;
+                border-color: #95a5a6;
+            }
+
+            .file-input-display i {
+                font-size: 3em;
+                color: #3498db;
+                margin-bottom: 10px;
+            }
+
+            .file-input-display span {
+                color: #555;
+                font-weight: 500;
+            }
+
+        .file-name-display {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+            min-height: 20px; /* Reserve space to prevent layout shift */
+        }
+
+        .upload-button {
+            background-color: #28a745; /* Bootstrap success green */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%; /* Full width button */
+            margin-top: 20px;
+        }
+
+            .upload-button:hover {
+                background-color: #218838; /* Darker green on hover */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+
+        .message-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            display: none; /* Hidden by default */
+        }
+
+            .message-box.success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .message-box.error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="upload-container">
+        <h2>Upload Excel File</h2>
+
+        <div class="file-input-wrapper">
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls">
+            <div class="file-input-display">
+                <i class="bi bi-cloud-arrow-up"></i>
+                <span>Drag & Drop your Excel file here or Click to Browse</span>
+                <span class="text-xs text-gray-500 mt-2">(Accepted formats: .xlsx, .xls)</span>
+            </div>
+        </div>
+
+        <div id="fileNameDisplay" class="file-name-display"></div>
+
+        <button id="uploadButton" class="upload-button">
+            <i class="bi bi-upload me-2"></i> Upload File
+        </button>
+
+        <div id="messageBox" class="message-box"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const excelFileInput = document.getElementById('excelFileInput');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const uploadButton = document.getElementById('uploadButton');
+            const messageBox = document.getElementById('messageBox');
+            const fileInputDisplay = document.querySelector('.file-input-display');
+
+            let selectedFile = null;
+
+            // Handle file selection
+            excelFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    selectedFile = this.files[0];
+                    fileNameDisplay.textContent = `Selected File: ${selectedFile.name}`;
+                    messageBox.style.display = 'none'; // Hide any previous messages
+                    messageBox.classList.remove('success', 'error');
+                } else {
+                    selectedFile = null;
+                    fileNameDisplay.textContent = '';
+                }
+            });
+
+            // Handle drag and drop (visual feedback)
+            fileInputDisplay.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileInputDisplay.style.borderColor = '#3498db'; /* Highlight on drag over */
+            });
+
+            fileInputDisplay.addEventListener('dragleave', () => {
+                fileInputDisplay.style.borderColor = '#bdc3c7'; /* Reset on drag leave */
+            });
+
+            fileInputDisplay.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileInputDisplay.style.borderColor = '#bdc3c7'; /* Reset on drop */
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    // Assign files to the input element
+                    excelFileInput.files = files;
+                    // Manually trigger change event since it's not native for programmatic file assignment
+                    const event = new Event('change');
+                    excelFileInput.dispatchEvent(event);
+                }
+            });
+
+
+            // Handle upload button click
+            uploadButton.addEventListener('click', function() {
+                if (selectedFile) {
+                    // In a real application, you would send 'selectedFile' to a server here.
+                    // For this design, we'll simulate an upload.
+
+                    // Basic file type validation
+                    const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+                    if (!allowedTypes.includes(selectedFile.type)) {
+                        showMessage('Error: Please upload a valid Excel file (.xlsx or .xls).', 'error');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append("file", selectedFile);
+
+                    fetch('/Worker/Worker/Upload', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        showMessage(data.message, 'success');
+                    })
+                    .catch(err => {
+                        showMessage('Upload failed.', 'error');
+                        console.error(err);
+                    });
+
+                    
+                } else {
+                    showMessage('Please select an Excel file to upload.', 'error');
+                }
+            });
+
+            function showMessage(message, type) {
+                messageBox.textContent = message;
+                messageBox.className = 'message-box'; // Reset classes
+                messageBox.style.display = 'block'; // Show the message box
+                if (type) {
+                    messageBox.classList.add(type);
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

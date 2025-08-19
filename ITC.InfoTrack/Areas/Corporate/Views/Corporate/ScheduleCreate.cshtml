@@ -1,0 +1,943 @@
+﻿@{
+    ViewBag.pTitle = "Schedule Create";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Schedule Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="~/libs/spectrum-colorpicker2/spectrum.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css/select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .arrow-connector {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: darkgreen;
+        font-size: 1rem;
+        animation: pulse 2s infinite;
+    }
+
+    .btn-gradients {
+        background: #dddddd !important; /* corrected color */
+        border: 1px solid #dddddd; /* border with width and style */
+        color: black !important;
+        transition: background 0.3s ease; /* smooth hover transition */
+    }
+
+        .btn-gradients:hover {
+            background: darkgreen !important;
+            color: white !important; /* better contrast on hover */
+            border-color: darkgreen;
+        }
+
+    .btn-gradients-cancel {
+        background: #dddddd !important;
+        border: 1px solid #dddddd;
+        color: black !important;
+        transition: background 0.3s ease;
+    }
+
+        .btn-gradients-cancel:hover {
+            background: #a00000 !important; /* a darker red on hover */
+            border-color: #a00000;
+            color: white !important;
+        }
+</style>
+<link href="~/css/calender.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Visit Schedule Create</h5>
+                <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2" id="scheduleBtn" disabled>
+                    <span id="countCheckdata">(0)</span><i class="bi bi-calendar-check"></i>
+                    Create Schedule
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="office">Branch Name</label>
+                            @Html.DropDownList("BranchId", ViewBag.office as SelectList, new { @class = "form-control select2", @id="BranchId", onchange="onBranchChange(this)" })
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="office">Sub-Branch Name</label>
+                            @Html.DropDownList("SubBranchId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "SubBranchId" })
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="office">District</label>
+                            @Html.DropDownList("DistrictId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "DistrictId" })
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="office">Division</label>
+                            @Html.DropDownList("DivisionId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "DivisionId" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-striped table-hover scheduleTable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead style=" background-color:#c9ccd3; font-weight:600;">
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll" /> All</th>
+                                    <th>SL</th>
+                                    <th>Office Name</th>
+                                    <th>Branch Name</th>
+                                    <th>Booth Name</th>
+                                    <th>Asset Name</th>
+                                    <th>Schedule Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+<!-- Calendar Section -->
+<div class="row">
+    <div class="col-12">
+        <div class="card calendar-wrapper">
+            <div class="calendar-header">
+                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-outline-light btn-sm" id="prevMonth">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <h4 class="mb-0 fw-bold" id="currentMonth">March 2024</h4>
+                        <button class="btn btn-outline-light btn-sm" id="nextMonth">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="event-dot" style="background: #139428;"></div>
+                            <small class="ms-1 text-white">Urgent</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="event-dot" style="background: #0c316f;"></div>
+                            <small class="ms-1 text-white">High</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="event-dot" style="background: #72590f;"></div>
+                            <small class="ms-1 text-white">Medium</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="event-dot" style="background: #85121d;"></div>
+                            <small class="ms-1 text-white">Low</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendar will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Schedule Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-top modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-calendar-plus me-2"></i>
+                    Create Schedule
+                </h5>
+                <button type="button" class="btn-close " data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="background:#f8f9fa;">
+                <div id="errorMessage"></div>
+                <div id="selectedLocationsDisplay" class="p-3 bg-light rounded">
+                    <!-- Cards will be added here dynamically -->
+                </div>              
+              
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-gradients-cancel" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-gradients" id="confirmScheduleBtn">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Confirm Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section scripts {
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/select2/js/select2.min.js"></script>
+    <script src="~/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/libs/spectrum-colorpicker2/spectrum.min.js"></script>
+    <script src="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="~/libs/admin-resources/bootstrap-filestyle/bootstrap-filestyle.min.js"></script>
+    <script src="~/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+    <script src="~/js/pages/form-advanced.init.js"></script>
+    <script src="~/js/app.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+
+
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+
+     $(document).ready(function () {          // Check if already initialized
+
+        // Load data on page load
+        filterTable();
+    });
+    function formatDateToDDMMYYYY(dateString) {
+        const date = new Date(dateString);
+        if (isNaN(date)) return ''; // Return empty string if invalid date
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+    }
+    function filterTable() {
+       
+        var branchId = $('#BranchId').val()===null? 0 :$('#BranchId').val();
+        var subbranch = $('#SubBranchId').val()===null? 0 :$('#SubBranchId').val();
+        var district = $('#DistrictId').val()===null? 0 :$('#DistrictId').val();
+        var division = $('#DivisionId').val()===null? 0 :$('#DivisionId').val();
+
+        $.ajax({
+            url: '/Corporate/Corporate/GetFilteredData',
+            type: 'GET',
+            data: {
+                branchId: branchId,
+                subbranch: subbranch,
+                district: district,
+                division:division,
+            },
+            success: function (data) {
+
+            let table = $('#datatable').DataTable();
+
+            table.clear(); // Clear existing rows
+
+            $.each(data, function (index, item) {
+                table.row.add([
+
+                    `<input type="checkbox" class="rowCheckbox" data-corpId="${item.corpId}"
+                     data-corpname="${item.corpName}"
+                     data-branchname="${item.branchName}"
+                     data-boothname="${item.boothName}"
+                     data-terminal="${item.terminalName}"
+                     data-branchid="${item.branchId}"
+                     data-assetid="${item.assetId}"
+                     data-boothid="${item.boothId}"/>`,
+                    index + 1,
+                    item.corpName,
+                    item.branchName,
+                    item.boothName,
+                    item.terminalName,
+                    formatDateToDDMMYYYY(item.createdate),
+
+                ]);
+            });
+
+            table.draw(); // Draw updated rows
+
+            },
+            error: function () {
+                alert('Error loading data.');
+            }
+        });
+    }
+
+
+    $('#selectAll').on('change', function () {
+        $('.rowCheckbox').prop('checked', this.checked);
+         // Update count
+        updateCheckedCount();
+    });
+
+    // Uncheck #selectAll if any row checkbox is unchecked
+    // Check #selectAll if all are checked
+    $('#datatable').on('change', '.rowCheckbox', function () {
+        let total = $('.rowCheckbox').length;
+        let checked = $('.rowCheckbox:checked').length;
+
+        $('#selectAll').prop('checked', total === checked);
+         // Update count
+        updateCheckedCount();
+    });
+        // Update the count display
+    function updateCheckedCount() {
+        let count = $('.rowCheckbox:checked').length;
+        $('#countCheckdata').text(`(${count})`);
+         $('#scheduleBtn').prop('disabled', count === 0);
+    }
+
+    function onBranchChange(dropdown) {
+
+        debugger;
+        var branchId = dropdown.value;
+        $('#SubBranchId').empty().append('<option>Loading...</option>');
+        // $('#BoothId').empty().append('<option>-- Select Booth --</option>');
+
+        $.ajax({
+            url: '/Corporate/Corporate/GetsubBranches',
+            type: 'GET',
+            data: { branchId: branchId },
+            dataType: 'json',
+            success: function (data) {
+
+                $('#SubBranchId').empty().append('<option>Select sub-Branch</option>');
+                $.each(data, function (i, item) {
+                    $('#SubBranchId').append($('<option>', {
+                        value: item.id, // use lowercase if using JsonResult without property casing fix
+                        text: item.name
+                    }));
+                });
+                  filterTable();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching branches:', error);
+            }
+        });
+    };
+
+    $('#BranchId').change(function () {
+        var branchId = $(this).val();
+        $('#BoothId').empty().append('<option>Loading...</option>');
+
+         $.ajax({
+            url: '/Corporate/Corporate/GetBooths',
+            type: 'GET',
+            data: { branchId: branchId },
+            dataType: 'json',
+            success: function (data) {
+                $('#BoothId').empty().append('<option>-- Select Booth --</option>');
+                $.each(data, function (i, item) {
+                    $('#BoothId').append($('<option>', {
+                        value: item.id,
+                        text: item.name
+                    }));
+                });
+                  filterTable();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching booths:', error);
+            }
+        });
+    });
+
+     $('#BoothId').change(function () {
+        var boothId = $(this).val();
+        $('#AssetId').empty().append('<option>Loading...</option>');
+
+         $.ajax({
+            url: '/Corporate/Corporate/GetAssets',
+            type: 'GET',
+            data: { boothId: boothId },
+            dataType: 'json',
+            success: function (data) {
+                $('#AssetId').empty().append('<option>-- Select Asset --</option>');
+                $.each(data, function (i, item) {
+                    $('#AssetId').append($('<option>', {
+                        value: item.id,
+                        text: item.name
+                    }));
+                });
+                  filterTable();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching booths:', error);
+            }
+        });
+    });
+
+    //for calender
+     let events = [];
+    let currentDate = new Date();
+      document.getElementById('scheduleBtn').addEventListener('click', openScheduleModal);
+      document.getElementById('confirmScheduleBtn').addEventListener('click', SaveConfirmSchedule);
+       // Calendar navigation
+            document.getElementById('prevMonth').addEventListener('click', () => navigateMonth(-1));
+            document.getElementById('nextMonth').addEventListener('click', () => navigateMonth(1));
+    renderCalendar();
+     // Render calendar
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthHeader = document.getElementById('currentMonth');
+
+            // Update month header
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            monthHeader.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            // Clear grid
+            grid.innerHTML = '';
+
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+
+            // Get first day of month and calculate start date
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            // Generate calendar days (6 weeks = 42 days)
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+
+                const dayElement = createCalendarDay(date);
+                grid.appendChild(dayElement);
+            }
+        }
+
+        // Create calendar day
+        function createCalendarDay(date) {
+            const day = document.createElement('div');
+            day.className = 'calendar-day';
+
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
+            const isCurrentMonth = date.getMonth() === currentDate.getMonth();
+
+            if (!isCurrentMonth) {
+                day.classList.add('other-month');
+            }
+
+            if (isToday) {
+                day.classList.add('today');
+            }
+
+            // Get events for this date
+            const dayEvents = events.filter(event =>
+                event.date.toDateString() === date.toDateString()
+            );
+
+            if (dayEvents.length > 0) {
+                day.classList.add('has-events');
+            }
+
+            // Day number
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = date.getDate();
+            day.appendChild(dayNumber);
+
+            // Check if mobile view
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                // Mobile view - show dots
+                const eventDots = document.createElement('div');
+                eventDots.className = 'event-dots';
+
+                dayEvents.slice(0, 4).forEach(event => {
+                    const dot = document.createElement('div');
+                    dot.className = 'event-dot';
+                    dot.style.background = getEventColor(event.type);
+                    dot.title = `${event.time} - ${event.title}`;
+                    eventDots.appendChild(dot);
+                });
+
+                if (dayEvents.length > 4) {
+                    const moreDot = document.createElement('div');
+                    moreDot.className = 'event-dot';
+                    moreDot.style.background = '#6c757d';
+                    moreDot.title = `+${dayEvents.length - 4} more events`;
+                    eventDots.appendChild(moreDot);
+                }
+
+                day.appendChild(eventDots);
+            } else {
+                // Desktop view - show event items
+                dayEvents.slice(0, 3).forEach(event => {
+                    const eventElement = createEventElement(event);
+                    day.appendChild(eventElement);
+                });
+
+                // More events indicator
+                if (dayEvents.length > 3) {
+                    const moreElement = document.createElement('div');
+                    moreElement.className = 'event-item';
+                    moreElement.textContent = `+${dayEvents.length - 3} more`;
+                    moreElement.style.fontSize = '0.65rem';
+                    moreElement.style.fontWeight = 'bold';
+                    day.appendChild(moreElement);
+                }
+            }
+
+            // Click event
+            day.addEventListener('click', () => {
+                if (dayEvents.length > 0) {
+                    showDayEvents(date, dayEvents);
+                }
+            });
+
+            return day;
+        }
+
+        // Create event element
+        function createEventElement(event) {
+            const eventEl = document.createElement('div');
+            eventEl.className = `event-item type-${event.type}`;
+
+            const user = users[event.userId];
+
+            eventEl.innerHTML = `
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="text-truncate flex-grow-1">${event.time} ${event.title}</span>
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: ${user.color}; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                        ${user.avatar.charAt(0)}
+                    </div>
+                </div>
+            `;
+
+            eventEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showEventDetails(event);
+            });
+
+            return eventEl;
+        }
+
+        // Get event color based on type
+        function getEventColor(type) {
+            const colors = {
+                'meeting': '#4285f4',
+                'inspection': '#ffc107',
+                'maintenance': '#dc3545'
+            };
+            return colors[type] || '#6c757d';
+        }
+
+        // Show event details
+        function showEventDetails(event) {
+            currentEventId = event.id;
+            const modal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+            const content = document.getElementById('eventDetailsContent');
+
+            const user = users[event.userId];
+            const locationNames = event.locationIds.map(id =>
+                locations.find(l => l.id === id).name
+            ).join(', ');
+
+            const priorityColors = {
+                'low': 'success',
+                'medium': 'warning',
+                'high': 'danger',
+                'urgent': 'dark'
+            };
+
+            content.innerHTML = `
+                <div class="row g-3">
+                    <div class="col-12">
+                        <h6 class="fw-bold text-primary mb-3">${event.title}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block mb-1">Date & Time</small>
+                        <div class="fw-semibold">${event.date.toLocaleDateString()}</div>
+                        <div class="text-primary">${event.time} (${event.duration}h)</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block mb-1">Assigned User</small>
+                        <div class="d-flex align-items-center">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${user.color}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 8px;">
+                                ${user.avatar}
+                            </div>
+                            <div>
+                                <div class="fw-semibold">${user.name}</div>
+                                <small class="text-muted">${user.role}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block mb-1">Priority</small>
+                        <span class="badge bg-${priorityColors[event.priority]} text-capitalize">${event.priority}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block mb-1">Type</small>
+                        <span class="badge bg-primary text-capitalize">${event.type}</span>
+                    </div>
+                    <div class="col-12">
+                        <small class="text-muted d-block mb-1">Locations</small>
+                        <div class="fw-semibold">${locationNames}</div>
+                    </div>
+                    ${event.comments ? `
+                    <div class="col-12">
+                        <small class="text-muted d-block mb-1">Comments</small>
+                        <div class="p-3 bg-light rounded">${event.comments}</div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+
+            modal.show();
+        }
+
+        // Show day events (for mobile or detailed view)
+        function showDayEvents(date, dayEvents) {
+            // Create a simple alert for now - you can enhance this with a proper modal
+            const eventList = dayEvents.map(event =>
+                `${event.time} - ${event.title} (${users[event.userId].name})`
+            ).join('\n');
+
+            alert(`Events for ${date.toLocaleDateString()}:\n\n${eventList}`);
+        }
+
+        // Navigate month
+        function navigateMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        // Go to today
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // Refresh data
+        function refreshData() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const originalText = refreshBtn.innerHTML;
+
+            refreshBtn.innerHTML = '<div class="loading-spinner me-1"></div>Refreshing...';
+            refreshBtn.disabled = true;
+
+            setTimeout(() => {
+                renderCalendar();
+                renderLocationsTable();
+                updateStatistics();
+
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.disabled = false;
+                showToast('Data refreshed successfully!');
+            }, 1500);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S to schedule
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (selectedLocations.length > 0) {
+                    openScheduleModal();
+                }
+            }
+
+            // Arrow keys for calendar navigation
+            if (e.key === 'ArrowLeft' && e.ctrlKey) {
+                e.preventDefault();
+                navigateMonth(-1);
+            }
+
+            if (e.key === 'ArrowRight' && e.ctrlKey) {
+                e.preventDefault();
+                navigateMonth(1);
+            }
+
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                const openModals = document.querySelectorAll('.modal.show');
+                openModals.forEach(modal => {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) bsModal.hide();
+                });
+            }
+        });
+
+
+         // Open schedule modal
+        function openScheduleModal() {
+            
+            let selectedData = [];
+           
+            $('.rowCheckbox:checked').each(function () {
+                let corpId = $(this).data('corpid');
+                let corpName = $(this).data('corpname');
+                let branchName = $(this).data('branchname');
+                let branchId = $(this).data('branchid');
+                let boothId = $(this).data('boothid');
+                let boothName = $(this).data('boothname');
+                let assetId = $(this).data('assetid');
+                let terminal = $(this).data('terminal');
+               
+                selectedData.push({ corpId, corpName,branchName,branchId, boothId,boothName,assetId,terminal });
+            });                                                  
+            if(selectedData.length>0){                          
+                CreateModaldesign(selectedData);                 
+            }                                                   
+
+           console.log(selectedData);
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+            modal.show();
+        }
+
+        function CreateModaldesign(selectedLocations)
+        {
+             const container = document.getElementById('selectedLocationsDisplay');
+            container.innerHTML = ''; // Clear previous content
+
+            selectedLocations.forEach((location, index) => {
+                const card = document.createElement('div');
+                card.className = 'card card-body mb-3';
+                card.innerHTML = `
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-geo-alt me-1"></i> Selected Location
+                            </label>
+                            <div class="p-3 bg-light text-primary rounded fw-bold">
+                                ${location.corpName} / ${location.branchName} / ${location.boothName || ''} / ${location.terminal || ''}
+                            </div>
+                         <input type="hidden" id="hidecorpid" value="corpid_${location.corpId}_${index}"/>
+                         <input type="hidden" id="hidebrachid" value="branch_${location.branchId}_${index}"/>
+                         <input type="hidden" id="hideboothid" value="booth_${location.boothId}_${index}"/>
+                         <input type="hidden" id="hideassetid" value="assist_${location.assetId}_${index}"/>
+                            
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-calendar me-1"></i> Date
+                            </label>
+                            <input type="date" class="form-control" name="eventDate_${index}" id="eventDate_${index}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-clock me-1"></i> Time
+                            </label>
+                            <input type="time" class="form-control" name="eventTime_${index}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-person me-1"></i> Assign User
+                            </label>
+                            <select class="form-select" name="assignedUser_${index}" id="assignedUser_${index}" required> 
+                            <option value="">Select User</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Priority
+                            </label>
+                            <select class="form-select" name="priority_${index}" required>
+                                <option value="">Select Priority</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-chat-text me-1"></i> Comments
+                            </label>
+                            <textarea class="form-control" name="comments_${index}" rows="3"
+                                placeholder="Add any additional notes or instructions..."></textarea>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                // Optional: add event listener to date field for dynamic user fetch
+                const dateInput = card.querySelector(`#eventDate_${index}`);
+                const userSelect = card.querySelector(`#assignedUser_${index}`);
+
+                dateInput.addEventListener('change', () => {
+                    const selectedDate = dateInput.value;
+                    if (selectedDate) {
+                        fetchUsersForDate(selectedDate, userSelect); // function should be defined separately
+                    }
+                });
+            });
+        }
+
+
+    function fetchUsersForDate(date, selectElement)
+    {
+        selectElement.innerHTML = `<option value="">Loading users...</option>`;
+        debugger;
+        fetch(`/Corporate/Corporate/GetLoadeduser?dateValue=${encodeURIComponent(date)}`)
+            .then(res => res.json())
+            .then(users => {
+                selectElement.innerHTML = `<option value="">Select User</option>`;
+                debugger;
+                users.forEach(user => {
+                    const opt = document.createElement('option');
+                    opt.value = user.userId;
+                    opt.textContent = user.userName;
+                    selectElement.appendChild(opt);
+                });
+            })
+            .catch(() => {
+                selectElement.innerHTML = `<option value="">Error loading users</option>`;
+            });
+    }
+
+
+    function SaveConfirmSchedule()
+    {
+        const cards = document.querySelectorAll('#selectedLocationsDisplay .card');
+        const errorContainer = document.getElementById('errorMessage');
+        const scheduleData = [];
+        errorContainer.innerHTML = ''; // Clear previous error
+        let hasError = false;
+        cards.forEach((card, index) => {
+            const locationText = card.querySelector('.bg-light.text-primary').textContent.trim();
+             const corpValue = card.querySelector(`#hidecorpid`).value;
+            const corpId = corpValue.split('_')[1];  // Gets the actual corpId from "corpid_123_index"
+
+            const branchValue = card.querySelector(`#hidebrachid`).value;
+            const branchId = branchValue.split('_')[1];
+
+            const boothValue = card.querySelector(`#hideboothid`).value;
+            const boothId = boothValue.split('_')[1];
+
+            const assetValue = card.querySelector(`#hideassetid`).value;
+            const assetId = assetValue.split('_')[1];
+            const date = card.querySelector(`[name="eventDate_${index}"]`).value;
+            const time = card.querySelector(`[name="eventTime_${index}"]`).value;
+            const assignedUser = card.querySelector(`[name="assignedUser_${index}"]`).value;
+            const priority = card.querySelector(`[name="priority_${index}"]`).value;
+            const comments = card.querySelector(`[name="comments_${index}"]`).value;
+            debugger;
+            if (!date || time==='' || !assignedUser || priority==='')
+            {
+                 errorContainer.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Entry ${index + 1}:</strong> Please complete all required fields.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                hasError = true;
+                return; // Stop this iteration
+            }
+
+            scheduleData.push({
+                locationText,
+                corpId,
+                branchId,
+                boothId,
+                assetId,
+                date,
+                time,
+                assignedUser,
+                priority,
+                comments
+            });
+        });
+
+        // Optional: confirm before sending
+        if (scheduleData.length > 0) {
+            fetch('/Corporate/Corporate/SaveScheduleList', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(scheduleData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Schedule saved successfully!');
+                    // Optionally close modal and reset
+                    document.getElementById('scheduleModal').classList.remove('show');
+                    document.body.classList.remove('modal-open');
+                    document.querySelector('.modal-backdrop')?.remove();
+                } else {
+                    alert('Failed to save schedule.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error occurred while saving schedule.');
+            });
+        }
+    }
+
+        
+
+</script>

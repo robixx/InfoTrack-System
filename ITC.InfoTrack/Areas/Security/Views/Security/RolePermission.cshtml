@@ -1,0 +1,549 @@
+﻿@{
+    ViewBag.pTitle = "Menu Permission";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Role Wise Menu Manage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .permission-card {
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .role-tab {
+        border-radius: 10px 10px 0 0;
+        transition: all 0.3s ease;
+    }
+
+        .role-tab.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+            color: white !important;
+            border-color: transparent !important;
+        }
+
+    .menu-item {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+
+        .menu-item:hover {
+            background-color: rgba(99, 102, 241, 0.05);
+            transform: translateX(5px);
+            border-left: 2px solid green;
+        }
+
+    .permission-toggle {
+        transition: all 0.3s ease;
+    }
+
+        .permission-toggle:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+
+    .submenu-item {
+        margin-left: 35px;
+        border-left: 2px solid #214181;
+        padding-left: 15px;
+    }
+
+    .stats-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    /*   keyframes fadeIn {
+                    from
+
+                {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                } */
+
+    .permission-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .menu-icon {
+        width: 15px;
+        text-align: center;
+    }
+</style>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Menu Permission</h5>
+            </div>
+            <div class="card-body">
+                <div id="noticeMessage" class="alert alert-dismissible fade d-none" role="alert">
+                    <span id="noticeText"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="uservalue" class="form-label">Role Name</label>
+                            @Html.DropDownList("RoleId", ViewBag.role as SelectList, new { @class = "form-control", @id = "roleId", onchange = "RolePermission()" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4 mb-2 d-none" id="hiddenButton">
+                    <h5 class="fw-bold text-primary">
+                        <i class="bi bi-crown me-2"></i>
+                        Role Wise Permissions
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success btn-sm" onclick="savePermissions()">
+                            <i class="bi bi-cloud-arrow-up me-1"></i>
+                            Permission
+                        </button>                       
+                    </div>
+                </div>
+                <div class="container-fluid py-4">
+                    <div id="menu-container"></div>
+                    @*<div class="row">
+
+                         <div class="col-md-6 col-sm-6">
+                            <div class="card mb-3 border-0 shadow bg-body-tertiary rounded">
+                                <div class="card-body">
+                                    <div class="menu-item p-3">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-grid menu-icon me-3 text-primary fs-4"></i>
+                                                <div>
+                                                    <h6 class="mb-1 text-primary fw-semibold">Dashboard</h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <span class="badge bg-light text-dark permission-badge">2 items</span>
+                                                <div class="form-check ">
+                                                    <input class="form-check-input parent-checkbox" type="checkbox" id="admin-dashboard" checked>
+                                                    <label class="form-check-label fw-semibold" for="admin-dashboard">Allowed</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Static sub-menu items -->
+                                        <div class="mt-3">
+                                            <div class="submenu-item mb-2" data-parent="admin-dashboard">
+                                                <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-house menu-icon me-3 text-secondary"></i>
+                                                        <div>
+                                                            <span class="fw-medium">Home</span><br>
+                                                            <small class="text-muted">/dashboard/home</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="admin-home" checked>
+                                                        <label class="form-check-label" for="admin-home">Allowed</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="submenu-item mb-2" data-parent="admin-dashboard">
+                                                <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-gear menu-icon me-3 text-secondary"></i>
+                                                        <div>
+                                                            <span class="fw-medium">Settings</span><br>
+                                                            <small class="text-muted">/dashboard/settings</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check ">
+                                                        <input class="form-check-input" type="checkbox" id="admin-settings">
+                                                        <label class="form-check-label" for="admin-settings">Denied</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Submenu -->
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="card mb-3 border-0 shadow bg-body-tertiary rounded">
+                                <div class="card-body">
+                                    <div class="menu-item p-3">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-grid menu-icon me-3 text-primary fs-4"></i>
+                                                <div>
+                                                    <h6 class="mb-1 text-primary fw-semibold">Dashboard</h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <span class="badge bg-light text-dark permission-badge">2 items</span>
+                                                <div class="form-check ">
+                                                    <input class="form-check-input parent-checkbox" type="checkbox" id="admin-dashboard" checked>
+                                                    <label class="form-check-label fw-semibold" for="admin-dashboard">Allowed</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Static sub-menu items -->
+                                        <div class="mt-3">
+                                            <div class="submenu-item mb-2" data-parent="admin-dashboard">
+                                                <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-house menu-icon me-3 text-secondary"></i>
+                                                        <div>
+                                                            <span class="fw-medium">Home</span><br>
+                                                            <small class="text-muted">/dashboard/home</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="admin-home" checked>
+                                                        <label class="form-check-label" for="admin-home">Allowed</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="submenu-item mb-2" data-parent="admin-dashboard">
+                                                <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-gear menu-icon me-3 text-secondary"></i>
+                                                        <div>
+                                                            <span class="fw-medium">Settings</span><br>
+                                                            <small class="text-muted">/dashboard/settings</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check ">
+                                                        <input class="form-check-input" type="checkbox" id="admin-settings">
+                                                        <label class="form-check-label" for="admin-settings">Denied</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Submenu -->
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div> 
+                    </div>*@
+
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+
+    }
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+           const message = localStorage.getItem('metaSuccessMessage');
+
+           if (message) {
+               const notice = $('#noticeMessage');
+               const text = $('#noticeText');
+
+               // ✅ Show the alert
+               text.text(message);
+               notice.removeClass('d-none fade alert-danger');
+               notice.addClass('alert alert-success show');
+
+               // ✅ Remove message after showing
+               localStorage.removeItem('metaSuccessMessage');
+           }
+        });
+    // Role Selected then  data load
+    function RolePermission(){
+         var id=$("#roleId").val();
+
+          fetch(`/Security/Security/RolePagePermission?id=${id}`, {
+              method: 'GET',
+              headers: {'Content-Type': 'application/json'}
+
+          })
+          .then(response => response.json())
+          .then(res => {
+              if(res.data.length>0){
+                $('#hiddenButton').removeClass("d-none","");
+                loadPageDesign(res.data);
+              }else{
+                 $('#hiddenButton').addClass("d-none");
+              }
+          })
+          .catch(error => {
+
+              alert('Error while saving.');
+          });
+    }
+    /// card Design
+    function loadPageDesign(data)
+    {
+          const container = document.getElementById('menu-container');
+          container.innerHTML = ''; // Clear any existing content
+
+        for (let i = 0; i < data.length; i += 2) {
+          let rowHtml = '<div class="row">';
+
+          // Loop through 2 items at a time
+              for (let j = i; j < i + 2 && j < data.length; j++) {
+                  const menu = data[j];
+                    rowHtml += `
+                      <div class="col-md-6 col-sm-6">
+                        <div class="card mb-3 border-0 shadow bg-body-tertiary rounded">
+                          <div class="card-body">
+                            <div class="menu-item p-3">
+                              <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                  <i class="bi bi-list menu-icon me-3 text-primary fs-4"></i>
+                                  <div>
+                                    <h6 class="mb-1 text-primary fw-semibold">${menu.menuName}</h6>
+                                  </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                  <span class="badge bg-light text-dark permission-badge">${menu.roelbasesubMenu.length} items</span>
+                                  <div class="form-check">
+                                    <input class="form-check-input parent-checkbox" type="checkbox" id="${menu.menuId}" ${menu.isAllowed ? 'checked' : ''}>
+                                    <label class="form-check-label fw-semibold" for="${menu.menuId}">${menu.isAllowed ? 'Allowed' : 'Denied'}</label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="mt-3">
+                                ${menu.roelbasesubMenu.map(sub => `
+                                  <div class="submenu-item mb-2" data-parent="${menu.menuId}">
+                                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light">
+                                      <div class="d-flex align-items-center">
+                                        <i class="bi bi-chevron-double-right menu-icon me-3 text-secondary"></i>
+                                        <div>
+                                          <span class="fw-medium">${sub.menuName}</span>
+                                        </div>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="${sub.menuId}" ${sub.isAllowed ? 'checked' : ''}>
+                                        <label class="form-check-label" for="${sub.menuId}">${sub.isAllowed ? 'Allowed' : 'Denied'}</label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                `).join('')}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+              }
+
+          rowHtml += '</div>'; // close row
+          container.innerHTML += rowHtml; // append to container
+        }
+    }
+
+    /// ready for allow data
+    function collectPermissionData() {
+        const data = [];
+
+        document.querySelectorAll('.parent-checkbox').forEach(parentCheckbox => {
+            const menuId = parentCheckbox.id;
+
+            // Get only checked submenus
+            const submenus = [];
+            document.querySelectorAll(`.submenu-item[data-parent="${menuId}"]`).forEach(submenu => {
+                const checkbox = submenu.querySelector('.form-check-input');
+                if (checkbox.checked) {
+                    submenus.push({
+                        menuId: checkbox.id,
+                        isAllowed: true
+                    });
+                }
+            });
+
+            // Include parent only if checked or if it has any checked submenu
+            if (parentCheckbox.checked || submenus.length > 0) {
+                data.push({
+                    menuId: menuId,
+                    isAllowed: parentCheckbox.checked,
+                    rolebasesubMenu: submenus
+                });
+            }
+        });
+        debugger;
+        return data;
+    }
+
+
+
+    document.addEventListener('change', function (e)
+    {
+        const checkbox = e.target;
+
+        if (!checkbox.classList.contains('form-check-input')) return;
+
+        const label = checkbox.nextElementSibling;
+        if (label && label.tagName.toLowerCase() === 'label') {
+            label.textContent = checkbox.checked ? 'Allowed' : 'Denied';
+        }
+
+        // If it's a parent checkbox
+        if (checkbox.classList.contains('parent-checkbox')) {
+            const submenuGroups = document.querySelectorAll(`.submenu-item[data-parent="${checkbox.id}"]`);
+            submenuGroups.forEach(submenuGroup => {
+                const submenuCheckboxes = submenuGroup.querySelectorAll('.form-check-input');
+                submenuCheckboxes.forEach(cb => {
+                    cb.checked = checkbox.checked;
+                    const siblingLabel = cb.nextElementSibling;
+                    if (siblingLabel && siblingLabel.tagName.toLowerCase() === 'label') {
+                        siblingLabel.textContent = checkbox.checked ? 'Allowed' : 'Denied';
+                    }
+                });
+            });
+        }
+
+        // If it's a submenu checkbox
+        if (checkbox.closest('.submenu-item')) {
+            const parentId = checkbox.closest('.submenu-item').getAttribute('data-parent');
+            const parentCheckbox = document.getElementById(parentId);
+            const siblingSubmenus = document.querySelectorAll(`.submenu-item[data-parent="${parentId}"] .form-check-input`);
+
+            // If any submenu is checked, parent should be checked
+            const anyChecked = Array.from(siblingSubmenus).some(cb => cb.checked);
+            parentCheckbox.checked = anyChecked;
+
+            // Update parent label
+            const parentLabel = parentCheckbox.nextElementSibling;
+            if (parentLabel && parentLabel.tagName.toLowerCase() === 'label') {
+                parentLabel.textContent = anyChecked ? 'Allowed' : 'Denied';
+            }
+        }
+    });
+
+
+     function savePermissions()
+     {
+        const roleId = document.getElementById("roleId").value;
+        const dropdown = document.getElementById("roleId");
+        const rolename = dropdown.options[dropdown.selectedIndex].text;
+        
+
+        if (!roleId) {
+            alert("Please select a role first!", "danger");
+            return;
+        }
+        debugger;
+        const permissions = collectPermissionData();
+        debugger;
+        $.ajax({
+            url: '/Security/Security/SaveRolePagePermission',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                roleId: roleId,
+                roleName: rolename,
+                permissions: permissions
+            }),
+            success: function (res) {
+              const notice = $('#noticeMessage');
+              const text = $('#noticeText');
+              notice.removeClass('alert-success alert-danger');
+
+              if (!res.status) {
+
+                  text.text(res.message);
+                  notice.removeClass('d-none fade').addClass('alert-danger show');
+              } else {
+
+                  localStorage.setItem('metaSuccessMessage', res.message);
+                  location.reload(); // ✅ Reload the page
+              }
+            },
+            error: function () {
+                showNotice("Error saving permissions.", "danger");
+            }
+        });
+    }
+
+
+</script>
+

@@ -1,0 +1,256 @@
+﻿@{
+    ViewBag.pTitle = "OrganizationCreate";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Organization Setup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Organization Setup</h5>
+                <a class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2" id="addOrg">
+                    <i class="fa fa-plus"></i>
+                    Create Organization
+                </a>
+            </div>
+
+            <div class="card-body">
+                <div id="noticeMessage" class="alert alert-dismissible fade d-none" role="alert">
+                    <span id="noticeText"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="row mt-2">
+                    <table id="datatable" class="table table-striped dt-responsive nowrap table-hover scheduleTable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead style=" background-color:#c9ccd3; font-weight:600;">
+                            <tr>                                
+                                <th>SL</th>
+                                <th>Name</th>
+                                <th>Org Type</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Address</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+<!--  Modal content for the above example -->
+<div class="modal fade bs-example" id="dynamicModals" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <div id="modalData"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="SaveChange" class="btn btn-sm btn-primary waves-effect waves-light"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+
+    }
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+
+      $(document).ready(function () {
+        const message = localStorage.getItem('metaSuccessMessage');
+
+        if (message) {
+            const notice = $('#noticeMessage');
+            const text = $('#noticeText');
+
+            // ✅ Show the alert
+            text.text(message);
+            notice.removeClass('d-none fade alert-danger');
+            notice.addClass('alert alert-success show');
+
+            // ✅ Remove message after showing
+            localStorage.removeItem('metaSuccessMessage');
+        }
+    });
+
+    $('#addOrg').on('click', function(){
+        $('#myModalLabel').text('Add Organization Title');
+        $('#SaveChange').text('Save');
+        OrgInsertData();
+        $('#dynamicModals').modal('show');
+
+    });
+
+    function OrgInsertData()
+    {
+         var fielddata=document.getElementById('modalData');
+         var htmltext='';
+          htmltext +=`<div class="row"><div class="col-md-6 mb-3">
+                        <label for="metaelementTitle" class="form-label">Org Name<span class="text-danger">*</span></label>
+                        <input type="text" placeholder="Organization Name" class="form-control" name="orgName" id="orgName" required/>
+                        <input type="hidden" id="orgId" name="orgId"/></div>
+                        <div class="col-md-6 mb-3">
+                        <label for="metaelementTitle" class="form-label">Org Type<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="orgType" id="orgType"/>
+                       
+           </div></div>`;
+
+         
+          htmltext +=`<div class="row"><div class="col-md-6 mb-3">
+                        <label for="metaelementTitle" class="form-label">Contact </label>
+                        <input type="text" placeholder="Contact Number" class="form-control" name="orgcontact" id="orgcontact"/></div>
+                        <div class="col-md-6 mb-3">
+                        <label for="metaelementTitle" class="form-label">Org Email</label>
+                        <input type="text" placeholder="Enter Email" class="form-control" name="orgEmail" id="orgEmail"/>
+           </div></div>`;
+           htmltext +=`<div class="row"><div class="col-md-8 mb-3">
+                        <label for="metaelementTitle" class="form-label">Address </label>
+                        <textarea type="text" placeholder="Please Write Address ..." class="form-control" name="orgAddress" id="orgAddress"></textarea>
+                        </div>
+                        <div class="col-md-4 mb-3 d-flex align-items-center">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="isStatus" id="isStatus" />
+                            <label class="form-check-label" for="metaelementcheck">Is Active</label>
+                        </div></div></div>`;
+
+         
+          fielddata.innerHTML=htmltext;
+    }
+
+
+    $('#SaveChange').on('click', function(){
+        var metaId=$('#orgId').val().trim()===''?0:$('#orgId').val().trim();
+        var orName=$('#orgName').val().trim();
+        var orType=$('#orgType').val().trim();
+        var orcontact=$('#orgcontact').val().trim();
+        var orEmail=$('#orgEmail').val().trim();
+        var orAddress=$('#orgAddress').val().trim();
+        var isActive=$('#isStatus').is(':checked');
+        if(orName==='' || orgName==null){
+            $('#orgName').focus().css('border', '1px solid #7e1414');
+        }
+        
+        // var model={
+        //             metaId :metaId,
+        //             element:element,
+        //             description:description,
+        //             isActive:isActive,
+        //         };
+        //  $.ajax({
+        //        url: '/Security/Security/MetaElementSave',
+        //        type: 'POST',
+        //        contentType: 'application/json',
+        //        data: JSON.stringify(model),
+        //        success: function (res) {
+        //            const notice= $('#noticeMessage');
+        //            const text=$('#noticeText');
+        //            notice.removeClass('alert-success alert-danger');
+        //         if(!res.status){
+
+        //                 text.text(res.message);
+        //                 $('#noticeMessage').removeClass('d-none fade').addClass('alert-danger show');
+
+        //          }else{
+        //                localStorage.setItem('metaSuccessMessage', res.message);
+        //                 // ✅ Reload the page
+        //                 location.reload();
+        //          }
+        //              $('#metaModals').modal('hide');
+        //          },
+        //          error: function (err) {
+        //                 alert('Error while saving.');
+        //        }
+        //  });
+
+    });
+
+
+
+
+</script>
