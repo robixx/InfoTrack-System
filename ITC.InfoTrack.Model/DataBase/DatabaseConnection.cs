@@ -47,6 +47,7 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<BranchInfo> BranchInfo { get; set; }
         public DbSet<LevelSetting> LevelSetting { get; set; }
         public DbSet<ProfileWiseOrganization> ProfileWiseOrganization { get; set; }
+        public DbSet<OrganizationHierarchyDto> OrganizationHierarchyDto { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -80,6 +81,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<RoleBaseSubMenuDto>().HasNoKey();
             modelBuilder.Entity<CustomTypeWiseLoadedDto>().HasNoKey();
             modelBuilder.Entity<OrganizationConfigureDto>().HasNoKey();
+            modelBuilder.Entity<OrganizationHierarchyDto>().HasNoKey();
 
             base.OnModelCreating(modelBuilder);
         }

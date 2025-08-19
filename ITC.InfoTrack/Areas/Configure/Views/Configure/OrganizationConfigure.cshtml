@@ -3,7 +3,7 @@
     ViewBag.pageTitle = "InfoTrack";
     ViewBag.Title = "OrganizationConfigure";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int i = 1;
+    
 }
 @section styles {
     <!-- jquery.vectormap css -->
@@ -238,12 +238,14 @@
                     <input type="hidden" id="form-parent-id"> <!-- To store parent ID when adding -->
                     <div class="mb-3">
                         <label for="form-name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="form-name" required>
+                        @* <input type="text" class="form-control" id="form-name" required> *@
+                        <select class="form-select" name="form-name" id="form-name" required>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="form-type" class="form-label">Type</label>
                         <select class="form-select" id="form-type" required>
-                            <option value="">Select Type</option>
+                            <option value="0">Select Type</option>
                             <option value="Organization">Organization</option>
                             <option value="Branch">Branch</option>
                             <option value="SubBranch">Sub-Branch</option>
@@ -466,23 +468,23 @@
         // Map node types to Font Awesome icons
         const nodeIcons = {
             'Organization': 'fa-solid fa-building',
-            'Branch': 'fa-solid fa-code-branch', // This will apply to branches without children
+            'Branch': 'fa-solid fa-code-branch', 
             'SubBranch': 'fa-solid fa-sitemap',
             'District': 'fa-solid fa-city',
             'Division': 'fa-solid fa-layer-group',
             // 'Zone': 'fa-solid fa-map-marker-alt',
             // 'Area': 'fa-solid fa-location-dot',
-            'Booth': 'fa-solid fa-file' // Changed to a file icon for booths
+            'Booth': 'fa-solid fa-file' 
         };
 
-        // Mapping to determine the expected type of children for a given parent type
+        
         const childTypeMapping = {
             'Organization': 'Branch',
             'Branch': 'SubBranch',
             'SubBranch': 'District',
             'District': 'Division',
             'Division': 'Booth',
-            'Booth': 'N/A' // Booths have no further children types in this hierarchy
+            'Booth': 'N/A' 
         };
         const treeContainer = document.getElementById('tree-container');
         const nodeListPanel = document.getElementById('node-list-panel');
@@ -508,8 +510,8 @@
 
         let selectedNodeId = null;
         let selectedNodeInListId = null;
-        let currentListType = null; // Stores the type of node currently displayed in the list panel
-        let currentListParentNodeId = null; // Stores the ID of the tree node whose children are displayed in the list
+        let currentListType = null; 
+        let currentListParentNodeId = null; 
 
         function renderTree() {
             console.log("Rendering tree...");
@@ -589,7 +591,7 @@
                 let nodesToDisplayInList = [];
                 let typeForList = '';
                 let parentIdForListAdd = null;
-                debugger;
+              
 
                 if (node.id === 1) {
                     nodesToDisplayInList = findAllNodesByType(treeData, 'Branch');
@@ -645,12 +647,12 @@
 
 
          function renderNodeListPanel(nodes, type) {
-            nodeListTbody.innerHTML = ''; // Clear existing rows
-            selectedNodeInListId = null; // Clear selection when list is re-rendered
-            currentListType = type; // Set the current type for list CRUD operations
 
-            // Update panel title and button texts
-            currentListTypeTitle.textContent = type + 's'; // e.g., "Branches", "Districts"
+            nodeListTbody.innerHTML = ''; 
+            selectedNodeInListId = null; 
+            currentListType = type;             
+            
+            currentListTypeTitle.textContent = type + 's'; 
             listBtnTypeSpans.forEach(span => span.textContent = type);
 
             if (nodes.length === 0) {
@@ -695,23 +697,65 @@
         }
 
         addNodeInListBtn.addEventListener('click', () => {
+
+            DynamicdataName(currentListParentNodeId); // for data name
+            
+        });
+
+
+        function DynamicdataName(data_id)
+        {
+            
+            $.ajax({
+                url: '/Configure/Configure/GetDynamicOrganizationName',
+                type: 'GET',
+                contentType: 'application/json',
+                data:{id:data_id},
+                success: function (res) {
+                   
+                     if(res.length>0)
+                     {
+                        
+                         AddButtonWork(res);
+                     }
+                },
+                error: function (err) {
+                    
+                    alert('Error while fetching Dynamic Organization Name.');
+                }
+             });
+        }
+
+
+        function AddButtonWork(data)
+        {
             console.log(`Add ${currentListType} (List) button clicked.`);
             if (!currentListType || !currentListParentNodeId) {
                 showMessage("Please select a parent node in the tree first to add a new item to its list.");
                 return;
             }
-
+            
+             const dropdown = $('#form-name');
+                dropdown.empty();
+                dropdown.append('<option value="0">Select Name</option>');
+                
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        dropdown.append(`<option value="${item.value}">${item.text}</option>`);
+                    });
+                }
+                dropdown.val('0');
             crudNodeModalLabel.textContent = `Add New ${currentListType}`;
-            formNodeId.value = ''; // Clear node ID for new node
-            formParentId.value = currentListParentNodeId; // Set the parent ID from the currently displayed list's parent
+            formNodeId.value = '';
+            formParentId.value = currentListParentNodeId;
             formName.value = '';
-            formType.value = currentListType; // Pre-select the type of the current list
+            formType.value = currentListType;
             formCreatedDate.value = new Date().toISOString().split('T')[0];
             formIsActive.checked = true;
             formAddress.value = '';
             formContactNumber.value = '';
              $('#crudNodeModal').modal('show');
-        });
+        }
 
        editNodeInListBtn.addEventListener('click', () => {
             console.log(`Edit ${currentListType} (List) button clicked.`);
@@ -815,7 +859,7 @@
                 showMessage("Please fill in all required fields (Name, Type, Created Date).");
                 return;
             }
-
+            
             const nodeId = formNodeId.value;
             const parentId = formParentId.value; // Only used when adding from tree context
             const name = formName.value;
@@ -826,9 +870,10 @@
             const contactNumber = formContactNumber.value;
 
             const newNodeData = {
-                id: nodeId || `node-${Date.now()}`, // Generate new ID if adding
+                id: nodeId===''?0: nodeId, // Generate new ID if adding
                 name,
                 type,
+                parentId,
                 createdDate,
                 isActive,
                 address,
@@ -838,72 +883,68 @@
 
             if (nodeId) { // Editing existing node (from tree or list)
                 console.log("Attempting to edit node:", nodeId);
-                const nodeToUpdate = findNodeById(nodeId);
-                if (nodeToUpdate) {
-                    Object.assign(nodeToUpdate, newNodeData); // Update properties
-                    console.log(`Node ${nodeToUpdate.name} (ID: ${nodeToUpdate.id}) updated.`);
-                } else {
-                    showMessage("Error: Node to update not found.");
-                    console.error("Node to update not found. ID:", nodeId);
-                }
+                
             } else { // Adding new node
                 console.log("Attempting to add new node. Parent ID:", parentId);
-                // If parentId is available (from tree's add button or list's add button)
-                if (parentId) {
-                    const parentNode = findNodeById(parentId);
-                    if (parentNode) {
-                        // Ensure children array exists
-                        if (!parentNode.children) {
-                            parentNode.children = [];
-                        }
-                        parentNode.children.push(newNodeData);
-                        console.log(`New node ${newNodeData.name} (ID: ${newNodeData.id}) added under ${parentNode.name} (ID: ${parentNode.id}).`);
-                    } else {
-                        showMessage("Error: Parent node not found for adding new node. Please ensure the parent exists in the tree.");
-                        console.error("Parent node not found for adding new node. Parent ID:", parentId);
-                    }
-                } else {
-                    // If no parentId, this implies adding a new top-level node.
-                    // For this example, we'll add it as a child of the main 'City Bank PLC' node.
-                    // In a real application, you might add logic to select a parent or handle top-level additions.
-                    if (treeData && treeData.type === 'Organization') {
-                        // This assumes the new node is meant to be a direct child of the root organization.
-                        // You might want a more sophisticated way to pick a parent, e.g., a dropdown in the modal.
-                        treeData.children.push(newNodeData);
-                        console.log(`New node ${newNodeData.name} (ID: ${newNodeData.id}) added under root Organization.`);
-                    } else {
-                        showMessage("Cannot determine where to add the new node. Please select a parent in the tree or define a clear logic for adding top-level nodes.");
-                        console.error("Cannot add node without a specified parent.");
-                    }
-                }
+                    DataSave(newNodeData);
+                 
             }
 
             $('#crudNodeModal').modal('hide');
             renderTree();
 
-            if (nodeListPanel.style.display === 'flex' && currentListType && currentListParentNodeId) {
+            if (nodeListPanel.style.display === 'flex' && currentListType && currentListParentNodeId)
+            {
                 const parentNodeForList = findNodeById(currentListParentNodeId);
-                if (parentNodeForList) {
-                    // If the list was showing ALL branches (from Organization click), re-render ALL branches
-                    if (parentNodeForList.id === 'org-1' && currentListType === 'Branch') {
+                if (parentNodeForList)
+                {
+                   
+                    if (parentNodeForList.id === 1 && currentListType === 'Branch')
+                    {
                         renderNodeListPanel(findAllNodesByType(treeData, 'Branch'), 'Branch');
-                    } else {
-                        renderNodeListPanel(parentNodeForList.children || [], childTypeMapping[parentNodeForList.type]);
+                    } 
+                    else
+                    {
+                        renderNodeListPanel(parentNodeForList.children || [], childTypeMapping[parentNodeForList.propertyId]);
                     }
                 }
-            } else {
-                // If the list panel was not visible or context was lost, hide it
+            } 
+            else
+            {
+               
                 nodeListPanel.style.display = 'none';
                 currentListParentNodeId = null;
             }
         });
 
+
+          // DataSave function
+        function DataSave(newNodeData) {
+            fetch('/Configure/Configure/InsertTreeNode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newNodeData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                debugger;
+                showMessages(data.message, data.status)   // just show the message
+                    .then(() => {
+                        $('#crudNodeModal').modal('hide');
+                        setTimeout(() => location.reload(), 1000);
+                    });
+            })
+            .catch(err => console.error(err));
+        }
+
          function showMessage(message, isConfirm = false) {
+             debugger;
             return new Promise((resolve) => {
                 messageModalBody.textContent = message;
                 messageModalFooter.innerHTML = ''; // Clear previous buttons
 
                 if (isConfirm) {
+                    debugger;
                     const yesBtn = document.createElement('button');
                     yesBtn.type = 'button';
                     yesBtn.classList.add('btn', 'btn-danger', 'rounded-pill');
@@ -940,5 +981,64 @@
             });
         }
 
+
+
+    function showMessages(message, isConfirm = false) {
+        return new Promise((resolve) => {
+            const messageModalElement = document.getElementById('messageModal');
+            const messageModalBody = document.getElementById('messageModalBody');
+            const messageModalFooter = document.getElementById('messageModalFooter');
+
+            // Set the message text and clear previous buttons
+            messageModalBody.textContent = message;
+            messageModalFooter.innerHTML = '';
+
+            // Create Bootstrap modal instance
+            const messageModal = new bootstrap.Modal(messageModalElement);
+
+            if (isConfirm) {
+
+                 // OK button
+                const okBtn = document.createElement('button');
+                okBtn.type = 'button';
+                okBtn.classList.add('btn', 'btn-primary', 'rounded-pill');
+                okBtn.textContent = 'OK';
+                okBtn.addEventListener('click', () => {
+                    messageModal.hide();
+                    resolve(true);
+                });
+
+                messageModalFooter.appendChild(okBtn);
+
+                // Yes / No buttons
+                
+            } else {
+                const yesBtn = document.createElement('button');
+                yesBtn.type = 'button';
+                yesBtn.classList.add('btn', 'btn-danger', 'rounded-pill');
+                yesBtn.textContent = 'Ok';
+                yesBtn.addEventListener('click', () => {
+                    messageModal.hide();
+                    resolve(true);
+                });
+
+                const noBtn = document.createElement('button');
+                noBtn.type = 'button';
+                noBtn.classList.add('btn', 'btn-secondary', 'rounded-pill', 'ms-2');
+                noBtn.textContent = 'No, Cancel';
+                noBtn.addEventListener('click', () => {
+                    messageModal.hide();
+                    resolve(false);
+                });
+
+                messageModalFooter.appendChild(noBtn);
+                messageModalFooter.appendChild(yesBtn);
+               
+            }
+
+            // Show modal using Bootstrap API
+            messageModal.show();
+        });
+    }
 
 </script>

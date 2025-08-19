@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -64,20 +65,26 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
-        public async Task<List<DropDownDto>> getBranchList(long OfficeId)
+        public async Task<List<DropDownDto>> getBranchList(int BranchId)
         {
             try
             {
-                var result = await _connection.MetaDataElements
-                    .Where(i => i.ParentPropertyId == OfficeId && i.DataElementStatus == 1)
-                    .Select(i => new DropDownDto
+                var branch = await _connection.ProfileWiseOrganization
+                        .Where(i => i.PropertyId == BranchId ) // handle nullable input
+                        .Select(i=>i.Id)
+                        .FirstOrDefaultAsync(); // fetch first match or null
+
+                var subbranchulist = await _connection.ProfileWiseOrganization
+                    .Where(i => i.ParentId == branch)
+                    .OrderBy(i=>i.OrderView)
+                    .Select(i=>new DropDownDto
                     {
-                        Id = i.DataElementId,
-                        Name = i.MetaElementValue
+                        Id=i.Id,
+                        Name=i.LevelName,
                     })
                     .ToListAsync();
 
-                return result.OrderBy(i => i.Id).ToList();
+                return subbranchulist;
 
             }
             catch (Exception ex)
@@ -91,7 +98,7 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 var parentElements = await _connection.MetaDataElements
-                             .Where(p => p.DataElementStatus == 1 && p.ParentPropertyId==type)
+                             .Where(p => p.DataElementStatus == 1 && p.ParentPropertyId == type)
                              .Select(i => new DropDownDtos
                              {
                                  Id = i.DataElementId,
@@ -106,7 +113,7 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception($"Could not find {ex.Message}");
             }
         }
-        
+
 
         public async Task<List<DropDownDto>> GetCustomTypeWiseLocation(long OrgId, long TypeId)
         {
@@ -123,9 +130,9 @@ namespace ITC.InfoTrack.Model.DAO
 
                     .ToListAsync();
 
-                var result = data.Select(i=> new DropDownDto
+                var result = data.Select(i => new DropDownDto
                 {
-                    Id= i.Id,
+                    Id = i.Id,
                     Name = i.Name,
                 }).ToList();
 
@@ -143,7 +150,7 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 var parentElements = await _connection.MetaDataType
-                             .Where(p => p.PropertyStatus == 1)                             
+                             .Where(p => p.PropertyStatus == 1)
                              .Select(i => new DropDownDtos
                              {
                                  Id = i.PropertyId,
@@ -164,14 +171,14 @@ namespace ITC.InfoTrack.Model.DAO
         {
             try
             {
-                var parentElements = await( from a in _connection.MetaDataElements
+                var parentElements = await (from a in _connection.MetaDataElements
                                             join b in _connection.MetaDataType on a.PropertyId equals b.PropertyId
-                             where a.DataElementStatus == 1
-                             select new DropDownDtos
-                             {
-                                 Id = a.DataElementId,
-                                 Name = a.MetaElementValue +" ( "+ b.PropertyName + " )",
-                             })
+                                            where a.DataElementStatus == 1
+                                            select new DropDownDtos
+                                            {
+                                                Id = a.DataElementId,
+                                                Name = a.MetaElementValue + " ( " + b.PropertyName + " )",
+                                            })
                              .ToListAsync();
 
                 return parentElements;
@@ -182,16 +189,16 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
-        public async Task<List<DropDownDto>> getOfficeList()
+        public async Task<List<DropDownDto>> getConfigBranchList()
         {
             try
             {
-                var result = await _connection.MetaDataElements
-                    .Where(i => i.DataElementStatus == 1 && i.PropertyId==5)  // all branch
+                var result = await _connection.ProfileWiseOrganization
+                    .Where(i => i.IsActive == 1 && i.ParentId == 1)  // all branch
                     .Select(i => new DropDownDto
                     {
-                        Id = i.DataElementId,
-                        Name = i.MetaElementValue
+                        Id = i.PropertyId,
+                        Name = i.LevelName
                     })
                     .ToListAsync();
                 result.Add(new DropDownDto { Id = 0, Name = "Select Branch" });
@@ -231,9 +238,9 @@ namespace ITC.InfoTrack.Model.DAO
         {
             try
             {
-                
+
                 var parentElements = await _connection.MetaDataType
-                             .Where(p => p.PropertyStatus == 1 && p.RootValue==1).OrderBy(i => i.Label)
+                             .Where(p => p.PropertyStatus == 1 && p.RootValue == 1).OrderBy(i => i.Label)
                              .Select(i => new DropDownDtos
                              {
                                  Id = i.PropertyId,
@@ -296,7 +303,7 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 var parentElements = await _connection.MetaDataType
-                             .Where(p => p.RootValue == 1 )
+                             .Where(p => p.RootValue == 1)
                              .Select(i => new DropDownDtos
                              {
                                  Id = i.PropertyId,
@@ -307,9 +314,9 @@ namespace ITC.InfoTrack.Model.DAO
                 return (parentElements, true);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception (ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -328,7 +335,7 @@ namespace ITC.InfoTrack.Model.DAO
 
                 return (parentElements, true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -394,6 +401,74 @@ namespace ITC.InfoTrack.Model.DAO
                 return (parentElements, true);
             }
             catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropDownDtos>> getDynamicNameIdAsync(string id)
+        {
+            try
+            {
+                int parentId = Convert.ToInt32(id);
+
+              
+                // Step 1: get the first propertyId
+                var acualvalue = await _connection.ProfileWiseOrganization
+                    .Where(i => i.IsActive == 1 && i.ParentId == parentId)
+                    .Select(p => p.PropertyId)
+                    .FirstOrDefaultAsync();               
+
+                // Step 2: get all propertyIds that should be excluded
+                var excludedIds = await _connection.ProfileWiseOrganization
+                    .Where(i => i.IsActive == 1 && i.PropertyId!= acualvalue)
+                    .Select(p => p.PropertyId)
+                    .ToListAsync();
+
+                // Step 3: fetch MetaDataElements for acualvalue but not already in excludedIds
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == acualvalue && !excludedIds.Contains(i.DataElementId))
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                         .ToListAsync();
+
+
+
+
+                return datalist;
+
+            }
+            catch (Exception ex)
+            { 
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropDownDto>> getDistrictList(int subbranchId)
+        {
+            try
+            {
+                var branch = await _connection.ProfileWiseOrganization
+                        .Where(i => i.Id == subbranchId) // handle nullable input
+                        .Select(i => i.Id)
+                        .FirstOrDefaultAsync(); // fetch first match or null
+
+                var subbranchulist = await _connection.ProfileWiseOrganization
+                    .Where(i => i.ParentId == branch)
+                    .OrderBy(i => i.OrderView)
+                    .Select(i => new DropDownDto
+                    {
+                        Id = i.Id,
+                        Name = i.LevelName,
+                    })
+                    .ToListAsync();
+
+                return subbranchulist;
+            }
+            catch(Exception ex)
             {
                 throw new Exception(ex.Message);
             }

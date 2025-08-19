@@ -47,23 +47,45 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         [HttpGet]
         public async Task<IActionResult> ScheduleCreate()
         {
-            ViewBag.office = new SelectList(await _dropdown.getOfficeList(), "Id", "Name");
+            ViewBag.branchname = new SelectList(await _dropdown.getConfigBranchList(), "Id", "Name");
            
             return View();
         }
         [HttpGet]
         public async Task<IActionResult> GetsubBranches(int branchId)
         {
-            long branchid = Convert.ToInt64(branchId);
-            var branches =  await _dropdown.getBranchList(branchid);
+            
+            var branches =  await _dropdown.getBranchList(branchId);
 
             return Json(branches);
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetDistrictCode(int subbranchId)
+        {
+
+            var branches = await _dropdown.getDistrictList(subbranchId);
+
+            return Json(branches);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDivisionCode(int districtid)
+        {
+
+            var branches = await _dropdown.getDistrictList(districtid);
+
+            return Json(branches);
+        }
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetBooths(long branchId)
         {
-
-            var booths = await _dropdown.getboothList(branchId);
+            long branchid= Convert.ToInt64(branchId);
+            var booths = await _dropdown.getboothList(branchid);
             return Json(booths);
         }
 
@@ -79,11 +101,11 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         public async Task<IActionResult> GetFilteredData( int? branchId, int? subbranch, int? district , int? division)
         {
             
-            long branch = Convert.ToInt64(branchId);
+            int branch = branchId??0;
             int subbranchid = subbranch ?? 0;
             int districtid = district ?? 0;
             int divisionid = division ?? 0;
-            var data = await _corporate.ScheduleDataFind( branch, subbranchid, districtid, divisionid);
+            var data = await _corporate.GetOrganizationHierarchyAsync(branch, subbranchid, districtid, divisionid);
             return Json(data);
         }
 

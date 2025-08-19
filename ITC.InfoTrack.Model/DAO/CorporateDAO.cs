@@ -184,5 +184,32 @@ namespace ITC.InfoTrack.Model.DAO
             }
 
         }
+
+        public async Task<List<OrganizationHierarchyDto>> GetOrganizationHierarchyAsync(int? branchId, int? subbranch, int? district, int? division)
+        {
+            try
+            {
+                var parameters = new[]
+               {
+                    new NpgsqlParameter("p_branch_property_id", NpgsqlTypes.NpgsqlDbType.Integer)
+                        { Value = branchId ?? (object)DBNull.Value },
+                    new NpgsqlParameter("p_subbranch_property_id", NpgsqlTypes.NpgsqlDbType.Integer)
+                        { Value = subbranch ?? (object)DBNull.Value },
+                    new NpgsqlParameter("p_district_property_id", NpgsqlTypes.NpgsqlDbType.Integer)
+                        { Value = district ?? (object)DBNull.Value },
+                    new NpgsqlParameter("p_division_property_id", NpgsqlTypes.NpgsqlDbType.Integer)
+                        { Value = division ?? (object)DBNull.Value }
+
+                };
+                var data = await _connection.OrganizationHierarchyDto.FromSqlRaw("SELECT * FROM get_hierarchy_by_property({0}, {1}, {2}, {3})", parameters).ToListAsync();
+
+                return data;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

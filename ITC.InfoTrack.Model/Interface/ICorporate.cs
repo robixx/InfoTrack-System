@@ -16,5 +16,8 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<ScheduleDataDto>> ScheduleDataFind(long? branch, long? subbranchid, int? districtid, int? divisionid);
         Task<List<UserDto>> GetUserDateWise(string dateValue);
 
+        Task<List<OrganizationHierarchyDto>> GetOrganizationHierarchyAsync(int? branchId, int? subbranch, int? district, int? division);
+
+
     }
 }

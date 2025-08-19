@@ -379,6 +379,49 @@ namespace ITC.InfoTrack.Model.DAO
             return rootItems;
         }
 
+        public async Task<(string message, bool status)> TreeNodeModificationAsync(TreeNodeInsertDto model)
+        {
+            try
+            {
+                string message = "";
+                bool status = false;
+                if (model == null)
+                    return("Model Invalid", false);
+                if (model != null)
+                {
+                   
+                    var levelName= await _connection.MetaDataElements.Where(i=>i.DataElementId==Convert.ToInt32(model.Name)).FirstOrDefaultAsync();
+                    var topOrder = await _connection.ProfileWiseOrganization.MaxAsync(i => i.OrderView);
 
+                    if (model.Id == 0)
+                    {
+                        var insertdata = new ProfileWiseOrganization
+                        {
+                            LevelName= levelName.MetaElementValue,
+                            ParentId=Convert.ToInt32(model.parentId),
+                            IsActive=1,
+                            Status=0,
+                            PropertyId=levelName.DataElementId,
+                            Icon=null,
+                            type=model.Type,
+                            OrderView= topOrder+1
+
+                        };
+                         _connection.Add(insertdata);
+                        await _connection.SaveChangesAsync();
+                        message = $"{model.Type} Added Successfully";
+                        status = true;
+                    }
+                    else
+                    {
+
+                    }
+                }
+                return (message, status);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

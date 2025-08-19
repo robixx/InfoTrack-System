@@ -47,7 +47,30 @@ namespace ITC.InfoTrack.Areas.Configure.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> GetDynamicOrganizationName(string id)
+        {
+            var result= await _dropdown.getDynamicNameIdAsync(id);
+            var data = result.Select(p => new
+            {
+                value = p.Id,
+                text = p.Name,
+            });
+            return Json(data);
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> InsertTreeNode([FromBody] TreeNodeInsertDto newNodeData)
+        {
+            var result= await _configuration.TreeNodeModificationAsync(newNodeData);
+            var response = new
+            {
+                status = result.status,
+                message = result.message,
+                
+            };
+            return Json(response);
+        }
 
         [HttpGet]
         public async Task<IActionResult> LocationSet()

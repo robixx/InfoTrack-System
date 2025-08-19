@@ -10,9 +10,10 @@ namespace ITC.InfoTrack.Model.Interface
 {
     public interface IDropDown
     {
-        Task<List<DropDownDto>> getOfficeList();
-        Task<List<DropDownDto>> getBranchList(long OfficeId);
-        Task<List<DropDownDtos>> getboothList(long BranchId);
+        Task<List<DropDownDto>> getConfigBranchList();
+        Task<List<DropDownDto>> getBranchList(int brinchId);
+        Task<List<DropDownDto>> getDistrictList(int  subbranchId);
+        Task<List<DropDownDtos>> getboothList(long  subbranchId);
         Task<List<DropDownDtos>> getAssetList(int BoothId);
         Task<List<DropDownDtos>> GetMetaGroupTitle();
         Task<List<DropDownDtos>> GetMetaParentTitle();
@@ -27,5 +28,6 @@ namespace ITC.InfoTrack.Model.Interface
         Task<(List<DropDownDto> data, bool status)> getTypePropertyElement();
         Task<(List<DropDownDto> data, bool status)> getLevelRootPropertyElement( int type);
         Task<List<DropDownDtos>> getChildenPropertyElement( int type);
+        Task<List<DropDownDtos>> getDynamicNameIdAsync(string id);
     }
 }

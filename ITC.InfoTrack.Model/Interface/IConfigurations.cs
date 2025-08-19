@@ -17,5 +17,6 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<HierarchyNodeDto>> GetHierarchyNodeAsync();
         Task<List<OrgNodeDto>> GetOrganizationTreeAsync();
         Task<(string message, bool status)> SaveLevelData(LevelDataDto model);
+        Task<(string message, bool status)> TreeNodeModificationAsync(TreeNodeInsertDto model);
     }
 }

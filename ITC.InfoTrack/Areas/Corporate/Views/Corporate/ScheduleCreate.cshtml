@@ -3,7 +3,7 @@
     ViewBag.pageTitle = "InfoTrack";
     ViewBag.Title = "Schedule Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int i = 1;
+    
 }
 @section styles {
     <!-- jquery.vectormap css -->
@@ -96,19 +96,19 @@
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label for="office">Branch Name</label>
-                            @Html.DropDownList("BranchId", ViewBag.office as SelectList, new { @class = "form-control select2", @id="BranchId", onchange="onBranchChange(this)" })
+                            @Html.DropDownList("BranchId", ViewBag.branchname as SelectList, new { @class = "form-control select2", @id = "BranchId", onchange = "onBranchChange(this)" })
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label for="office">Sub-Branch Name</label>
-                            @Html.DropDownList("SubBranchId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "SubBranchId" })
+                            @Html.DropDownList("SubBranchId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "SubBranchId", onchange = "onsubBranchChange(this)" })
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label for="office">District</label>
-                            @Html.DropDownList("DistrictId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "DistrictId" })
+                            @Html.DropDownList("DistrictId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "DistrictId", onchange = "onDistrictChange(this)" })
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
@@ -124,12 +124,12 @@
                             <thead style=" background-color:#c9ccd3; font-weight:600;">
                                 <tr>
                                     <th><input type="checkbox" id="selectAll" /> All</th>
-                                    <th>SL</th>
-                                    <th>Office Name</th>
+                                                                    
                                     <th>Branch Name</th>
+                                    <th>Sub-Branch</th>
+                                    <th>District</th>
+                                    <th>Division</th>
                                     <th>Booth Name</th>
-                                    <th>Asset Name</th>
-                                    <th>Schedule Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -285,28 +285,32 @@
             success: function (data) {
 
             let table = $('#datatable').DataTable();
-
+            debugger;
             table.clear(); // Clear existing rows
-
+            let serial = 1;
             $.each(data, function (index, item) {
                 table.row.add([
 
-                    `<input type="checkbox" class="rowCheckbox" data-corpId="${item.corpId}"
-                     data-corpname="${item.corpName}"
-                     data-branchname="${item.branchName}"
-                     data-boothname="${item.boothName}"
-                     data-terminal="${item.terminalName}"
-                     data-branchid="${item.branchId}"
-                     data-assetid="${item.assetId}"
+                    `<input type="checkbox" class="rowCheckbox" 
+                     data-branchId="${item.branchId}"
+                     data-branchname="${item.branch}"
+                     data-subbranchName="${item.subBranch}"
+                     data-subbranchId="${item.subBranchId}"
+                     data-districtId="${item.districtId}"
+                     data-district="${item.district}"
+                     data-division="${item.division}"
+                     data-divisionId="${item.divisionId}"
+                     data-booth="${item.booth}"
                      data-boothid="${item.boothId}"/>`,
-                    index + 1,
-                    item.corpName,
-                    item.branchName,
-                    item.boothName,
-                    item.terminalName,
-                    formatDateToDDMMYYYY(item.createdate),
+                   
+                    item.branch,
+                    item.subBranch,
+                    item.district,
+                    item.division,
+                    item.booth,
 
                 ]);
+                serial++;
             });
 
             table.draw(); // Draw updated rows
@@ -344,7 +348,7 @@
 
     function onBranchChange(dropdown) {
 
-        debugger;
+       
         var branchId = dropdown.value;
         $('#SubBranchId').empty().append('<option>Loading...</option>');
         // $('#BoothId').empty().append('<option>-- Select Booth --</option>');
@@ -371,19 +375,19 @@
         });
     };
 
-    $('#BranchId').change(function () {
-        var branchId = $(this).val();
-        $('#BoothId').empty().append('<option>Loading...</option>');
+    function onsubBranchChange(dropdown) {
+        var subbranchId = dropdown.value;
+        $('#DistrictId').empty().append('<option>Loading...</option>');
 
          $.ajax({
-            url: '/Corporate/Corporate/GetBooths',
+            url: '/Corporate/Corporate/GetDistrictCode',
             type: 'GET',
-            data: { branchId: branchId },
+            data: { subbranchId: subbranchId },
             dataType: 'json',
             success: function (data) {
-                $('#BoothId').empty().append('<option>-- Select Booth --</option>');
+                $('#DistrictId').empty().append('<option>Select District</option>');
                 $.each(data, function (i, item) {
-                    $('#BoothId').append($('<option>', {
+                    $('#DistrictId').append($('<option>', {
                         value: item.id,
                         text: item.name
                     }));
@@ -391,24 +395,24 @@
                   filterTable();
             },
             error: function (xhr, status, error) {
-                console.error('Error fetching booths:', error);
+                console.error('Error fetching District:', error);
             }
         });
-    });
+    };
 
-     $('#BoothId').change(function () {
-        var boothId = $(this).val();
-        $('#AssetId').empty().append('<option>Loading...</option>');
+    function onDistrictChange(dropdown) {
+        var districtid = dropdown.value;
+        $('#DivisionId').empty().append('<option>Loading...</option>');
 
          $.ajax({
-            url: '/Corporate/Corporate/GetAssets',
+            url: '/Corporate/Corporate/GetDivisionCode',
             type: 'GET',
-            data: { boothId: boothId },
+            data: { districtid: districtid },
             dataType: 'json',
             success: function (data) {
-                $('#AssetId').empty().append('<option>-- Select Asset --</option>');
+                $('#DivisionId').empty().append('<option>Select Division</option>');
                 $.each(data, function (i, item) {
-                    $('#AssetId').append($('<option>', {
+                    $('#DivisionId').append($('<option>', {
                         value: item.id,
                         text: item.name
                     }));
@@ -416,10 +420,10 @@
                   filterTable();
             },
             error: function (xhr, status, error) {
-                console.error('Error fetching booths:', error);
+                console.error('Error fetching division:', error);
             }
         });
-    });
+    };
 
     //for calender
      let events = [];
@@ -731,18 +735,28 @@
             let selectedData = [];
            
             $('.rowCheckbox:checked').each(function () {
-                let corpId = $(this).data('corpid');
-                let corpName = $(this).data('corpname');
-                let branchName = $(this).data('branchname');
-                let branchId = $(this).data('branchid');
-                let boothId = $(this).data('boothid');
-                let boothName = $(this).data('boothname');
-                let assetId = $(this).data('assetid');
-                let terminal = $(this).data('terminal');
-               
-                selectedData.push({ corpId, corpName,branchName,branchId, boothId,boothName,assetId,terminal });
+                debugger;
+                let branchName  = $(this).data('branchname');
+                let branchId    = $(this).data('branchid');
+                let subbranch   = $(this).data('subbranchname');
+                let subbranchid = $(this).data('subbranchid');
+                let district    = $(this).data('district');
+                let districtId  = $(this).data('districtid');
+                let division    = $(this).data('division');
+                let divisionId  = $(this).data('divisionid');
+                let booth       = $(this).data('booth');
+                let boothId     = $(this).data('boothid');
+
+                selectedData.push({
+                    branchName, branchId,
+                    subbranch, subbranchid,
+                    district, districtId,
+                    division, divisionId,
+                    booth, boothId
+                });
             });                                                  
-            if(selectedData.length>0){                          
+            if(selectedData.length>0){  
+                debugger;
                 CreateModaldesign(selectedData);                 
             }                                                   
 
@@ -754,9 +768,10 @@
 
         function CreateModaldesign(selectedLocations)
         {
+            
              const container = document.getElementById('selectedLocationsDisplay');
             container.innerHTML = ''; // Clear previous content
-
+            debugger;
             selectedLocations.forEach((location, index) => {
                 const card = document.createElement('div');
                 card.className = 'card card-body mb-3';
@@ -767,12 +782,12 @@
                                 <i class="bi bi-geo-alt me-1"></i> Selected Location
                             </label>
                             <div class="p-3 bg-light text-primary rounded fw-bold">
-                                ${location.corpName} / ${location.branchName} / ${location.boothName || ''} / ${location.terminal || ''}
+                                ${location.branchname} / ${location.subbranchName} / ${location.district || ''} / ${location.division || ''}
                             </div>
-                         <input type="hidden" id="hidecorpid" value="corpid_${location.corpId}_${index}"/>
+                         <input type="hidden" id="hidesubbid" value="subbranchId_${location.subbranchId}_${index}"/>
                          <input type="hidden" id="hidebrachid" value="branch_${location.branchId}_${index}"/>
-                         <input type="hidden" id="hideboothid" value="booth_${location.boothId}_${index}"/>
-                         <input type="hidden" id="hideassetid" value="assist_${location.assetId}_${index}"/>
+                         <input type="hidden" id="hidedistrictId" value="districtId_${location.districtId}_${index}"/>
+                         <input type="hidden" id="hidedivisionId" value="divisionId_${location.divisionId}_${index}"/>
                             
                         </div>
 
