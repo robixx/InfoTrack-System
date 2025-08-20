@@ -168,10 +168,10 @@ namespace ITC.InfoTrack.Model.DAO
 
                 var userlist = await _connection.Users
                     .Where(i => !visitIds.Contains(i.UserId))
-                    .Select(n=> new UserDto
+                    .Select(n => new UserDto
                     {
-                        UserId= n.UserId,
-                        UserName= n.UserName,
+                        UserId = n.UserId,
+                        UserName = n.UserName,
                     })
                     .ToListAsync();
 
@@ -209,6 +209,79 @@ namespace ITC.InfoTrack.Model.DAO
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string Message, bool Status)> SaveScheduleListAsync(List<ScheduleEntryDto> scheduleData)
+        {
+            try
+            {
+                if (scheduleData == null)
+                    return ("Invalid Data ", false);
+                if (scheduleData.Count > 0 && scheduleData != null)
+                {
+                    using var transaction = await _connection.Database.BeginTransactionAsync();
+
+                    foreach (var item in scheduleData)
+                    {
+                        var mastertable = new VisitSchedule
+                        {
+
+                            AssignUserId = Convert.ToInt32(item.AssignedUser),
+                            DateOfVisit = Convert.ToDateTime(item.Date),
+                            TimeOfVisit = TimeSpan.Parse(item.Time),
+                            LocationId = 0,
+                            InsertBy = 1,
+                            InsertDate = DateTime.Now,
+                            ScheduleStatus = 1
+
+                        };
+                        await _connection.VisitSchedule.AddAsync(mastertable);
+                        await _connection.SaveChangesAsync();
+
+                        var detailstable = new VisitScheduleDetails
+                        {
+                            VisitId = Convert.ToInt64(mastertable.ScheduleId),
+                            PoolId = 0,
+                            CreateDate = DateTime.Now,
+                            CreatedBy = 1,
+                            BranchId = Convert.ToInt32(item.BranchId),
+                            SubBranchId = Convert.ToInt32(item.SubBranchId),
+                            DistrictId = Convert.ToInt32(item.DistrictId),
+                            DivisionId = Convert.ToInt32(item.divisionId),
+                            BoothId = Convert.ToInt32(item.BoothId),
+                            Comments = item.Comments,
+                            LocationText = item.LocationText,
+                            Priority = item.Priority,
+                            UpdatedBy = 0
+                        };
+
+                        await _connection.VisitScheduleDetails.AddAsync(detailstable);
+                        await _connection.SaveChangesAsync();
+                    }
+                    await transaction.CommitAsync();
+                }
+                return ("Schedules saved successfully", true);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<CalenderVisitScheduleDto>> GetCalenderVisitScheduleAsync()
+        {
+            try
+            {
+                var data = await _connection.CalenderVisitScheduleDto.FromSqlRaw("SELECT * FROM public.get_visit_schedules()")
+                    .ToListAsync();
+
+                return data;
+            }
+            catch (Exception ex)
+            { 
+                throw new Exception(ex.Message); 
             }
         }
     }

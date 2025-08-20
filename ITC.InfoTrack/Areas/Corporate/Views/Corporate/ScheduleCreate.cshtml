@@ -3,7 +3,7 @@
     ViewBag.pageTitle = "InfoTrack";
     ViewBag.Title = "Schedule Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    
+
 }
 @section styles {
     <!-- jquery.vectormap css -->
@@ -21,64 +21,207 @@
 
 }
 <style>
+    :root {
+        --citybank-blue: #4550a8;
+        --citybank-light-blue: #e6f0f7;
+        --citybank-text-dark: #212529;
+        --citybank-text-muted: #6c757d;
+    }
+
+
+
+    .header-section {
+        background-color: #ffffff;
+        border-bottom: 1px solid #e9ecef;
+        padding: 1rem 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .main-container {
+        flex-grow: 1;
+        padding: 1.5rem 0;
+    }
+
     .card {
-        margin-bottom: 0.4rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
-    .card-header {
-        background-color: white !important;
+
+    .btn-citybank-primary {
+        background-color: var(--citybank-blue);
+        color: #fff;
+        border-color: var(--citybank-blue);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
-    .bg-color {
-        background-color: #5664d2;
-    }
+        .btn-citybank-primary:hover {
+            background-color: #003a6b;
+            border-color: #003a6b;
+            color: #fff;
+        }
 
-        .bg-color:hover {
-            background-color: #5664d2;
-            color: white;
+        .btn-citybank-primary:focus, .btn-citybank-primary.focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 75, 141, 0.25);
         }
 
 
-    table#datatable > tbody > tr > td {
-        padding: 6px;
-        font-size: 12px;
-    }
-
-    .arrow-connector {
+    .calendar-header {
+        background-color: var(--citybank-blue);
+        color: #fff;
+        border-top-left-radius: 0.75rem;
+        border-top-right-radius: 0.75rem;
+        padding: 0.4rem;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
-        color: darkgreen;
-        font-size: 1rem;
-        animation: pulse 2s infinite;
     }
 
-    .btn-gradients {
-        background: #dddddd !important; /* corrected color */
-        border: 1px solid #dddddd; /* border with width and style */
-        color: black !important;
-        transition: background 0.3s ease; /* smooth hover transition */
-    }
-
-        .btn-gradients:hover {
-            background: darkgreen !important;
-            color: white !important; /* better contrast on hover */
-            border-color: darkgreen;
+        .calendar-header button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.25rem;
         }
 
-    .btn-gradients-cancel {
-        background: #dddddd !important;
-        border: 1px solid #dddddd;
-        color: black !important;
-        transition: background 0.3s ease;
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background-color: #e9ecef;
+        padding: 1px; /* Overall padding for the grid lines */
+        border-bottom-left-radius: 0.75rem;
+        border-bottom-right-radius: 0.75rem;
+        overflow: hidden; /* Ensures rounded corners are applied */
     }
 
-        .btn-gradients-cancel:hover {
-            background: #a00000 !important; /* a darker red on hover */
-            border-color: #a00000;
-            color: white !important;
+    .calendar-day-header {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        text-align: center;
+        padding: 0.75rem 0.25rem;
+        font-size: 0.875rem;
+        color: var(--citybank-text-dark);
+    }
+
+    .calendar-cell {
+        background-color: #ffffff;
+        min-height: 80px; /* Minimum height for calendar cells */
+        padding: 0.5rem;
+        text-align: right;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+        font-size: 0.875rem;
+        color: var(--citybank-text-dark);
+    }
+
+        .calendar-cell:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .calendar-cell.inactive {
+            color: #adb5bd; /* Lighter color for days outside current month */
+            background-color: #f1f2f4;
+            pointer-events: none; /* Disable interaction */
+        }
+
+        .calendar-cell.has-event .event-dot {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: var(--citybank-blue); /* Event indicator */
+            border-radius: 50%;
+        }
+
+        .calendar-cell.current-day {
+            border: 2px solid var(--citybank-blue); /* Highlight current day */
+            z-index: 1; /* Ensure border is visible */
+        }
+
+        .calendar-cell.selected-day {
+            background-color: var(--citybank-light-blue); /* Lighter blue for selected day */
+            border: 1px solid var(--citybank-blue);
+        }
+
+    /* Visit List Styling */
+    .visit-list {
+        max-height: 600px; /* Fixed height for scrollable list */
+        overflow-y: auto;
+        padding-right: 0.5rem; /* Space for scrollbar */
+    }
+        /* Custom scrollbar for visit list */
+        .visit-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .visit-list::-webkit-scrollbar-thumb {
+            background-color: #ced4da;
+            border-radius: 4px;
+        }
+
+        .visit-list::-webkit-scrollbar-track {
+            background-color: #f8f9fa;
+        }
+
+    .visit-card {
+        margin-bottom: 1rem;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        cursor: pointer;
+    }
+
+        .visit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .visit-card .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.7em;
+            border-radius: 0.5rem;
+        }
+
+    .visit-card-time {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--citybank-text-dark);
+    }
+
+    .visit-card-title {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--citybank-text-dark);
+    }
+
+    .visit-card-subtitle {
+        font-size: 0.875rem;
+        color: var(--citybank-text-muted);
+    }
+
+    .visit-card-actions button {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+    }
+
+    .visit-card-actions .btn-danger {
+        background-color: #dc3545; /* Bootstrap red */
+        border-color: #dc3545;
+    }
+
+        .visit-card-actions .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
         }
 </style>
+
 <link href="~/css/calender.css" rel="stylesheet" />
 
 <div class="row">
@@ -124,7 +267,7 @@
                             <thead style=" background-color:#c9ccd3; font-weight:600;">
                                 <tr>
                                     <th><input type="checkbox" id="selectAll" /> All</th>
-                                                                    
+
                                     <th>Branch Name</th>
                                     <th>Sub-Branch</th>
                                     <th>District</th>
@@ -146,42 +289,16 @@
 
 <!-- Calendar Section -->
 <div class="row">
-    <div class="col-12">
-        <div class="card calendar-wrapper">
+    <div class="col-md-10">
+        <div class="card p-0">
             <div class="calendar-header">
-                <div class="d-flex align-items-center justify-content-between flex-wrap">
-                    <div class="d-flex align-items-center gap-3">
-                        <button class="btn btn-outline-light btn-sm" id="prevMonth">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <h4 class="mb-0 fw-bold" id="currentMonth">March 2024</h4>
-                        <button class="btn btn-outline-light btn-sm" id="nextMonth">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
-                        <div class="d-flex align-items-center">
-                            <div class="event-dot" style="background: #139428;"></div>
-                            <small class="ms-1 text-white">Urgent</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="event-dot" style="background: #0c316f;"></div>
-                            <small class="ms-1 text-white">High</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="event-dot" style="background: #72590f;"></div>
-                            <small class="ms-1 text-white">Medium</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="event-dot" style="background: #85121d;"></div>
-                            <small class="ms-1 text-white">Low</small>
-                        </div>
-                    </div>
-                </div>
+                <button id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                <h3 class="h5 mb-0 text-white" id="currentMonthYear"></h3>
+                <button id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
             </div>
-
             <div class="calendar-grid" id="calendarGrid">
-                <!-- Calendar will be populated by JavaScript -->
+                <!-- Day headers will be rendered here -->
+                <!-- Calendar cells will be rendered here -->
             </div>
         </div>
     </div>
@@ -203,15 +320,15 @@
                 <div id="errorMessage"></div>
                 <div id="selectedLocationsDisplay" class="p-3 bg-light rounded">
                     <!-- Cards will be added here dynamically -->
-                </div>              
-              
+                </div>
+
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-gradients-cancel" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle me-1"></i>
                     Cancel
                 </button>
-                <button type="button" class="btn btn-gradients" id="confirmScheduleBtn">
+                <button type="button" class="btn btn-success" id="confirmScheduleBtn">
                     <i class="bi bi-check-circle me-1"></i>
                     Confirm Schedule
                 </button>
@@ -220,6 +337,24 @@
     </div>
 </div>
 
+
+<!-- View Visit Details Modal -->
+<div class="modal fade" id="viewVisitModal" tabindex="-1" aria-labelledby="viewVisitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-top">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark fw-bold" id="viewVisitModalLabel">Visit Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="viewModalBodyContent">
+                <!-- Visit details will be dynamically populated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -244,16 +379,16 @@
     <!-- Datatable init js -->
     <script src="~/js/pages/datatables.init.js"></script>
 
-
 }
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 <script>
+    let visits=[];
+     $(document).ready(function () {
 
-     $(document).ready(function () {          // Check if already initialized
+         loaddata();
 
-        // Load data on page load
         filterTable();
     });
     function formatDateToDDMMYYYY(dateString) {
@@ -267,7 +402,7 @@
         return `${day}-${month}-${year}`;
     }
     function filterTable() {
-       
+
         var branchId = $('#BranchId').val()===null? 0 :$('#BranchId').val();
         var subbranch = $('#SubBranchId').val()===null? 0 :$('#SubBranchId').val();
         var district = $('#DistrictId').val()===null? 0 :$('#DistrictId').val();
@@ -285,13 +420,12 @@
             success: function (data) {
 
             let table = $('#datatable').DataTable();
-            debugger;
             table.clear(); // Clear existing rows
             let serial = 1;
             $.each(data, function (index, item) {
                 table.row.add([
 
-                    `<input type="checkbox" class="rowCheckbox" 
+                    `<input type="checkbox" class="rowCheckbox"
                      data-branchId="${item.branchId}"
                      data-branchname="${item.branch}"
                      data-subbranchName="${item.subBranch}"
@@ -302,7 +436,6 @@
                      data-divisionId="${item.divisionId}"
                      data-booth="${item.booth}"
                      data-boothid="${item.boothId}"/>`,
-                   
                     item.branch,
                     item.subBranch,
                     item.district,
@@ -329,14 +462,12 @@
         updateCheckedCount();
     });
 
-    // Uncheck #selectAll if any row checkbox is unchecked
+
     // Check #selectAll if all are checked
     $('#datatable').on('change', '.rowCheckbox', function () {
         let total = $('.rowCheckbox').length;
         let checked = $('.rowCheckbox:checked').length;
-
         $('#selectAll').prop('checked', total === checked);
-         // Update count
         updateCheckedCount();
     });
         // Update the count display
@@ -348,7 +479,7 @@
 
     function onBranchChange(dropdown) {
 
-       
+
         var branchId = dropdown.value;
         $('#SubBranchId').empty().append('<option>Loading...</option>');
         // $('#BoothId').empty().append('<option>-- Select Booth --</option>');
@@ -427,315 +558,17 @@
 
     //for calender
      let events = [];
-    let currentDate = new Date();
+     let currentDate = new Date();
       document.getElementById('scheduleBtn').addEventListener('click', openScheduleModal);
       document.getElementById('confirmScheduleBtn').addEventListener('click', SaveConfirmSchedule);
-       // Calendar navigation
-            document.getElementById('prevMonth').addEventListener('click', () => navigateMonth(-1));
-            document.getElementById('nextMonth').addEventListener('click', () => navigateMonth(1));
-    renderCalendar();
-     // Render calendar
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const monthHeader = document.getElementById('currentMonth');
-
-            // Update month header
-            const monthNames = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-            monthHeader.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-
-            // Clear grid
-            grid.innerHTML = '';
-
-            // Add day headers
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'calendar-day-header';
-                header.textContent = day;
-                grid.appendChild(header);
-            });
-
-            // Get first day of month and calculate start date
-            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - firstDay.getDay());
-
-            // Generate calendar days (6 weeks = 42 days)
-            for (let i = 0; i < 42; i++) {
-                const date = new Date(startDate);
-                date.setDate(startDate.getDate() + i);
-
-                const dayElement = createCalendarDay(date);
-                grid.appendChild(dayElement);
-            }
-        }
-
-        // Create calendar day
-        function createCalendarDay(date) {
-            const day = document.createElement('div');
-            day.className = 'calendar-day';
-
-            const today = new Date();
-            const isToday = date.toDateString() === today.toDateString();
-            const isCurrentMonth = date.getMonth() === currentDate.getMonth();
-
-            if (!isCurrentMonth) {
-                day.classList.add('other-month');
-            }
-
-            if (isToday) {
-                day.classList.add('today');
-            }
-
-            // Get events for this date
-            const dayEvents = events.filter(event =>
-                event.date.toDateString() === date.toDateString()
-            );
-
-            if (dayEvents.length > 0) {
-                day.classList.add('has-events');
-            }
-
-            // Day number
-            const dayNumber = document.createElement('div');
-            dayNumber.className = 'day-number';
-            dayNumber.textContent = date.getDate();
-            day.appendChild(dayNumber);
-
-            // Check if mobile view
-            const isMobile = window.innerWidth <= 768;
-
-            if (isMobile) {
-                // Mobile view - show dots
-                const eventDots = document.createElement('div');
-                eventDots.className = 'event-dots';
-
-                dayEvents.slice(0, 4).forEach(event => {
-                    const dot = document.createElement('div');
-                    dot.className = 'event-dot';
-                    dot.style.background = getEventColor(event.type);
-                    dot.title = `${event.time} - ${event.title}`;
-                    eventDots.appendChild(dot);
-                });
-
-                if (dayEvents.length > 4) {
-                    const moreDot = document.createElement('div');
-                    moreDot.className = 'event-dot';
-                    moreDot.style.background = '#6c757d';
-                    moreDot.title = `+${dayEvents.length - 4} more events`;
-                    eventDots.appendChild(moreDot);
-                }
-
-                day.appendChild(eventDots);
-            } else {
-                // Desktop view - show event items
-                dayEvents.slice(0, 3).forEach(event => {
-                    const eventElement = createEventElement(event);
-                    day.appendChild(eventElement);
-                });
-
-                // More events indicator
-                if (dayEvents.length > 3) {
-                    const moreElement = document.createElement('div');
-                    moreElement.className = 'event-item';
-                    moreElement.textContent = `+${dayEvents.length - 3} more`;
-                    moreElement.style.fontSize = '0.65rem';
-                    moreElement.style.fontWeight = 'bold';
-                    day.appendChild(moreElement);
-                }
-            }
-
-            // Click event
-            day.addEventListener('click', () => {
-                if (dayEvents.length > 0) {
-                    showDayEvents(date, dayEvents);
-                }
-            });
-
-            return day;
-        }
-
-        // Create event element
-        function createEventElement(event) {
-            const eventEl = document.createElement('div');
-            eventEl.className = `event-item type-${event.type}`;
-
-            const user = users[event.userId];
-
-            eventEl.innerHTML = `
-                <div class="d-flex align-items-center justify-content-between">
-                    <span class="text-truncate flex-grow-1">${event.time} ${event.title}</span>
-                    <div style="width: 12px; height: 12px; border-radius: 50%; background: ${user.color}; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                        ${user.avatar.charAt(0)}
-                    </div>
-                </div>
-            `;
-
-            eventEl.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showEventDetails(event);
-            });
-
-            return eventEl;
-        }
-
-        // Get event color based on type
-        function getEventColor(type) {
-            const colors = {
-                'meeting': '#4285f4',
-                'inspection': '#ffc107',
-                'maintenance': '#dc3545'
-            };
-            return colors[type] || '#6c757d';
-        }
-
-        // Show event details
-        function showEventDetails(event) {
-            currentEventId = event.id;
-            const modal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
-            const content = document.getElementById('eventDetailsContent');
-
-            const user = users[event.userId];
-            const locationNames = event.locationIds.map(id =>
-                locations.find(l => l.id === id).name
-            ).join(', ');
-
-            const priorityColors = {
-                'low': 'success',
-                'medium': 'warning',
-                'high': 'danger',
-                'urgent': 'dark'
-            };
-
-            content.innerHTML = `
-                <div class="row g-3">
-                    <div class="col-12">
-                        <h6 class="fw-bold text-primary mb-3">${event.title}</h6>
-                    </div>
-                    <div class="col-md-6">
-                        <small class="text-muted d-block mb-1">Date & Time</small>
-                        <div class="fw-semibold">${event.date.toLocaleDateString()}</div>
-                        <div class="text-primary">${event.time} (${event.duration}h)</div>
-                    </div>
-                    <div class="col-md-6">
-                        <small class="text-muted d-block mb-1">Assigned User</small>
-                        <div class="d-flex align-items-center">
-                            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${user.color}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 8px;">
-                                ${user.avatar}
-                            </div>
-                            <div>
-                                <div class="fw-semibold">${user.name}</div>
-                                <small class="text-muted">${user.role}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <small class="text-muted d-block mb-1">Priority</small>
-                        <span class="badge bg-${priorityColors[event.priority]} text-capitalize">${event.priority}</span>
-                    </div>
-                    <div class="col-md-6">
-                        <small class="text-muted d-block mb-1">Type</small>
-                        <span class="badge bg-primary text-capitalize">${event.type}</span>
-                    </div>
-                    <div class="col-12">
-                        <small class="text-muted d-block mb-1">Locations</small>
-                        <div class="fw-semibold">${locationNames}</div>
-                    </div>
-                    ${event.comments ? `
-                    <div class="col-12">
-                        <small class="text-muted d-block mb-1">Comments</small>
-                        <div class="p-3 bg-light rounded">${event.comments}</div>
-                    </div>
-                    ` : ''}
-                </div>
-            `;
-
-            modal.show();
-        }
-
-        // Show day events (for mobile or detailed view)
-        function showDayEvents(date, dayEvents) {
-            // Create a simple alert for now - you can enhance this with a proper modal
-            const eventList = dayEvents.map(event =>
-                `${event.time} - ${event.title} (${users[event.userId].name})`
-            ).join('\n');
-
-            alert(`Events for ${date.toLocaleDateString()}:\n\n${eventList}`);
-        }
-
-        // Navigate month
-        function navigateMonth(direction) {
-            currentDate.setMonth(currentDate.getMonth() + direction);
-            renderCalendar();
-        }
-
-        // Go to today
-        function goToToday() {
-            currentDate = new Date();
-            renderCalendar();
-        }
-
-        // Refresh data
-        function refreshData() {
-            const refreshBtn = document.getElementById('refreshBtn');
-            const originalText = refreshBtn.innerHTML;
-
-            refreshBtn.innerHTML = '<div class="loading-spinner me-1"></div>Refreshing...';
-            refreshBtn.disabled = true;
-
-            setTimeout(() => {
-                renderCalendar();
-                renderLocationsTable();
-                updateStatistics();
-
-                refreshBtn.innerHTML = originalText;
-                refreshBtn.disabled = false;
-                showToast('Data refreshed successfully!');
-            }, 1500);
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Ctrl+S to schedule
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                if (selectedLocations.length > 0) {
-                    openScheduleModal();
-                }
-            }
-
-            // Arrow keys for calendar navigation
-            if (e.key === 'ArrowLeft' && e.ctrlKey) {
-                e.preventDefault();
-                navigateMonth(-1);
-            }
-
-            if (e.key === 'ArrowRight' && e.ctrlKey) {
-                e.preventDefault();
-                navigateMonth(1);
-            }
-
-            // Escape to close modals
-            if (e.key === 'Escape') {
-                const openModals = document.querySelectorAll('.modal.show');
-                openModals.forEach(modal => {
-                    const bsModal = bootstrap.Modal.getInstance(modal);
-                    if (bsModal) bsModal.hide();
-                });
-            }
-        });
-
 
          // Open schedule modal
         function openScheduleModal() {
-            
+
             let selectedData = [];
-           
+
             $('.rowCheckbox:checked').each(function () {
-                debugger;
+
                 let branchName  = $(this).data('branchname');
                 let branchId    = $(this).data('branchid');
                 let subbranch   = $(this).data('subbranchname');
@@ -754,11 +587,11 @@
                     division, divisionId,
                     booth, boothId
                 });
-            });                                                  
-            if(selectedData.length>0){  
-                debugger;
-                CreateModaldesign(selectedData);                 
-            }                                                   
+            });
+            if(selectedData.length>0){
+
+                CreateModaldesign(selectedData);
+            }
 
            console.log(selectedData);
             // Show modal
@@ -768,10 +601,10 @@
 
         function CreateModaldesign(selectedLocations)
         {
-            
+
              const container = document.getElementById('selectedLocationsDisplay');
             container.innerHTML = ''; // Clear previous content
-            debugger;
+
             selectedLocations.forEach((location, index) => {
                 const card = document.createElement('div');
                 card.className = 'card card-body mb-3';
@@ -782,13 +615,14 @@
                                 <i class="bi bi-geo-alt me-1"></i> Selected Location
                             </label>
                             <div class="p-3 bg-light text-primary rounded fw-bold">
-                                ${location.branchname} / ${location.subbranchName} / ${location.district || ''} / ${location.division || ''}
+                                ${location.branchName} / ${location.subbranch} / ${location.district || ''} / ${location.division || ''}
                             </div>
-                         <input type="hidden" id="hidesubbid" value="subbranchId_${location.subbranchId}_${index}"/>
+                         <input type="hidden" id="hidesubbid" value="subbranchId_${location.subbranchid}_${index}"/>
                          <input type="hidden" id="hidebrachid" value="branch_${location.branchId}_${index}"/>
                          <input type="hidden" id="hidedistrictId" value="districtId_${location.districtId}_${index}"/>
                          <input type="hidden" id="hidedivisionId" value="divisionId_${location.divisionId}_${index}"/>
-                            
+                         <input type="hidden" id="hideboothId" value="boothId_${location.boothId}_${index}"/>
+
                         </div>
 
                         <div class="col-md-6">
@@ -809,7 +643,7 @@
                             <label class="form-label fw-semibold">
                                 <i class="bi bi-person me-1"></i> Assign User
                             </label>
-                            <select class="form-select" name="assignedUser_${index}" id="assignedUser_${index}" required> 
+                            <select class="form-select" name="assignedUser_${index}" id="assignedUser_${index}" required>
                             <option value="">Select User</option>
                             </select>
                         </div>
@@ -855,12 +689,12 @@
     function fetchUsersForDate(date, selectElement)
     {
         selectElement.innerHTML = `<option value="">Loading users...</option>`;
-        debugger;
+
         fetch(`/Corporate/Corporate/GetLoadeduser?dateValue=${encodeURIComponent(date)}`)
             .then(res => res.json())
             .then(users => {
                 selectElement.innerHTML = `<option value="">Select User</option>`;
-                debugger;
+
                 users.forEach(user => {
                     const opt = document.createElement('option');
                     opt.value = user.userId;
@@ -883,23 +717,27 @@
         let hasError = false;
         cards.forEach((card, index) => {
             const locationText = card.querySelector('.bg-light.text-primary').textContent.trim();
-             const corpValue = card.querySelector(`#hidecorpid`).value;
-            const corpId = corpValue.split('_')[1];  // Gets the actual corpId from "corpid_123_index"
+             const barnchValue = card.querySelector(`#hidebrachid`).value;
+            const branchId = barnchValue.split('_')[1];  // Gets the actual corpId from "corpid_123_index"
 
-            const branchValue = card.querySelector(`#hidebrachid`).value;
-            const branchId = branchValue.split('_')[1];
+            const subbranch = card.querySelector(`#hidesubbid`).value;
+            const subbranchId = subbranch.split('_')[1];
 
-            const boothValue = card.querySelector(`#hideboothid`).value;
+            const districtValue = card.querySelector(`#hidedistrictId`).value;
+            const districtId = districtValue.split('_')[1];
+
+            const divisionValue = card.querySelector(`#hidedivisionId`).value;
+            const divisionId = divisionValue.split('_')[1];
+
+            const boothValue = card.querySelector(`#hideboothId`).value;
             const boothId = boothValue.split('_')[1];
 
-            const assetValue = card.querySelector(`#hideassetid`).value;
-            const assetId = assetValue.split('_')[1];
             const date = card.querySelector(`[name="eventDate_${index}"]`).value;
             const time = card.querySelector(`[name="eventTime_${index}"]`).value;
             const assignedUser = card.querySelector(`[name="assignedUser_${index}"]`).value;
             const priority = card.querySelector(`[name="priority_${index}"]`).value;
             const comments = card.querySelector(`[name="comments_${index}"]`).value;
-            debugger;
+
             if (!date || time==='' || !assignedUser || priority==='')
             {
                  errorContainer.innerHTML = `
@@ -914,10 +752,11 @@
 
             scheduleData.push({
                 locationText,
-                corpId,
                 branchId,
+                subbranchId,
+                districtId,
+                divisionId,
                 boothId,
-                assetId,
                 date,
                 time,
                 assignedUser,
@@ -936,12 +775,14 @@
                 body: JSON.stringify(scheduleData)
             })
             .then(response => {
+                debugger;
                 if (response.ok) {
-                    alert('Schedule saved successfully!');
+                    alert("Schedule Create Successfully");
                     // Optionally close modal and reset
                     document.getElementById('scheduleModal').classList.remove('show');
                     document.body.classList.remove('modal-open');
                     document.querySelector('.modal-backdrop')?.remove();
+                    window.location.reload();
                 } else {
                     alert('Failed to save schedule.');
                 }
@@ -953,6 +794,277 @@
         }
     }
 
-        
+    function loaddata(){
+         $.ajax({
+            url: '/Corporate/Corporate/GetCalaenderData',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+
+                visits=data;
+                generateCalendar(currentMonth, currentYear);
+            },
+            error: function () {
+                alert('Error loading data.');
+            }
+        });
+    }    
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            const currentMonthYearDisplay = document.getElementById('currentMonthYear');
+            const prevMonthBtn = document.getElementById('prevMonthBtn');
+            const nextMonthBtn = document.getElementById('nextMonthBtn');
+
+
+            // View Details Modal elements
+            const viewVisitModal =document.getElementById('viewVisitModal');
+
+            const viewModalBodyContent = document.getElementById('viewModalBodyContent');
+            const viewVisitModalLabel = document.getElementById('viewVisitModalLabel');
+
+
+            let currentMonth = new Date().getMonth();
+            let currentYear = new Date().getFullYear();
+            let selectedDate = new Date(); // Initially select today
+
+            // Function to format time for display (e.g., "14:30" to "02:30 PM")
+            function formatTimeForDisplay(timeStr) {
+                if (!timeStr) return '';
+                // Handle cases where time might already be in AM/PM format (e.g., from initial data)
+                if (timeStr.includes('AM') || timeStr.includes('PM')) {
+                    return timeStr;
+                }
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+                return `${String(displayHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${ampm}`;
+            }
+
+            // Function to format date for display (e.g., "YYYY-MM-DD" to "Month Day, Year")
+            function formatDateForDisplay(dateStr) {
+                if (!dateStr) return '';
+                const dateObj = new Date(dateStr + 'T00:00:00'); // Add T00:00:00 to avoid timezone issues
+                return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+
+            // Function to generate calendar
+            function generateCalendar(month, year) {
+                calendarGrid.innerHTML = ''; // Clear existing calendar
+                const today = new Date();
+                const firstDayOfMonth = new Date(year, month, 1);
+                const lastDayOfMonth = new Date(year, month + 1, 0);
+                const daysInMonth = lastDayOfMonth.getDate();
+                const firstDayOfWeek = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday
+                debugger;
+                currentMonthYearDisplay.textContent = new Date(year, month).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+                // Day headers
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayNames.forEach(day => {
+                    const dayHeader = document.createElement('div');
+                    dayHeader.classList.add('calendar-day-header');
+                    dayHeader.textContent = day;
+                    calendarGrid.appendChild(dayHeader);
+                });
+
+                // Fill leading empty cells
+                for (let i = 0; i < firstDayOfWeek; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('calendar-cell', 'inactive');
+                    // Optionally show a few days from previous month
+                    const prevMonthLastDay = new Date(year, month, 0).getDate();
+                    cell.textContent = prevMonthLastDay - firstDayOfWeek + 1 + i;
+                    calendarGrid.appendChild(cell);
+                }
+
+                // Fill days of the month
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('calendar-cell');
+                    cell.textContent = day;
+                    const cellDateFormatted = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    cell.dataset.date = cellDateFormatted;
+
+                    // Add current day highlight
+                    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                        cell.classList.add('current-day');
+                    }
+                    // Add selected day highlight
+                    if (cellDateFormatted === selectedDate.toISOString().substring(0, 10)) {
+                        cell.classList.add('selected-day');
+                    }
+
+                    // Add event indicators
+                    const hasEvent = visits.some(visit =>{
+                        const visitDate = visit.dateOfVisit.split('T')[0];
+                        debugger;
+                        return visitDate === cellDateFormatted;
+                    }
+                    );
+                    if (hasEvent) {
+                        debugger;
+                        const eventDot = document.createElement('div');
+                        eventDot.classList.add('event-dot');
+                        cell.appendChild(eventDot);
+                        cell.classList.add('has-event');
+                    }
+
+                    // Calendar cell click event to open View Details Modal
+                    cell.addEventListener('click', () => {
+                        // Remove previous selection
+                        document.querySelectorAll('.calendar-cell.selected-day').forEach(s => s.classList.remove('selected-day'));
+                        // Add new selection
+                        cell.classList.add('selected-day');
+                        selectedDate = new Date(year, month, day); // Update selected date
+
+                        viewVisitsForDay(selectedDate); // Open view modal for this day
+                    });
+                    calendarGrid.appendChild(cell);
+                }
+
+                // Fill trailing empty cells (to complete the last row)
+                const totalCells = firstDayOfWeek + daysInMonth;
+                const remainingCells = 42 - totalCells; // Max 6 rows * 7 days = 42 cells
+                for (let i = 1; i <= remainingCells; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('calendar-cell', 'inactive');
+                    cell.textContent = i; // Days from next month
+                    calendarGrid.appendChild(cell);
+                }
+            }
+
+
+
+            // Function to delete a visit
+            function deleteVisit(id) {
+                if (confirm('Are you sure you want to delete this visit?')) {
+                    visits = visits.filter(visit => visit.scheduleId !== id);
+                    generateCalendar(currentMonth, currentYear); // Re-render calendar to remove event dot if no more visits
+
+                }
+            }
+
+            // Function to view visit details in a dedicated modal for a specific day
+            function viewVisitsForDay(date) {
+
+                const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                const visitsForDay = visits.filter(visit =>{
+                     const visitDate = visit.dateOfVisit.split('T')[0];
+                    return visitDate === formattedDate;
+                }
+                );
+
+                viewModalBodyContent.innerHTML = ''; // Clear previous content
+                viewVisitModalLabel.textContent = `Visits for ${formatDateForDisplay(formattedDate)}`;
+
+                if (visitsForDay.length === 0) {
+                    viewModalBodyContent.innerHTML = `<p class="text-muted text-center py-3">No visits scheduled for this day.</p>`;
+                } else {
+
+                    debugger;
+                    visitsForDay.sort((a, b) => {
+                        debugger;
+                        const timeA = new Date(`2000/01/01 ${a.timeOfVisit}`);
+                        const timeB = new Date(`2000/01/01 ${b.timeOfVisit}`);
+                        return timeA - timeB;
+                    });
+                    visitsForDay.forEach(visit => {
+                        const statusClass = visit.priority === 'high' ? 'bg-success' :
+                                            visit.priority === 'medium' ? 'bg-primary' :
+                                            visit.priority === 'urgent' ? 'bg-warning text-dark' :
+                                            visit.priority === 'low' ? 'bg-secondary' :
+                                            'bg-danger'; // For cancelled
+                           const visitDate = visit.dateOfVisit.split('T')[0];
+
+                        const visitHtml = `
+                            <div class="card mb-3 shadow-sm border" style="background:#edf8fb;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 fw-bold text-dark">${visit.userName}</h6>
+                                        <span class="badge ${statusClass}">${visit.priority}</span>
+                                    </div>
+                                    <p class="mb-1 text-muted small"><i class="fas fa-clock me-1"></i> ${formatTimeForDisplay(visit.timeOfVisit)}</p>
+                                    <p class="mb-1 text-muted small"><i class="fas fa-calendar me-1"></i> ${visitDate}</p>
+                                    <p class="mb-2 text-muted small"><i class="fa fa-bell me-1"></i> ${visit.locationText}</p>
+                                    <p class="mb-2 text-muted small"><i class="fa fa-map-marker me-1"></i> ${visit.bootName}</p>
+                                    <p class="mb-2 text-muted small"><i class="fa fa-comment me-1"></i> ${visit.commentValue}</p>
+                                    <div class="text-end">
+                                        <button class="btn btn-sm btn-danger" data-id="${visit.scheduleId}" data-action="delete-from-view">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        viewModalBodyContent.insertAdjacentHTML('beforeend', visitHtml);
+                    });
+
+                    // Attach event listeners to buttons within the newly rendered modal content
+                    viewModalBodyContent.querySelectorAll('button[data-action="edit-from-view"]').forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            const id = parseInt(event.target.dataset.scheduleId);
+                            debugger;
+                            const visitToEdit = visits.find(v => v.scheduleId === id);
+                            if (visitToEdit) {
+                                viewVisitModal.hide(); // Hide current modal
+                                openAddEditModal(visitToEdit); // Open edit modal
+                            }
+                        });
+                    });
+
+                    viewModalBodyContent.querySelectorAll('button[data-action="delete-from-view"]').forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            const id = parseInt(event.target.dataset.scheduleId);
+                            deleteVisit(id);
+                            viewVisitModal.hide(); // Hide current modal after delete
+                            // Re-open if other visits exist for the day, or just close if none
+                            const remainingVisits = visits.filter(v =>
+                                {
+                                    const dvd=formatDateForDisplay(v.dateOfVisit);
+                                    return   dvd === formattedDate;
+                                }
+                                );
+                                debugger;
+                            if (remainingVisits.length > 0) {
+                                // Use a timeout to ensure modal is hidden before attempting to show again
+                                setTimeout(() => viewVisitsForDay(dateOfVisit), 300);
+                            }
+                        });
+                    });
+                }
+                 $('#viewVisitModal').modal('show');
+
+            }
+
+
+            // Event Listeners for Month Navigation
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar(currentMonth, currentYear);
+
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar(currentMonth, currentYear);
+
+            });
+
+            // "Add New Visit" button functionality (desktop & mobile)
+            $('#addVisitBtnDesktop').on('click', () => openAddEditModal(null));
+            $('#addVisitBtnMobile').on('click', () => openAddEditModal(null));
+
+            // Initial render
+
+
+
 
 </script>

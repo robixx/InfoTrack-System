@@ -120,7 +120,16 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveScheduleList([FromBody] List<ScheduleEntryDto> scheduleData)
         {
-            return View();
+            var result= await _corporate.SaveScheduleListAsync(scheduleData);
+            return  Json(new { message = result.Message, status = result.Status });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult>GetCalaenderData()
+        {
+            var result= await _corporate.GetCalenderVisitScheduleAsync();
+            return Json(result);
+
         }
     }
 }

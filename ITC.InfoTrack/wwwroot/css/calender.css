@@ -1,226 +1,27 @@
-﻿.main-wrapper {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-    overflow: hidden;
-    margin: 15px;
-}
-
-.header-gradient {
-    background: var(--primary-gradient);
-    color: white;
-    padding: 2rem;
-}
-
-/* Responsive Calendar Styles */
-.calendar-wrapper {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    overflow: hidden;
-}
-
-.calendar-header {
-    background: #869f96;
-    color: white;
-    padding: 0.5rem;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    background: #f8f9fa;
-    border-radius: 0 0 15px 15px;
-}
-
-.calendar-day-header {
-    background: #e9ecef;
-    padding: 0.6rem 0.5rem;
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.7rem;
-    border-bottom: 1px solid #dee2e6;
-    color: #5664d2;
-}
-
-.calendar-day {
-    background: white;
-    min-height: 100px;
-    padding: 0.5rem;
-    border: 1px solid #e9ecef;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-    .calendar-day:hover {
-        background: rgba(66, 133, 244, 0.05);
-        transform: scale(1.02);
-    }
-
-    .calendar-day.today {
-        background: rgba(66, 133, 244, 0.1);
-        border: 2px solid #4285f4;
-        font-weight: bold;
-    }
-
-    .calendar-day.other-month {
-        background: #f8f9fa;
-        color: #6c757d;
-    }
-
-    .calendar-day.has-events {
-        background: rgba(52, 168, 83, 0.05);
-    }
-
-.day-number {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
-}
-
-.event-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin: 1px;
-}
-
-.event-item {
-    background: rgba(66, 133, 244, 0.1);
-    border-left: 3px solid #4285f4;
-    padding: 2px 4px;
-    margin: 1px 0;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    line-height: 1.2;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-    .event-item:hover {
-        background: rgba(66, 133, 244, 0.2);
-        transform: translateX(2px);
-    }
-
-    .event-item.type-meeting {
-        border-left-color: #4285f4;
-        background: rgba(66, 133, 244, 0.1);
-    }
-
-    .event-item.type-inspection {
-        border-left-color: #ffc107;
-        background: rgba(255, 193, 7, 0.1);
-    }
-
-    .event-item.type-maintenance {
-        border-left-color: #dc3545;
-        background: rgba(220, 53, 69, 0.1);
-    }
-
-/* Responsive Table Styles */
+﻿
 
 
-/* Mobile Responsive Calendar */
-@media (max-width: 768px) {
-    .main-wrapper {
-        margin: 10px;
-        border-radius: 15px;
-    }
-
-    .header-gradient {
-        padding: 1.5rem;
-    }
-
-    .calendar-day {
-        min-height: 70px;
-        padding: 0.25rem;
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .calendar-cell {
+        min-height: 60px; /* Smaller height for mobile calendar cells */
+        font-size: 0.75rem;
+        padding: 0.4rem;
     }
 
     .calendar-day-header {
-        padding: 0.75rem 0.25rem;
-        font-size: 0.8rem;
+        font-size: 0.7rem;
+        padding: 0.5rem 0.1rem;
     }
 
-    .day-number {
-        font-size: 0.8rem;
+    .visit-list {
+        max-height: 400px; /* Adjust height for mobile */
+        margin-top: 1.5rem; /* Space between calendar and list on mobile */
     }
 
-    .event-item {
-        font-size: 0.65rem;
-        padding: 1px 3px;
-    }
-
-    /* Mobile Calendar - Stack Events as Dots */
-    .calendar-day .event-item {
-        display: none;
-    }
-
-    .calendar-day .event-dots {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2px;
-        margin-top: 0.25rem;
+    .add-visit-btn-mobile {
+        width: 100%;
+        margin-top: 1rem;
     }
 }
-
-@media (max-width: 576px) {
-    .calendar-day {
-        min-height: 50px;
-        padding: 0.2rem;
-    }
-
-    .day-number {
-        font-size: 0.75rem;
-    }
-
-    .calendar-day-header {
-        padding: 0.5rem 0.2rem;
-        font-size: 0.75rem;
-    }
-}
-
-
-.btn-gradient {
-    background: var(--primary-gradient);
-    border: none;
-    border-radius: 10px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    color: white;
-    transition: all 0.3s ease;
-}
-
-    .btn-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        color: white;
-    }
-
-/* Loading Animation */
-.loading-spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top: 2px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Fade Animation */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
 

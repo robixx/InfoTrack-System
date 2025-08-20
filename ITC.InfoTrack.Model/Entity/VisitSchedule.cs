@@ -11,7 +11,7 @@ namespace ITC.InfoTrack.Model.Entity
     {
         [Key]
         public int ScheduleId { get; set; }         // Primary Key
-        public int OrgId { get; set; }              // Foreign Key to Organization
+        public int AssignUserId { get; set; }              // Foreign Key to Organization
         public DateTime DateOfVisit { get; set; }   // Visit date
         public TimeSpan TimeOfVisit { get; set; }   // Visit time
         public int LocationId { get; set; }         // Foreign Key to Location

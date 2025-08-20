@@ -48,6 +48,7 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<LevelSetting> LevelSetting { get; set; }
         public DbSet<ProfileWiseOrganization> ProfileWiseOrganization { get; set; }
         public DbSet<OrganizationHierarchyDto> OrganizationHierarchyDto { get; set; }
+        public DbSet<CalenderVisitScheduleDto> CalenderVisitScheduleDto { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,7 +58,19 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<BoothAsset>().HasKey(x => x.AssetId);
             modelBuilder.Entity<Organization>().HasKey(x => x.OrgId);
             modelBuilder.Entity<OrgResource>().HasKey(x => x.ResourceProfileId);
-            modelBuilder.Entity<VisitSchedule>().HasKey(x => x.ScheduleId);
+            modelBuilder.Entity<VisitSchedule>(entity =>
+            {
+                // Primary Key
+                entity.HasKey(x => x.ScheduleId);
+
+                // Make ScheduleId auto-increment
+                entity.Property(x => x.ScheduleId)
+                      .ValueGeneratedOnAdd();
+
+                // Map TimeOfVisit to PostgreSQL "time"
+                entity.Property(x => x.TimeOfVisit)
+                      .HasColumnType("time");
+            });
             modelBuilder.Entity<ResourceList>().HasKey(x => x.ResListId);
             modelBuilder.Entity<OrgLocation>().HasKey(x => x.LocationId);
             modelBuilder.Entity<OrgAsset>().HasKey(x => x.AssetId);
@@ -82,6 +95,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<CustomTypeWiseLoadedDto>().HasNoKey();
             modelBuilder.Entity<OrganizationConfigureDto>().HasNoKey();
             modelBuilder.Entity<OrganizationHierarchyDto>().HasNoKey();
+            modelBuilder.Entity<CalenderVisitScheduleDto>().HasNoKey();
 
             base.OnModelCreating(modelBuilder);
         }

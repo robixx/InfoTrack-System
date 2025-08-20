@@ -12,11 +12,14 @@ namespace ITC.InfoTrack.Model.Interface
     {
         Task<List<CorporateOffice>> getOfficeList();
         Task<(string Message, bool Status)> addOfficeInformation(CorporateOfficeDto model);
+        Task<(string Message, bool Status)> SaveScheduleListAsync(List<ScheduleEntryDto> scheduleData);
         Task<CorporateOffice> OfficeDataFind(long corpId);
         Task<List<ScheduleDataDto>> ScheduleDataFind(long? branch, long? subbranchid, int? districtid, int? divisionid);
         Task<List<UserDto>> GetUserDateWise(string dateValue);
 
         Task<List<OrganizationHierarchyDto>> GetOrganizationHierarchyAsync(int? branchId, int? subbranch, int? district, int? division);
+
+        Task<List<CalenderVisitScheduleDto>> GetCalenderVisitScheduleAsync();
 
 
     }
