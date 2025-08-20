@@ -53,9 +53,7 @@ app.UseRouting();
 app.UseSession();
 app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "/",
