@@ -32,6 +32,7 @@ namespace ITC.InfoTrack.Areas.Login.Controllers
         public async Task<IActionResult> DoLogin([FromBody] LoginRequest loginRequest)
         {
             var auth= await _auth.LoginAsync(loginRequest);
+
             if (auth == null)
             {
                 return Json(new

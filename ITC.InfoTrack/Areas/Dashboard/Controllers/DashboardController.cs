@@ -1,4 +1,5 @@
-﻿using ITC.InfoTrack.Model.ViewModel;
+﻿using ITC.InfoTrack.Model.Entity;
+using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -12,11 +13,13 @@ namespace ITC.InfoTrack.Areas.Dashboard.Controllers
     public class DashboardController : Controller
     {
         [HttpGet]       
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             string userName = User.Identity.Name;
-            if(User.Identity.IsAuthenticated)
+           
+            if (User.Identity.IsAuthenticated)
             {
+                HttpContext.Session.SetString("UserName", userName);
                 return View();
             }
             else
