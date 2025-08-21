@@ -414,15 +414,15 @@ namespace ITC.InfoTrack.Model.DAO
 
               
                 // Step 1: get the first propertyId
-                var acualvalue = await _connection.ProfileWiseOrganization
-                    .Where(i => i.IsActive == 1 && i.ParentId == parentId)
+                var acualvalue = await _connection.LevelSetting
+                    .Where(i => i.IsActive == 1 && i.Status == parentId)
                     .Select(p => p.PropertyId)
                     .FirstOrDefaultAsync();               
 
                 // Step 2: get all propertyIds that should be excluded
                 var excludedIds = await _connection.ProfileWiseOrganization
-                    .Where(i => i.IsActive == 1 && i.PropertyId!= acualvalue)
-                    .Select(p => p.PropertyId)
+                    .Where(i => i.IsActive == 1 && i.ParentId== parentId)
+                    .Select(p =>  p.PropertyId)
                     .ToListAsync();
 
                 // Step 3: fetch MetaDataElements for acualvalue but not already in excludedIds

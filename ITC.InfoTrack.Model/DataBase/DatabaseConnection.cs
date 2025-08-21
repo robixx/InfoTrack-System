@@ -49,6 +49,7 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<ProfileWiseOrganization> ProfileWiseOrganization { get; set; }
         public DbSet<OrganizationHierarchyDto> OrganizationHierarchyDto { get; set; }
         public DbSet<CalenderVisitScheduleDto> CalenderVisitScheduleDto { get; set; }
+        public DbSet<LoginResponse> LoginResponse { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -96,6 +97,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<OrganizationConfigureDto>().HasNoKey();
             modelBuilder.Entity<OrganizationHierarchyDto>().HasNoKey();
             modelBuilder.Entity<CalenderVisitScheduleDto>().HasNoKey();
+            modelBuilder.Entity<LoginResponse>().HasNoKey();
 
             base.OnModelCreating(modelBuilder);
         }

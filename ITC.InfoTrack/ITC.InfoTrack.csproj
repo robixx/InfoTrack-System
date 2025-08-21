@@ -73,7 +73,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Dashboard\Views\" />
     <Folder Include="Areas\Login\Views\" />
   </ItemGroup>
 

@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
@@ -31,21 +33,32 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 if (login != null)
-                { 
-               
-                    var user = await _connection.Users
-                        .Where(e => e.LoginName == login.UserName && e.Password == login.Password).FirstOrDefaultAsync();
+                {
+
+                    var parameters = new[]
+                        {
+                            new NpgsqlParameter("p_login", login.UserName ?? (object)DBNull.Value),
+                            new NpgsqlParameter("p_password", login.Password ?? (object)DBNull.Value),
+                        };
+
+                    var data = await _connection.LoginResponse
+                        .FromSqlRaw("SELECT * FROM login_user(@p_login, @p_password)", parameters)
+                        .ToListAsync();
+
+
+
+                    var user = data.FirstOrDefault();
 
                     if (user == null)
-                        return null; 
+                        return null;
 
-                   
+                    
                     var claims = new List<Claim>
                         {
                             new Claim(ClaimTypes.Name, user.UserName),
-                            new Claim(ClaimTypes.Role, "SuperAdmin"),
+                            new Claim(ClaimTypes.Role,user.RoleName),
                             new Claim("UserId", user.UserId.ToString()),
-                            new Claim("RoleId", "1")
+                            new Claim("RoleId",user.RoleId.ToString())
                         };
 
                     var identity = new ClaimsIdentity(claims, "CookieAuth");
@@ -57,13 +70,7 @@ namespace ITC.InfoTrack.Model.DAO
                         await httpContext.SignInAsync("CookieAuth", principal);
                     }
 
-                    return new LoginResponse
-                    {
-                        UserId = user.UserId,
-                        UserName = user.UserName,
-                        RoleName = "SuperAdmin",
-                        RoleId = 1
-                    };
+                    return user;
                 }
                 return null;
             }

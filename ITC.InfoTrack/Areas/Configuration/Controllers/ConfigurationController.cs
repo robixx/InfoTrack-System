@@ -1,5 +1,6 @@
 ﻿using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Emit;
@@ -7,6 +8,7 @@ using System.Reflection.Emit;
 namespace ITC.InfoTrack.Areas.Configuration.Controllers
 {
     [Area("Configuration")]
+    [Authorize]
     public class ConfigurationController : Controller
     {
 

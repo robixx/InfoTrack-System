@@ -34,10 +34,17 @@ namespace ITC.InfoTrack.Areas.Login.Controllers
             var auth= await _auth.LoginAsync(loginRequest);
             if (auth == null)
             {
-                ModelState.AddModelError("", "Invalid username or password.");
-                return View("~/Views/Home/Index.cshtml", loginRequest);
+                return Json(new
+                {
+                    status = false,
+                    message = "Invalid username or password."
+                });
             }
-            return RedirectToAction("Index", "Dashboard", new { area = "Dashboard" });
+            return Json(new
+            {
+                status = true,
+                redirectUrl = Url.Action("Index", "Dashboard", new { area = "Dashboard" })
+            });
         }
     }
 }

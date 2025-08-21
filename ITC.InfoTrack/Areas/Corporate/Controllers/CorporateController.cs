@@ -1,6 +1,7 @@
 ﻿using ITC.InfoTrack.Model.DataBase;
 using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ITC.InfoTrack.Areas.Corporate.Controllers
 {
     [Area("Corporate")]
+    [Authorize]
     public class CorporateController : Controller
     {
 

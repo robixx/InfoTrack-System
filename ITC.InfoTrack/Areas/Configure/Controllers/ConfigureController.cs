@@ -1,10 +1,12 @@
 ﻿using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ITC.InfoTrack.Areas.Configure.Controllers
 {
     [Area("Configure")]
+    [Authorize]
     public class ConfigureController : Controller
     {
         private readonly IDropDown _dropdown;

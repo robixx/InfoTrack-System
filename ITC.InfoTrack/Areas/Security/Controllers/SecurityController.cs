@@ -1,6 +1,7 @@
 ﻿using ITC.InfoTrack.Model.Entity;
 using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
@@ -8,7 +9,7 @@ using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
 namespace ITC.InfoTrack.Areas.Security.Controllers
 {
     [Area("Security")]
-  
+    [Authorize]
     public class SecurityController : Controller
     {
         private readonly IMetaData _metadata;

@@ -696,9 +696,10 @@
             return foundNodes;
         }
 
-        addNodeInListBtn.addEventListener('click', () => {
-
+        $('#addNodeInListBtn').on('click', () => {
+            debugger;
             DynamicdataName(currentListParentNodeId); // for data name
+            
             
         });
 
@@ -729,6 +730,7 @@
 
         function AddButtonWork(data)
         {
+            debugger;
             console.log(`Add ${currentListType} (List) button clicked.`);
             if (!currentListType || !currentListParentNodeId) {
                 showMessage("Please select a parent node in the tree first to add a new item to its list.");
