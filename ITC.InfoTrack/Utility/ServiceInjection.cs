@@ -17,6 +17,7 @@ namespace ITC.InfoTrack.Utility
             services.AddScoped<IOrgLocation, CorpLocationDAO>();
             services.AddScoped<IConfigurations, ConfigurationDAO>();
             services.AddScoped<IAuth, AuthenticationDAO>();
+            services.AddScoped<ICategoryData, CategoryWiseDataDAO>();
             
         }
     }

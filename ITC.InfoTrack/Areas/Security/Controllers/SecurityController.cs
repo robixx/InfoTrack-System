@@ -87,7 +87,7 @@ namespace ITC.InfoTrack.Areas.Security.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> OrganizationRootSet()
+        public IActionResult OrganizationRootSet()
         {
             return View();
         }
@@ -101,7 +101,7 @@ namespace ITC.InfoTrack.Areas.Security.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> UserList()
+        public IActionResult UserList()
         {
             return View();
         }

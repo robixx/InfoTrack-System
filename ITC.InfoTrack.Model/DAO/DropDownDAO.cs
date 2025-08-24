@@ -473,5 +473,27 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<DropDownDtos>> getCategory()
+        {
+            try
+            {
+                var categorylist = await _connection.Category
+                    .Where(c => c.IsActive == true)
+                    .Select(i => new DropDownDtos
+                    {
+                        Id = i.CategoryId,
+                        Name = i.CategoryName,
+                    })
+                    .ToListAsync();
+
+                return categorylist;
+
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

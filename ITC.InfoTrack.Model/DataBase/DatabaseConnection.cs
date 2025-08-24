@@ -50,6 +50,11 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<OrganizationHierarchyDto> OrganizationHierarchyDto { get; set; }
         public DbSet<CalenderVisitScheduleDto> CalenderVisitScheduleDto { get; set; }
         public DbSet<LoginResponse> LoginResponse { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<CategoryWiseDetails> CategoryWiseDetails { get; set; }
+        public DbSet<TokenMaster> TokenMaster { get; set; }
+        public DbSet<TokenDetails> TokenDetails { get; set; }
+        public DbSet<TokenDetailsImage> TokenDetailsImage { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +64,11 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<BoothAsset>().HasKey(x => x.AssetId);
             modelBuilder.Entity<Organization>().HasKey(x => x.OrgId);
             modelBuilder.Entity<OrgResource>().HasKey(x => x.ResourceProfileId);
+            modelBuilder.Entity<Category>().HasKey(x => x.CategoryId);
+            modelBuilder.Entity<CategoryWiseDetails>().HasKey(x => x.Id);
+            modelBuilder.Entity<TokenMaster>().HasKey(x => x.TokenId);
+            modelBuilder.Entity<TokenDetails>().HasKey(x => x.Id);
+            modelBuilder.Entity<TokenDetailsImage>().HasKey(x => x.ImageId);
             modelBuilder.Entity<VisitSchedule>(entity =>
             {
                 // Primary Key

@@ -108,7 +108,7 @@ namespace ITC.InfoTrack.Areas.Configuration.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProfileConfiguration()
+        public IActionResult ProfileConfiguration()
         {
             return View();
         }

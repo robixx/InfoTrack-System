@@ -20,13 +20,13 @@ namespace ITC.InfoTrack.Areas.Configure.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> OrganizationCreate()
+        public IActionResult OrganizationCreate()
         {
             return View();
         }
 
         [HttpGet]
-        public async Task<IActionResult> OrganizationConfigure()
+        public IActionResult OrganizationConfigure()
         {
             return View();
         }

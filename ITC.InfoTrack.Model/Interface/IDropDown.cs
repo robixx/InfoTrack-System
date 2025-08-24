@@ -29,5 +29,6 @@ namespace ITC.InfoTrack.Model.Interface
         Task<(List<DropDownDto> data, bool status)> getLevelRootPropertyElement( int type);
         Task<List<DropDownDtos>> getChildenPropertyElement( int type);
         Task<List<DropDownDtos>> getDynamicNameIdAsync(string id);
+        Task<List<DropDownDtos>> getCategory();
     }
 }
