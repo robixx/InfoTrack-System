@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ITC.InfoTrack.Model.ViewModel
+{
+    public class CategoryWiseDetailsDto
+    {
+        public int Id { get; set; }
+
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+
+        public string Title { get; set; }
+
+        public int CreateBy { get; set; }
+
+        public DateTime CreateDate { get; set; } = DateTime.Now;
+
+        public int UpdateBy { get; set; }
+
+        public DateTime Updated { get; set; }
+
+        public DateTime ActiveDate { get; set; }
+
+        public bool IsActive { get; set; } = true;
+    }
+}

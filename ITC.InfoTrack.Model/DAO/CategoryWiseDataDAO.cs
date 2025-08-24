@@ -1,6 +1,7 @@
 ﻿using ITC.InfoTrack.Model.DataBase;
 using ITC.InfoTrack.Model.Entity;
 using ITC.InfoTrack.Model.Interface;
+using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,26 @@ namespace ITC.InfoTrack.Model.DAO
                 _connection=connection;
         }
 
-        public async Task<List<CategoryWiseDetails>> getCategoryWiseData()
+        public async Task<List<CategoryWiseDetailsDto>> getCategoryWiseData()
         {
             try
             {
-                var result = await _connection.CategoryWiseDetails.Where(c => c.IsActive == true).ToListAsync();
+                var result = await (from a in  _connection.CategoryWiseDetails 
+                    join b in _connection.Category on a.CategoryId equals b.CategoryId
+                    where b.IsActive==true
+                    select new CategoryWiseDetailsDto
+                    {
+                        Id=a.Id,
+                        CategoryId= a.CategoryId,
+                        CategoryName=b.CategoryName,
+                        Title=a.Title,
+                        CreateBy=a.CreateBy,
+                        CreateDate=a.CreateDate,
+                        IsActive=a.IsActive,
+                        ActiveDate=a.ActiveDate,
+                    }
+                    
+                    ).ToListAsync();
                 return result;
 
             }catch (Exception ex)

@@ -3,6 +3,7 @@ using ITC.InfoTrack.Model.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Threading.Tasks;
 
 namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
 {
@@ -20,8 +21,11 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
         }
 
         [HttpGet]
-        public IActionResult TokenCreate()
+        public async Task<IActionResult> TokenCreate()
         {
+            ViewBag.type = new SelectList(await _drop.GetTokenType(), "Id", "Name"); 
+            ViewBag.district = new SelectList(await _drop.getDistrict(), "Id", "Name"); 
+            ViewBag.division = new SelectList(await _drop.getDivision(), "Id", "Name"); 
             return View();
         }
 
@@ -30,7 +34,8 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
         public async Task<IActionResult> CategoryWiseData()
         {
             ViewBag.category = new SelectList(await _drop.getCategory(), "Id", "Name");
-            return View();
+            var data = await _categorydata.getCategoryWiseData();
+            return View(data);
 
         }
 
@@ -52,6 +57,22 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
 
             });
 
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> TypeWiseElementName(string typeId)
+        {
+            int id= Convert.ToInt32(typeId);
+            var result= await _drop.getRootPropertyElement(id);
+            return Json( new {status=result.status, data=result.data });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TypeWiseTokenData()
+        {
+            var data = await _categorydata.getCategoryWiseData();
+            return Json(new { status = true, data = data });
         }
     }
 }

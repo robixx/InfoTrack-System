@@ -1,4 +1,5 @@
 ﻿using ITC.InfoTrack.Model.Entity;
+using ITC.InfoTrack.Model.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,6 @@ namespace ITC.InfoTrack.Model.Interface
     public interface ICategoryData
     {
         Task<(string message, bool status)>SaveCategoryData(int categoryId, string Title, int loginuserId);
-        Task<List<CategoryWiseDetails>>getCategoryWiseData();
+        Task<List<CategoryWiseDetailsDto>>getCategoryWiseData();
     }
 }

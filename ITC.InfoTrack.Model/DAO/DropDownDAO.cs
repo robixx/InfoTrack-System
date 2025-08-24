@@ -329,7 +329,9 @@ namespace ITC.InfoTrack.Model.DAO
                              .Select(i => new DropDownDtos
                              {
                                  Id = i.DataElementId,
-                                 Name = i.MetaElementValue
+                                 Name = i.MetaElementValue != null && i.MetaElementValue.Length > 0
+            ? char.ToUpper(i.MetaElementValue[0]) + i.MetaElementValue.Substring(1).ToLower()
+            : i.MetaElementValue
                              })
                              .ToListAsync();
 
@@ -491,6 +493,74 @@ namespace ITC.InfoTrack.Model.DAO
 
             }
             catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropDownDtos>> GetTokenType()
+        {
+            try
+            {
+                var categorylist = await _connection.LevelSetting
+                    .Where(c => c.IsActive == 1)
+                    .OrderBy (c => c.OrderView)
+                    .Select(i => new DropDownDtos
+                    {
+                        Id = i.PropertyId,
+                        Name = i.LevelName,
+                    })
+                    .ToListAsync();
+
+                return categorylist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropDownDtos>> getDistrict()
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == 8)
+                         .OrderBy(v => v.PropertyViewOrder)
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                         .ToListAsync();
+                return datalist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropDownDtos>> getDivision()
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == 9)
+                         .OrderBy(v => v.PropertyViewOrder)
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                        
+                         .ToListAsync();
+                return datalist;
+
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

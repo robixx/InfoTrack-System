@@ -21,6 +21,7 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<DropDownDto>> GetRole();
         Task<List<DropDownDtos>> GetOrganization();
         Task<List<DropDownDtos>> GetLevelSetting();
+        Task<List<DropDownDtos>> GetTokenType();
         Task<List<DropDownDtos>> GetOrganizationLocation();
         Task<List<DropDownDto>> GetCustomTypeWiseLocation( long OrgId, long TypeId);
         Task<(List<DropDownDtos> data, bool status)> getRootMetaPropertyElement();
@@ -30,5 +31,7 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<DropDownDtos>> getChildenPropertyElement( int type);
         Task<List<DropDownDtos>> getDynamicNameIdAsync(string id);
         Task<List<DropDownDtos>> getCategory();
+        Task<List<DropDownDtos>> getDistrict();
+        Task<List<DropDownDtos>> getDivision();
     }
 }
