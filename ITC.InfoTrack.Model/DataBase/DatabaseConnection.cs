@@ -55,6 +55,7 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<TokenMaster> TokenMaster { get; set; }
         public DbSet<TokenDetails> TokenDetails { get; set; }
         public DbSet<TokenDetailsImage> TokenDetailsImage { get; set; }
+        public DbSet<TokenMasterDto> TokenMasterDto { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -108,6 +109,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<OrganizationHierarchyDto>().HasNoKey();
             modelBuilder.Entity<CalenderVisitScheduleDto>().HasNoKey();
             modelBuilder.Entity<LoginResponse>().HasNoKey();
+            modelBuilder.Entity<TokenMasterDto>().HasNoKey();
 
             base.OnModelCreating(modelBuilder);
         }

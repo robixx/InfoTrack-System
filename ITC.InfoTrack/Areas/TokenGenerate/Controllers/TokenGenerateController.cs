@@ -86,5 +86,13 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
             var result = await _categorydata.SaveTokenGenerateData(model, loginUserId);
             return Json(new {message=result.message , success = result.success });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTokenList()
+        {
+            var result= await _categorydata.getTokenData();
+            return View(result);
+
+        }
     }
 }

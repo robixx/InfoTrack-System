@@ -53,6 +53,20 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
+        public async Task<List<TokenMasterDto>> getTokenData()
+        {
+            try
+            {
+                var list= await _connection.TokenMasterDto.FromSqlRaw("SELECT * FROM get_token_master_data()")
+                        .ToListAsync();
+                return list;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<(string message, bool status)> SaveCategoryData(int categoryId, string Title, int loginuserId)
         {
             try

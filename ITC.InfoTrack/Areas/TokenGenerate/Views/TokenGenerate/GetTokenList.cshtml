@@ -1,0 +1,160 @@
+﻿@model List<ITC.InfoTrack.Model.ViewModel.TokenMasterDto>
+
+@{
+    ViewBag.Title = "Token List";
+    ViewBag.pTitle = "Token List";
+    ViewBag.pageTitle = "InfoTrack";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int i = 1;
+}
+
+@section styles {
+    <!-- jquery.vectormap css -->
+
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+    
+
+</style>
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Token List</h5>
+            </div>
+            <div class="card-body">                
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div id="tableWrapper" class="table-responsive">
+                            <div class="table-responsive">
+                                <table id="datatable" class="table">
+                                    <thead class="fw-bolt" style="background-color:#f0f2f5;">
+                                        <tr>
+                                            <th>Sl.</th>
+                                            <th>Source Data</th>
+                                            <th>Token Date</th>
+                                            <th>CreateDate</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>
+                                                    <strong>District : </strong> @item.DistrictName →
+                                                    <strong>Division : </strong> @item.DivisionName →
+                                                    <strong>SourceName : </strong> @item.SourceName <span>(@item.TypeName)</span> <br>
+                                                    <span class="text-muted">@item.Address</span>
+                                                   
+                                                  
+                                                </td>
+                                                <td>@item.TokenDate.ToString("dd-MMM-yyy")</td>
+                                                <td>@item.CreateDate.ToString("dd-MMM-yyy")</td>
+                                                <td>
+                                                    <a class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                       data-bs-target="#detailsModal" data-id="@item.TokenId">Details</a>
+                                                </td>
+                                            </tr>
+                                            i++;
+                                        }
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+<!--Modal Open-->
+
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-top">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Token Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be loaded dynamically -->
+                <div id="modalContent">
+                    <p class="text-center text-muted">Loading...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section scripts {
+    <!-- apexcharts -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- App js -->
+    <script src="~/js/app.js"></script>
+
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var detailsModal = document.getElementById('detailsModal');
+        detailsModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Button that triggered modal
+            var tokenId = button.getAttribute('data-id');
+
+          
+            document.getElementById("modalContent").innerHTML = "<p class='text-center text-muted'>Loading...</p>";
+
+           
+        });
+    });
+</script>
