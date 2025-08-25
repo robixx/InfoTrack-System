@@ -5,11 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section styles{
+@section styles {
     <!-- jquery.vectormap css -->
-    
+
     <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
-    
+
     <!-- DataTables -->
     <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
@@ -17,7 +17,7 @@
     <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
 }
-
+<link href="~/css/tokencustom.css" rel="stylesheet" />
 <style>
     .card {
         margin-bottom: 0.4rem;
@@ -36,8 +36,8 @@
             color: white;
         }
 
-    .select2-container .select2-selection--single{
-        height:35px !important;
+    .select2-container .select2-selection--single {
+        height: 35px !important;
     }
 
 </style>
@@ -53,25 +53,30 @@
                 <div id="error"></div>
                 <div class="mt-4">
                     <div class="row g-3">
-                        <div class="col-12 col-md-3">
+                        <div class="col-12 col-md-2">
+                            <label for="metaelementTitle" class="form-label">Date Time<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="datevalue" id="datevalue" />
+
+                        </div>
+                        <div class="col-12 col-md-2">
                             <label for="metaelementTitle" class="form-label">Type<span class="text-danger">*</span></label>
-                            @Html.DropDownList("typeId", ViewBag.type as SelectList, "Select Type", new { @class = "form-select", @id = "typeId", onchange="TypeWiseSource()" })
+                            @Html.DropDownList("typeId", ViewBag.type as SelectList, "Select Type", new { @class = "form-select", @id = "typeId", onchange = "TypeWiseSource()" })
 
                         </div>
-                        <div class="col-12 col-md-3">
+                        <div class="col-12 col-md-2">
                             <label for="districtSelect" class="form-label">District<span class="text-danger">*</span></label>
-                            @Html.DropDownList("districtId", ViewBag.district as SelectList, "Select District", new { @class = "form-select", @id = "districtId"})
+                            @Html.DropDownList("districtId", ViewBag.district as SelectList, "Select District", new { @class = "form-select", @id = "districtId" })
                         </div>
-                        <div class="col-12 col-md-3">
+                        <div class="col-12 col-md-2">
                             <label for="metaelementTitle" class="form-label">Division<span class="text-danger">*</span></label>
-                            @Html.DropDownList("divisionId", ViewBag.division as SelectList, "Select Division", new { @class = "form-select", @id = "divisionId" })
+                            @Html.DropDownList("divisionId", ViewBag.division as SelectList, "Select Division", new { @class = "form-select w-100", @id = "divisionId" })
 
                         </div>
-                        
+
 
                         <div class="col-12 col-md-3">
-                            <label for="metaelementTitle" class="form-label">Type Name<span class="text-danger">*</span></label>
-                            <select class="form-select" name="typename" id="typename" onchange="LoadData()">
+                            <label for="metaelementTitle" class="form-label" id="typelevel">Type Name<span class="text-danger">*</span></label>
+                            <select class="form-select w-100" name="typename" id="typename" onchange="LoadData()">
                                 <option value="0">Select Type Name</option>
                             </select>
 
@@ -80,93 +85,26 @@
                 </div>
                 <div class="mt-4">
                     <div class="row">
-                        <div id="categorywisebranding"></div>
-                        <div class="container mt-5">
-                            <div class="table-responsive mt-4">
-                                <table class="table table-borderless table-striped" id="dataTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Data</th>
-                                            <th>Select</th>
-                                            <th id="imageupload"></th>
-                                            <th>Comments</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Data 1</td>
-                                            <td>
-                                                <select class="form-select" id="yesNoSelect1">
-                                                    <option value="no">No</option>
-                                                    <option value="yes">Yes</option>
-                                                </select>
-                                            </td>
-                                            <td id="imageUploadCell1">
-                                                <div style="display: none;">
-                                                    <input class="form-control" type="file" id="imageUpload1" multiple>
-                                                    <div id="imagePreview1" class="d-flex flex-wrap gap-2 mt-2"></div>
-                                                </div>
-                                            </td>
-                                            <td id="commentsCell1">
-                                                <div style="display: none;">
-                                                    <textarea class="form-control" id="comments1" rows="1"></textarea>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data 2</td>
-                                            <td>
-                                                <select class="form-select" id="yesNoSelect2">
-                                                    <option value="no">No</option>
-                                                    <option value="yes">Yes</option>
-                                                </select>
-                                            </td>
-                                            <td id="imageUploadCell2">
-                                                <div style="display: none;">
-                                                    <input class="form-control" type="file" id="imageUpload2" multiple>
-                                                    <div id="imagePreview2" class="d-flex flex-wrap gap-2 mt-2"></div>
-                                                </div>
-                                            </td>
-                                            <td id="commentsCell2">
-                                                <div style="display: none;">
-                                                    <textarea class="form-control" id="comments2" rows="1"></textarea>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <div class="col-xl-12">
+                            <div id="tableWrapper" class="table-responsive mt-4" style="display:none;">
+                                <div class="table-responsive mt-4">
+                                    <table id="datatable" class="table">
+                                        <thead class="fw-bolt" style="background-color:#f0f2f5;">
+                                            <tr>
+                                                <th width="150">Category</th>
+                                                <th width="200">Posibility</th>
+                                                <th id="imageupload"></th>
+                                                <th width="500"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button type="button" id="submit" class="btn btn-primary btn-sm" style="display:none;">Save Data</button>
                             </div>
                         </div>
-                        @* <table class="table">
-                            
-                           <tr>
-                               <th>Category</th>
-                           </tr>
-                            <tr>
-                                <td>data</td>
-                                <td>Yes/ No</td>
-                                <td>multiple Image Upload</td>
-                                <td>Comments</td>
-                            </tr>
-                            <tr>
-                                <td>data</td>
-                                <td>Yes/ No</td>
-                                <td>multiple Image Upload</td>
-                                <td>Comments</td>
-                            </tr>
-                            <tr>
-                                <td>data</td>
-                                <td>Yes/ No</td>
-                                <td>multiple Image Upload</td>
-                                <td>Comments</td>
-                            </tr>
-                            <tr>
-                                <td>data</td>
-                                <td>Yes/ No</td>
-                                <td>multiple Image Upload</td>
-                                <td>Comments</td>
-                            </tr>
-                        </table> *@
+                       
                     </div>
                 </div>
             </div>
@@ -179,7 +117,7 @@
 
 
 @section scripts {
-    <!-- apexcharts -->   
+    <!-- apexcharts -->
     <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
     <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
     <!-- Required datatable js -->
@@ -190,24 +128,29 @@
     <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
     <!-- App js -->
     <script src="~/js/app.js"></script>
-   
+
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/libs/select2/js/select2.min.js"></script>
 
 
- <script>
+<script>
       $('#typename').select2({
             placeholder: "Select Type Name",
             allowClear: true
         });
+
+
     function TypeWiseSource()
     {
         let typeId=$('#typeId').val();
+        let typeText = $('#typeId option:selected').text();
+        const typeNameLevel= document.getElementById('typelevel');
+       $('#typelevel').html(`${typeText} Name <span class="text-danger">*</span>`);
 
        $.ajax({
                url: '/TokenGenerate/TokenGenerate/TypeWiseElementName',
-               type: 'GET',              
+               type: 'GET',
                data: {typeId:typeId},
                success: function (res) {
                     if(res.status){
@@ -223,7 +166,7 @@
                          dropdown.empty();
                          dropdown.append('<option value="0"> Select Type Name </option>');
                      }
-                   
+
                  },
                  error: function (err) {
                   alert('Error while saving.');
@@ -236,6 +179,8 @@
     {
         let typeName= $('#typename').val();
         const error = document.getElementById('error');
+        const button = document.getElementById('submit');
+        const tableWrapper = document.getElementById('tableWrapper');
         //const error = document.getElementById('categorywisebranding');
         let innerHTML='';
         debugger;
@@ -247,15 +192,21 @@
                 </div>
             `;
             document.getElementById('typename').focus();
+             tableWrapper.style.display = 'none';
+             button.style.display = 'none';
             return;
         }
+        tableWrapper.style.removeProperty("display");
+        button.style.removeProperty("display");
+
         $.ajax({
                url: '/TokenGenerate/TokenGenerate/TypeWiseTokenData',
-               type: 'GET',              
+               type: 'GET',
                success: function (res) {
                     if(res.status)
                     {
-                        
+
+                        loadTable(res.data);
                     }
 
                  },
@@ -265,51 +216,79 @@
         });
     }
 
-     function setupRowLogic(rowNumber) {
-        const yesNoSelect = document.getElementById(`yesNoSelect${rowNumber}`);
-        const imageUploadDiv = document.getElementById(`imageUploadCell${rowNumber}`).firstElementChild;
-        const commentsDiv = document.getElementById(`commentsCell${rowNumber}`).firstElementChild;
-        const imageUploadInput = document.getElementById(`imageUpload${rowNumber}`);
-        const imagePreviewContainer = document.getElementById(`imagePreview${rowNumber}`);
-        const img=document.getElementById('imageupload');
 
-        // Handle Yes/No dropdown to show/hide fields
-        yesNoSelect.addEventListener('change', () => {
-            if (yesNoSelect.value === 'yes') {
-                img.innerText="Multiple Image ";
-                imageUploadDiv.style.display = 'block';
-                commentsDiv.style.display = 'block';
-            } else {
-                 img.innerText="";
-                imageUploadDiv.style.display = 'none';
-                commentsDiv.style.display = 'none';
-            }
+    function loadTable(dataList) {
+        const tbody = document.getElementById("dataTableBody");
+        tbody.innerHTML = ""; // clear old rows first
+
+        dataList.forEach(item => {
+            const rowHtml = `
+                <tr>
+                    <td width="150">${item.title}</br> <span class="text-muted badge" style="font-size:10px; background-color:#dff1ef;">${item.categoryName}</span></td>
+                    <td width="200">
+                        <select class="form-select form-select-sm" id="yesNoSelect${item.id}">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </td>
+                    <td id="imageUploadCell${item.id}">
+                        <div style="display: none;">
+                            <input class="form-control form-control-sm fileup" type="file" id="imageUpload${item.id}" multiple>
+                            <div id="imagePreview${item.id}" class="d-flex flex-wrap gap-2 mt-2"></div>
+                        </div>
+                    </td>
+                    <td id="commentsCell${item.id}" width="500">
+                        <div style="display: none;">
+                            <textarea class="form-control form-control-sm" placeholder="Please write a comment" id="comments${item.id}" rows="2"></textarea>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += rowHtml;
         });
 
-        // Handle image upload and create rounded previews
-        imageUploadInput.addEventListener('change', (event) => {
-            imagePreviewContainer.innerHTML = ''; // Clear previous previews
-            const files = event.target.files;
+        // After rendering rows, attach event listeners
+        dataList.forEach(item => {
+            const select = document.getElementById("yesNoSelect" + item.id);
+            const uploadDiv = document.querySelector("#imageUploadCell" + item.id + " div");
+            const commentsDiv = document.querySelector("#commentsCell" + item.id + " div");
 
-            if (files) {
-                for (const file of files) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.classList.add('rounded-circle', 'img-thumbnail'); // Apply rounded style
-                        img.style.width = '30px';
-                        img.style.height = '30px';
-                        img.style.objectFit = 'cover';
-                        imagePreviewContainer.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
+            select.addEventListener("change", function () {
+                if (this.value === "yes") {
+                    uploadDiv.style.display = "block";
+                    commentsDiv.style.display = "block";
+                } else {
+                    uploadDiv.style.display = "none";
+                    commentsDiv.style.display = "none";
                 }
-            }
-        });
+            });
+
+
+            // Image preview for this row
+            const fileInput = document.getElementById("imageUpload" + item.id);
+            const previewDiv = document.getElementById("imagePreview" + item.id);
+
+            fileInput.addEventListener("change", function () {
+                previewDiv.innerHTML = ""; // clear previous images
+                const files = Array.from(this.files);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.style.width = "40px";
+                        img.style.height = "40px";
+                        img.style.objectFit = "cover";
+                        img.style.borderRadius = "50%";
+                        img.className = "border me-2 mb-2";
+                        previewDiv.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            });
+
+         });
     }
 
-    // --- Apply the logic to each table row ---
-    setupRowLogic(1); // For the first row (Data 1)
-    setupRowLogic(2); // For the second row (Data 2)
- </script>
+
+</script>

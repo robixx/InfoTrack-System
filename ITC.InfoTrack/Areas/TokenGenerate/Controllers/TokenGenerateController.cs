@@ -26,6 +26,7 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
             ViewBag.type = new SelectList(await _drop.GetTokenType(), "Id", "Name"); 
             ViewBag.district = new SelectList(await _drop.getDistrict(), "Id", "Name"); 
             ViewBag.division = new SelectList(await _drop.getDivision(), "Id", "Name"); 
+
             return View();
         }
 
