@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
 using ITC.InfoTrack.Model.Interface;
+using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -74,6 +75,16 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
         {
             var data = await _categorydata.getCategoryWiseData();
             return Json(new { status = true, data = data });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveTokenData(MainFormViewModelDto model)
+        {
+            var userIdClaim = User.FindFirst("UserId");
+            int loginUserId = Convert.ToInt32(userIdClaim.Value);
+            var result = await _categorydata.SaveTokenGenerateData(model, loginUserId);
+            return Json(new {message=result.message , success = result.success });
         }
     }
 }

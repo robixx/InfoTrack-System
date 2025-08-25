@@ -8,4 +8,13 @@
         width: 200px !important;
     }
 }
+@media (max-width: 770px) {
+    textarea {
+        width: 200px !important;
+    }
+
+    .fileup {
+        width: 200px !important;
+    }
+}
 

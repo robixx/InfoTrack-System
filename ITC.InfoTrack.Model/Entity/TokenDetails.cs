@@ -15,5 +15,6 @@ namespace ITC.InfoTrack.Model.Entity
         public int CategoryId { get; set; }
         public int CategoryWiseId { get; set; }
         public string Comments { get; set; }
+        public string DataProperty { get; set; }
     }
 }

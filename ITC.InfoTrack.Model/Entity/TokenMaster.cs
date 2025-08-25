@@ -17,6 +17,7 @@ namespace ITC.InfoTrack.Model.Entity
         public int SourceId { get; set; }
         public int? CreateBy { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
+        public DateTime TokenDate { get; set; } 
 
     }
 }

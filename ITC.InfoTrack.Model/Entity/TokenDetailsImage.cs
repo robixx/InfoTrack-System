@@ -17,6 +17,6 @@ namespace ITC.InfoTrack.Model.Entity
         public int CategoryId { get; set; }
         public int CategoryWiseId { get; set; }
         public string ImageName { get; set; }
-        public bool IsActive { get; set; }
+        public int IsActive { get; set; }
     }
 }

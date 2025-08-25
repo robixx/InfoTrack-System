@@ -91,7 +91,7 @@
                                     <table id="datatable" class="table">
                                         <thead class="fw-bolt" style="background-color:#f0f2f5;">
                                             <tr>
-                                                <th width="150">Category</th>
+                                                <th width="200">Catelog</th>
                                                 <th width="200">Posibility</th>
                                                 <th id="imageupload"></th>
                                                 <th width="500"></th>
@@ -183,7 +183,7 @@
         const tableWrapper = document.getElementById('tableWrapper');
         //const error = document.getElementById('categorywisebranding');
         let innerHTML='';
-        debugger;
+      
         if(typeName==='0'){
             error.innerHTML =`
              <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -224,7 +224,9 @@
         dataList.forEach(item => {
             const rowHtml = `
                 <tr>
-                    <td width="150">${item.title}</br> <span class="text-muted badge" style="font-size:10px; background-color:#dff1ef;">${item.categoryName}</span></td>
+                    <td width="150">${item.title}</br> <span class="text-muted badge" style="font-size:10px; background-color:#dff1ef;">${item.categoryName}</span>
+                    <input type="hidden" id="categoryId${item.categoryId}" name="categoryId" value="${item.categoryId}" />
+                    </td>
                     <td width="200">
                         <select class="form-select form-select-sm" id="yesNoSelect${item.id}">
                             <option value="no">No</option>
@@ -290,5 +292,80 @@
          });
     }
 
+
+    document.getElementById("submit").addEventListener("click", function () {
+        const formData = new FormData();
+         const error = document.getElementById('error');
+        // 1. Collect form fields
+        const dateValue = document.getElementById("datevalue").value;
+        const typeId = document.getElementById("typeId").value;
+        const typeText = document.getElementById("typeId").options[document.getElementById("typeId").selectedIndex].text;
+        const districtId = document.getElementById("districtId").value;
+        const divisionId = document.getElementById("divisionId").value;
+        const typeNameId = document.getElementById("typename").value;
+        const typeNameText = document.getElementById("typename").options[document.getElementById("typename").selectedIndex].text;
+          
+        // Append to FormData
+        formData.append("DateValue", dateValue);
+        formData.append("TypeId", typeId);
+        formData.append("TypeText", typeText);
+        formData.append("DistrictId", districtId);
+        formData.append("DivisionId", divisionId);
+        formData.append("TypeNameId", typeNameId);
+        formData.append("TypeNameText", typeNameText);
+      
+        // 2. Collect dynamic table rows
+        const rows = document.querySelectorAll("#dataTableBody tr");
+        rows.forEach((row, index) => {
+            const id = row.querySelector("select").id.replace("yesNoSelect", "");
+            const selectVal = row.querySelector("select").value;
+            const commentElem = row.querySelector("textarea");
+            const comment = commentElem ? commentElem.value : "";
+            const categoryInput = row.querySelector("input[type=hidden]");
+            const categoryId = categoryInput ? categoryInput.value : "";
+
+            // Append row data
+            formData.append(`Items[${index}].Id`, id);
+            formData.append(`Items[${index}].SelectValue`, selectVal);
+            formData.append(`Items[${index}].Comment`, comment);
+            formData.append(`Items[${index}].CategoryId`, categoryId);
+
+            // Append files
+            const filesInput = row.querySelector("input[type=file]");
+            if (filesInput && filesInput.files.length > 0) {
+                Array.from(filesInput.files).forEach(file => {
+                    formData.append(`Items[${index}].Files`, file);
+                });
+            }
+        });
+
+        // 3. Send to controller using fetch
+        fetch('/TokenGenerate/TokenGenerate/SaveTokenData', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+              debugger;
+            if (data.success) {
+                error.innerHTML = `
+                              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                  <strong>Success!</strong> ${data.message}
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              </div>`;
+                 setTimeout(function() {
+                      location.reload();
+                 }, 2000);
+
+            } else {
+                alert("Error saving data.");
+            }
+        })
+        .catch(err => {
+              debugger;
+            console.error("Fetch error:", err);
+            alert("Something went wrong while saving.");
+        });
+    });
 
 </script>
