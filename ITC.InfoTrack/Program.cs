@@ -26,12 +26,16 @@ builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options => {
         options.LoginPath = "/login/default/index";
         options.AccessDeniedPath = "/login/default/noaccess";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        options.SlidingExpiration = true; // refresh cookie if user is active
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 builder.Services.AddSession(options =>
 {
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
 });
 
 var app = builder.Build();
@@ -50,10 +54,11 @@ if (!string.IsNullOrEmpty(pathBase))
     app.UsePathBase(pathBase);
 }
 app.UseRouting();
-app.UseSession();
+
 app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"

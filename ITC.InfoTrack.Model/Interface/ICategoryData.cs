@@ -15,5 +15,9 @@ namespace ITC.InfoTrack.Model.Interface
         Task<(string message, bool success)>SaveTokenGenerateData(MainFormViewModelDto model, int loginUserId);
         Task<List<TokenMasterDto>>getTokenData();
         Task<List<ProductShowcaseDto>>getTokenDetailsShow( int TokenId);
+
+        Task<List<TokenMasterDto>> getTokenDataFilter(int? typeId, int? districtId, int? divisionId, int? ValueTypeId);
+
+
     }
 }

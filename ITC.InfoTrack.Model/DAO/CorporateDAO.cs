@@ -233,7 +233,8 @@ namespace ITC.InfoTrack.Model.DAO
                             LocationId = 0,
                             InsertBy = 1,
                             InsertDate = DateTime.Now,
-                            ScheduleStatus = 1
+                            ScheduleStatus = 1,
+                            TokenId= Convert.ToInt32(item.tokenId)
 
                         };
                         await _connection.VisitSchedule.AddAsync(mastertable);
@@ -242,6 +243,8 @@ namespace ITC.InfoTrack.Model.DAO
                         var detailstable = new VisitScheduleDetails
                         {
                             VisitId = Convert.ToInt64(mastertable.ScheduleId),
+                            TypeId=Convert.ToInt32(item.typeId),
+                            ValueTypeId= Convert.ToInt32(item.sourceId),
                             PoolId = 0,
                             CreateDate = DateTime.Now,
                             CreatedBy = 1,                           

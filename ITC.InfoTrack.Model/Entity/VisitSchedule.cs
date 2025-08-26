@@ -15,6 +15,7 @@ namespace ITC.InfoTrack.Model.Entity
         public DateTime DateOfVisit { get; set; }   // Visit date
         public TimeSpan TimeOfVisit { get; set; }   // Visit time
         public int LocationId { get; set; }         // Foreign Key to Location
+        public int TokenId { get; set; }         // Foreign Key to Location
         public int InsertBy { get; set; }           // User ID who created
         public DateTime InsertDate { get; set; }    // Creation timestamp
         public int? UpdateBy { get; set; }          // User ID who last updated

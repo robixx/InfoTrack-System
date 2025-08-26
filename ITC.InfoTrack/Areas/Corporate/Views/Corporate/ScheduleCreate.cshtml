@@ -239,20 +239,26 @@
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label for="office">Type</label>
-                            @Html.DropDownList("TypeId", ViewBag.type as SelectList,"Select Type", new { @class = "form-control select2", @id = "TypeId", onchange = "onTypeChange(this)" })
+                            @Html.DropDownList("TypeId", ViewBag.type as SelectList, "Select Type", new { @class = "form-control select2", @id = "TypeId", onchange = "onTypeChange(this)" })
                         </div>
                     </div>
                     
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label for="office">District</label>
-                            @Html.DropDownList("DistrictId", ViewBag.district as SelectList, "Select District", new { @class = "form-control select2", @id = "DistrictId", onchange = "onDistrictChange(this)" })
+                            @Html.DropDownList("DistrictId", ViewBag.district as SelectList, "Select District", new { @class = "form-control select2", @id = "DistrictId"})
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label for="office">Division</label>
-                            @Html.DropDownList("DivisionId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "DivisionId" })
+                            @Html.DropDownList("DivisionId", ViewBag.division as SelectList, "Select Division", new { @class = "form-control select2", @id = "DivisionId" })
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="office">Value Type</label>
+                            @Html.DropDownList("ValueTypeId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "ValueTypeId" })
                         </div>
                     </div>
                 </div>
@@ -261,13 +267,10 @@
                         <table id="datatable" class="table table-striped table-hover scheduleTable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead style=" background-color:#c9ccd3; font-weight:600;">
                                 <tr>
-                                    <th><input type="checkbox" id="selectAll" /> All</th>
-
-                                    <th>Branch Name</th>
-                                    <th>Sub-Branch</th>
-                                    <th>District</th>
-                                    <th>Division</th>
-                                    <th>Booth Name</th>
+                                    <th width="40"><input type="checkbox" id="selectAll"/> All</th>
+                                    <th width="100">Token Date</th>
+                                    <th>Source Data</th>                                   
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -398,44 +401,44 @@
     }
     function filterTable() {
 
-        var branchId = $('#TypeId').val()===null? 0 :$('#TypeId').val();
-        var subbranch = $('#SubBranchId').val()===null? 0 :$('#SubBranchId').val();
-        var district = $('#DistrictId').val()===null? 0 :$('#DistrictId').val();
-        var division = $('#DivisionId').val()===null? 0 :$('#DivisionId').val();
+        var typeId = $('#TypeId').val()===null? 0 :$('#TypeId').val();        
+        var districtId = $('#DistrictId').val()===null? 0 :$('#DistrictId').val();
+        var divisionId = $('#DivisionId').val()===null? 0 :$('#DivisionId').val();
+        var valueTypeId= $('#ValueTypeId').val()===null? 0 :$('#ValueTypeId').val();
 
         $.ajax({
-            url: '/Corporate/Corporate/GetFilteredData',
+            url: '/Corporate/Corporate/GetScheduleData',
             type: 'GET',
             data: {
-                branchId: branchId,
-                subbranch: subbranch,
-                district: district,
-                division:division,
+                typeId: typeId,
+                districtId: districtId,
+                divisionId: divisionId,
+                valueTypeId:valueTypeId,
             },
             success: function (data) {
-
+               
             let table = $('#datatable').DataTable();
             table.clear(); // Clear existing rows
             let serial = 1;
             $.each(data, function (index, item) {
+                
                 table.row.add([
-
                     `<input type="checkbox" class="rowCheckbox"
-                     data-branchId="${item.branchId}"
-                     data-branchname="${item.branch}"
-                     data-subbranchName="${item.subBranch}"
-                     data-subbranchId="${item.subBranchId}"
-                     data-districtId="${item.districtId}"
-                     data-district="${item.district}"
-                     data-division="${item.division}"
-                     data-divisionId="${item.divisionId}"
-                     data-booth="${item.booth}"
-                     data-boothid="${item.boothId}"/>`,
-                    item.branch,
-                    item.subBranch,
-                    item.district,
-                    item.division,
-                    item.booth,
+                     data-tokenid="${item.tokenId}"
+                     data-districtid="${item.districtId}"
+                     data-divisionid="${item.divisionId}"
+                     data-typeid="${item.typeId}"
+                     data-sourceid="${item.sourceId}"
+                     data-district="${item.districtName}"
+                     data-division="${item.divisionName}"
+                     data-source="${item.sourceName}"
+                     />`,
+                     item.tokenDate.split('T')[0],
+                    `<strong>District : </strong> ${item.districtName} →
+                      <strong>Division : </strong> ${item.divisionName} →
+                      <strong>SourceName : </strong> ${item.sourceName} <span>(${item.typeName})</span> <br>
+                      <span class="text-muted">${item.address}</span>`,
+                    
 
                 ]);
                 serial++;
@@ -474,21 +477,19 @@
 
     function onTypeChange(dropdown) {
 
-
-        var branchId = dropdown.value;
-        $('#SubBranchId').empty().append('<option>Loading...</option>');
-        // $('#BoothId').empty().append('<option>-- Select Booth --</option>');
+        var typeid = dropdown.value;
+        $('#ValueTypeId').empty().append('<option>Loading...</option>');      
 
         $.ajax({
-            url: '/Corporate/Corporate/GetsubBranches',
+            url: '/Corporate/Corporate/getTypeWiseElementName',
             type: 'GET',
-            data: { branchId: branchId },
+            data: { typeid: typeid },
             dataType: 'json',
             success: function (data) {
 
-                $('#SubBranchId').empty().append('<option>Select sub-Branch</option>');
+                $('#ValueTypeId').empty().append('<option>Select sub-Branch</option>');
                 $.each(data, function (i, item) {
-                    $('#SubBranchId').append($('<option>', {
+                    $('#ValueTypeId').append($('<option>', {
                         value: item.id, // use lowercase if using JsonResult without property casing fix
                         text: item.name
                     }));
@@ -501,56 +502,8 @@
         });
     };
 
-    function onsubBranchChange(dropdown) {
-        var subbranchId = dropdown.value;
-        $('#DistrictId').empty().append('<option>Loading...</option>');
-
-         $.ajax({
-            url: '/Corporate/Corporate/GetDistrictCode',
-            type: 'GET',
-            data: { subbranchId: subbranchId },
-            dataType: 'json',
-            success: function (data) {
-                $('#DistrictId').empty().append('<option>Select District</option>');
-                $.each(data, function (i, item) {
-                    $('#DistrictId').append($('<option>', {
-                        value: item.id,
-                        text: item.name
-                    }));
-                });
-                  filterTable();
-            },
-            error: function (xhr, status, error) {
-                console.error('Error fetching District:', error);
-            }
-        });
-    };
-
-    function onDistrictChange(dropdown) {
-        var districtid = dropdown.value;
-        $('#DivisionId').empty().append('<option>Loading...</option>');
-
-         $.ajax({
-            url: '/Corporate/Corporate/GetDivisionCode',
-            type: 'GET',
-            data: { districtid: districtid },
-            dataType: 'json',
-            success: function (data) {
-                $('#DivisionId').empty().append('<option>Select Division</option>');
-                $.each(data, function (i, item) {
-                    $('#DivisionId').append($('<option>', {
-                        value: item.id,
-                        text: item.name
-                    }));
-                });
-                  filterTable();
-            },
-            error: function (xhr, status, error) {
-                console.error('Error fetching division:', error);
-            }
-        });
-    };
-
+   
+    
     //for calender
      let events = [];
      let currentDate = new Date();
@@ -564,23 +517,24 @@
 
             $('.rowCheckbox:checked').each(function () {
 
-                let branchName  = $(this).data('branchname');
-                let branchId    = $(this).data('branchid');
-                let subbranch   = $(this).data('subbranchname');
-                let subbranchid = $(this).data('subbranchid');
-                let district    = $(this).data('district');
+                let tokeId  = $(this).data('tokenid');
                 let districtId  = $(this).data('districtid');
+                let district    = $(this).data('district');
                 let division    = $(this).data('division');
                 let divisionId  = $(this).data('divisionid');
-                let booth       = $(this).data('booth');
-                let boothId     = $(this).data('boothid');
+                let typeId    = $(this).data('typeid');
+                let typeName    = $(this).data('typename');
+                let sourceId    = $(this).data('sourceid');
+                let soName   = $(this).data('source');
+                
 
                 selectedData.push({
-                    branchName, branchId,
-                    subbranch, subbranchid,
+                    tokeId,
                     district, districtId,
                     division, divisionId,
-                    booth, boothId
+                    typeId, typeName,
+                    sourceId,soName
+                    
                 });
             });
             if(selectedData.length>0){
@@ -596,7 +550,7 @@
 
         function CreateModaldesign(selectedLocations)
         {
-
+            
              const container = document.getElementById('selectedLocationsDisplay');
             container.innerHTML = ''; // Clear previous content
 
@@ -610,13 +564,13 @@
                                 <i class="bi bi-geo-alt me-1"></i> Selected Location
                             </label>
                             <div class="p-3 bg-light text-primary rounded fw-bold">
-                                ${location.branchName} / ${location.subbranch} / ${location.district || ''} / ${location.division || ''}
+                                District : ${location.district} / Division : ${location.division} / Source : ${location.soName || ''}
                             </div>
-                         <input type="hidden" id="hidesubbid" value="subbranchId_${location.subbranchid}_${index}"/>
-                         <input type="hidden" id="hidebrachid" value="branch_${location.branchId}_${index}"/>
+                         <input type="hidden" id="hidetokenid" value="tokeId_${location.tokeId}_${index}"/>
                          <input type="hidden" id="hidedistrictId" value="districtId_${location.districtId}_${index}"/>
                          <input type="hidden" id="hidedivisionId" value="divisionId_${location.divisionId}_${index}"/>
-                         <input type="hidden" id="hideboothId" value="boothId_${location.boothId}_${index}"/>
+                         <input type="hidden" id="hidetypeid" value="typeId_${location.typeId}_${index}"/>
+                         <input type="hidden" id="hidesourceid" value="sourceId_${location.sourceId}_${index}"/>
 
                         </div>
 
@@ -712,11 +666,11 @@
         let hasError = false;
         cards.forEach((card, index) => {
             const locationText = card.querySelector('.bg-light.text-primary').textContent.trim();
-             const barnchValue = card.querySelector(`#hidebrachid`).value;
-            const branchId = barnchValue.split('_')[1];  // Gets the actual corpId from "corpid_123_index"
+             const token = card.querySelector(`#hidetokenid`).value;
+            const tokenId = token.split('_')[1];  // Gets the actual corpId from "corpid_123_index"
 
-            const subbranch = card.querySelector(`#hidesubbid`).value;
-            const subbranchId = subbranch.split('_')[1];
+            const type = card.querySelector(`#hidetypeid`).value;
+            const typeId = type.split('_')[1];
 
             const districtValue = card.querySelector(`#hidedistrictId`).value;
             const districtId = districtValue.split('_')[1];
@@ -724,8 +678,8 @@
             const divisionValue = card.querySelector(`#hidedivisionId`).value;
             const divisionId = divisionValue.split('_')[1];
 
-            const boothValue = card.querySelector(`#hideboothId`).value;
-            const boothId = boothValue.split('_')[1];
+            const source = card.querySelector(`#hidesourceid`).value;
+            const sourceId = source.split('_')[1];
 
             const date = card.querySelector(`[name="eventDate_${index}"]`).value;
             const time = card.querySelector(`[name="eventTime_${index}"]`).value;
@@ -747,11 +701,11 @@
 
             scheduleData.push({
                 locationText,
-                branchId,
-                subbranchId,
+                tokenId,
+                typeId,
                 districtId,
                 divisionId,
-                boothId,
+                sourceId,
                 date,
                 time,
                 assignedUser,
@@ -770,7 +724,7 @@
                 body: JSON.stringify(scheduleData)
             })
             .then(response => {
-                debugger;
+               
                 if (response.ok) {
                     alert("Schedule Create Successfully");
                     // Optionally close modal and reset
@@ -817,10 +771,11 @@
             const viewModalBodyContent = document.getElementById('viewModalBodyContent');
             const viewVisitModalLabel = document.getElementById('viewVisitModalLabel');
 
-
+            let today=new Date();
             let currentMonth = new Date().getMonth();
             let currentYear = new Date().getFullYear();
-            let selectedDate = new Date(); // Initially select today
+            let selectedDate = today; // Initially select today
+            debugger;
 
             // Function to format time for display (e.g., "14:30" to "02:30 PM")
             function formatTimeForDisplay(timeStr) {
@@ -850,7 +805,7 @@
                 const lastDayOfMonth = new Date(year, month + 1, 0);
                 const daysInMonth = lastDayOfMonth.getDate();
                 const firstDayOfWeek = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday
-                debugger;
+               
                 currentMonthYearDisplay.textContent = new Date(year, month).toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
                 // Day headers
@@ -878,6 +833,7 @@
                     cell.classList.add('calendar-cell');
                     cell.textContent = day;
                     const cellDateFormatted = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    debugger;
                     cell.dataset.date = cellDateFormatted;
 
                     // Add current day highlight
@@ -892,12 +848,12 @@
                     // Add event indicators
                     const hasEvent = visits.some(visit =>{
                         const visitDate = visit.dateOfVisit.split('T')[0];
-                        debugger;
+                        
                         return visitDate === cellDateFormatted;
                     }
                     );
                     if (hasEvent) {
-                        debugger;
+                       
                         const eventDot = document.createElement('div');
                         eventDot.classList.add('event-dot');
                         cell.appendChild(eventDot);
@@ -956,9 +912,8 @@
                     viewModalBodyContent.innerHTML = `<p class="text-muted text-center py-3">No visits scheduled for this day.</p>`;
                 } else {
 
-                    debugger;
-                    visitsForDay.sort((a, b) => {
-                        debugger;
+                    
+                    visitsForDay.sort((a, b) => {                       
                         const timeA = new Date(`2000/01/01 ${a.timeOfVisit}`);
                         const timeB = new Date(`2000/01/01 ${b.timeOfVisit}`);
                         return timeA - timeB;
@@ -981,7 +936,7 @@
                                     <p class="mb-1 text-muted small"><i class="fas fa-clock me-1"></i> ${formatTimeForDisplay(visit.timeOfVisit)}</p>
                                     <p class="mb-1 text-muted small"><i class="fas fa-calendar me-1"></i> ${visitDate}</p>
                                     <p class="mb-2 text-muted small"><i class="fa fa-bell me-1"></i> ${visit.locationText}</p>
-                                    <p class="mb-2 text-muted small"><i class="fa fa-map-marker me-1"></i> ${visit.bootName}</p>
+                                    <p class="mb-2 text-muted small"><i class="fa fa-map-marker me-1"></i> ${visit.address}</p>
                                     <p class="mb-2 text-muted small"><i class="fa fa-comment me-1"></i> ${visit.commentValue}</p>
                                     <div class="text-end">
                                         <button class="btn btn-sm btn-danger" data-id="${visit.scheduleId}" data-action="delete-from-view">
@@ -1019,7 +974,7 @@
                                     return   dvd === formattedDate;
                                 }
                                 );
-                                debugger;
+                                
                             if (remainingVisits.length > 0) {
                                 // Use a timeout to ensure modal is hidden before attempting to show again
                                 setTimeout(() => viewVisitsForDay(dateOfVisit), 300);

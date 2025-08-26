@@ -16,10 +16,12 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
 
         private readonly ICorporate _corporate;
         private readonly IDropDown _dropdown;
-        public CorporateController(ICorporate corporate, IDropDown dropDown)
+        private readonly ICategoryData _category;
+        public CorporateController(ICorporate corporate, IDropDown dropDown, ICategoryData category)
         {
             _corporate = corporate;
             _dropdown = dropDown;
+            _category = category;
         }
 
 
@@ -49,13 +51,37 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         [HttpGet]
         public async Task<IActionResult> ScheduleCreate()
         {
-            ViewBag.branchname = new SelectList(await _dropdown.getConfigBranchList(), "Id", "Name");
+           
             ViewBag.type = new SelectList(await _dropdown.GetTokenType(), "Id", "Name");
             ViewBag.district = new SelectList(await _dropdown.getDistrict(), "Id", "Name");
             ViewBag.division = new SelectList(await _dropdown.getDivision(), "Id", "Name");
 
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getTypeWiseElementName(string typeid)
+        {
+            int id = Convert.ToInt32(typeid);
+            var result = await _dropdown.getRootPropertyElement(id);
+            return Json(new { status = result.status, data = result.data });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetScheduleData(int? typeId, int? districtId, int? divisionId, int? ValueTypeId)
+        {
+
+            int typeid = typeId ?? 0;
+            int disId = districtId ?? 0;
+            int divId = divisionId ?? 0;
+            int vTypeId = ValueTypeId ?? 0;
+            var data = await _category.getTokenDataFilter(typeid, disId, divId, vTypeId);
+            return Json(data);
+        }
+
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetsubBranches(int branchId)
         {
@@ -136,6 +162,8 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
             return Json(result);
 
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> VisitLog()

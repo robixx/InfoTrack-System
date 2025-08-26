@@ -221,5 +221,32 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<TokenMasterDto>> getTokenDataFilter(int? typeId, int? districtId, int? divisionId, int? ValueTypeId)
+        {
+            try
+            {
+
+                var parameters = new[]
+                    {
+                            new NpgsqlParameter("p_typeid", typeId== 0 ? 0 : typeId),
+                            new NpgsqlParameter("p_distid", districtId== 0 ? 0 : districtId),
+                            new NpgsqlParameter("p_divId", divisionId== 0 ? 0 : divisionId),
+                            new NpgsqlParameter("p_valueId", ValueTypeId== 0 ? 0 : ValueTypeId),
+
+                    };
+
+                var tokenDetailsList = await _connection.TokenMasterDto
+                    .FromSqlRaw("SELECT * FROM public.get_token_master_data_filter(@p_typeid,@p_distid,@p_divId,@p_valueId)", parameters)
+                    .ToListAsync();
+
+                return tokenDetailsList;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

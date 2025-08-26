@@ -10,11 +10,11 @@ namespace ITC.InfoTrack.Model.ViewModel
     public class ScheduleEntryDto
     {
         public string LocationText { get; set; }      
-        public string BranchId { get; set; }            
-        public string SubBranchId { get; set; }          
+        public string tokenId { get; set; }            
+        public string typeId { get; set; }          
         public string DistrictId { get; set; }          
         public string divisionId { get; set; }          
-        public string BoothId { get; set; }         
+        public string sourceId { get; set; }        
                
         public string Date { get; set; }              
         public string Time { get; set; }              
