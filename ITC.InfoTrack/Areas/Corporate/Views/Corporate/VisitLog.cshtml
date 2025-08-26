@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "Visit Log";
+    ViewBag.pTitle = "Visit Log";
+    ViewBag.pageTitle = "InfoTrack";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+   
+}
+
+@section styles {
+    <!-- jquery.vectormap css -->
+
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+   
+
+</style>
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Visit Log Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div id="tableWrapper" class="table-responsive">
+                            <div class="table-responsive">
+                                <table id="datatable" class="table">
+                                    <thead class="fw-bolt" style="background-color:#f0f2f5;">
+                                        <tr>
+                                            <th>Sl.</th>
+                                            <th>Assign Date</th>
+                                            <th>Assign User</th>
+                                            <th>Source Name</th>
+                                            <th>Time</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+
+
+
+@section scripts {
+    <!-- apexcharts -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- App js -->
+    <script src="~/js/app.js"></script>
+
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

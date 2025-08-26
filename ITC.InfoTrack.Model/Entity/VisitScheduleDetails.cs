@@ -17,11 +17,10 @@ namespace ITC.InfoTrack.Model.Entity
         public long PoolId { get; set; }
         public DateTime? CreateDate { get; set; }
         public int? CreatedBy { get; set; }
-        public int? BranchId { get; set; }
-        public int? SubBranchId { get; set; }
-        public int? DistrictId { get; set; }
-        public int? DivisionId { get; set; }
-        public int? BoothId { get; set; }
+        public int TypeId { get; set; }
+        public int ValueTypeId { get; set; }
+        public int DistrictId { get; set; }
+        public int DivisionId { get; set; }
         public string Comments { get; set; }
         public string LocationText { get; set; }
         public string Priority { get; set; }

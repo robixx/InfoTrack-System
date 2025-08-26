@@ -50,7 +50,10 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         public async Task<IActionResult> ScheduleCreate()
         {
             ViewBag.branchname = new SelectList(await _dropdown.getConfigBranchList(), "Id", "Name");
-           
+            ViewBag.type = new SelectList(await _dropdown.GetTokenType(), "Id", "Name");
+            ViewBag.district = new SelectList(await _dropdown.getDistrict(), "Id", "Name");
+            ViewBag.division = new SelectList(await _dropdown.getDivision(), "Id", "Name");
+
             return View();
         }
         [HttpGet]
@@ -131,6 +134,14 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         {
             var result= await _corporate.GetCalenderVisitScheduleAsync();
             return Json(result);
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VisitLog()
+        {
+            
+            return View();
 
         }
     }

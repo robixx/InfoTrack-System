@@ -56,6 +56,10 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<TokenDetails> TokenDetails { get; set; }
         public DbSet<TokenDetailsImage> TokenDetailsImage { get; set; }
         public DbSet<TokenMasterDto> TokenMasterDto { get; set; }
+        public DbSet<LocationMapping> LocationMapping { get; set; }
+        public DbSet<TokenDetailsShowDto> TokenDetailsShowDto { get; set; }
+        public DbSet<MappingCustodian> MappingCustodian { get; set; }
+        public DbSet<Custodian> Custodian { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -100,6 +104,9 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<BranchInfo>().HasKey(x => x.Id);
             modelBuilder.Entity<LevelSetting>().HasKey(x => x.LevelId);
             modelBuilder.Entity<ProfileWiseOrganization>().HasKey(x => x.Id);
+            modelBuilder.Entity<MappingCustodian>().HasKey(x => x.Id);
+            modelBuilder.Entity<LocationMapping>().HasKey(x => x.Id);
+            modelBuilder.Entity<Custodian>().HasKey(x => x.CustodianId);
             modelBuilder.Entity<MenuSetUp>().HasNoKey();
             modelBuilder.Entity<ScheduleDataDto>().HasNoKey(); 
             modelBuilder.Entity<UserWiseRoleShowDto>().HasNoKey();
@@ -110,6 +117,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<CalenderVisitScheduleDto>().HasNoKey();
             modelBuilder.Entity<LoginResponse>().HasNoKey();
             modelBuilder.Entity<TokenMasterDto>().HasNoKey();
+            modelBuilder.Entity<TokenDetailsShowDto>().HasNoKey();
 
             base.OnModelCreating(modelBuilder);
         }

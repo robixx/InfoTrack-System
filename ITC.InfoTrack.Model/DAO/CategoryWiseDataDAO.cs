@@ -5,6 +5,7 @@ using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +67,8 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception(ex.Message);
             }
         }
+
+       
 
         public async Task<(string message, bool status)> SaveCategoryData(int categoryId, string Title, int loginuserId)
         {
@@ -170,6 +173,48 @@ namespace ITC.InfoTrack.Model.DAO
                 await transaction.CommitAsync();
 
                 return ("Token Save Successfully", true);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        public async Task<List<ProductShowcaseDto>> getTokenDetailsShow(int TokenId)
+        {
+            try
+            {
+
+                
+                var parameters = new[]
+                    {
+                            new NpgsqlParameter("p_token_id", TokenId),
+                            
+                    };
+
+                var tokenDetailsList = await _connection.TokenDetailsShowDto
+                    .FromSqlRaw("SELECT * FROM get_token_details(@p_token_id)", parameters)
+                    .ToListAsync();
+
+
+                var productShowcases = tokenDetailsList
+                            .GroupBy(x => new { x.TokenId, x.CategoryWiseId }) // group by product
+                            .Select(g => new ProductShowcaseDto
+                            {
+                                Id = $"product-{g.Key.TokenId}-{g.Key.CategoryWiseId}",
+                                Category = g.First().CategoryName,
+                                Title = g.First().Title,
+                                Comments = g.First().Comments ?? string.Empty,
+                                Images = g.Select(x => x.ImageName ).ToList()
+                            })
+                           .ToList();
+
+
+
+
+                return productShowcases;
+
             }
             catch (Exception ex)
             {

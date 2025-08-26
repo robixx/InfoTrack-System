@@ -14,5 +14,6 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<CategoryWiseDetailsDto>>getCategoryWiseData();
         Task<(string message, bool success)>SaveTokenGenerateData(MainFormViewModelDto model, int loginUserId);
         Task<List<TokenMasterDto>>getTokenData();
+        Task<List<ProductShowcaseDto>>getTokenDetailsShow( int TokenId);
     }
 }

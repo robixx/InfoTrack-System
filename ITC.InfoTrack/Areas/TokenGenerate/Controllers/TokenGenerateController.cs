@@ -15,10 +15,12 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
     {
         private readonly IDropDown _drop;
         private readonly ICategoryData _categorydata;
-        public TokenGenerateController(IDropDown drop, ICategoryData categoryData)
+        private readonly string _imagePath;
+        public TokenGenerateController(IDropDown drop, ICategoryData categoryData, IConfiguration configuration)
         {
             _drop = drop;
             _categorydata = categoryData;
+            _imagePath = configuration["ImageStorage:TokenImagePath"];
         }
 
         [HttpGet]
@@ -94,5 +96,51 @@ namespace ITC.InfoTrack.Areas.TokenGenerate.Controllers
             return View(result);
 
         }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> TokenDetailShow( string tokenId)
+        {
+            int TokentId= Convert.ToInt32(tokenId);
+
+            var result = await _categorydata.getTokenDetailsShow(TokentId);
+            foreach (var product in result)
+            {
+                product.Images = product.Images
+                    .Select(img => Url.Action("Show", "TokenGenerate", new { fileName = img }))
+                    .ToList();
+            }
+
+            return Json(new {data= result,status=true});
+
+        }
+
+        [HttpGet("/images/{fileName}")]
+        public IActionResult Show(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return NotFound();
+
+            var fullPath = Path.Combine(_imagePath, fileName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            var fileExt = Path.GetExtension(fullPath).ToLower();
+            var contentType = fileExt switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream"
+            };
+
+            var bytes = System.IO.File.ReadAllBytes(fullPath);
+            return File(bytes, contentType);
+        }
+
+
+
     }
 }

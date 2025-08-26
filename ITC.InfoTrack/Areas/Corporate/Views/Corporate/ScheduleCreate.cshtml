@@ -238,20 +238,15 @@
                 <div class="row">
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
-                            <label for="office">Branch Name</label>
-                            @Html.DropDownList("BranchId", ViewBag.branchname as SelectList, new { @class = "form-control select2", @id = "BranchId", onchange = "onBranchChange(this)" })
+                            <label for="office">Type</label>
+                            @Html.DropDownList("TypeId", ViewBag.type as SelectList,"Select Type", new { @class = "form-control select2", @id = "TypeId", onchange = "onTypeChange(this)" })
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="form-group">
-                            <label for="office">Sub-Branch Name</label>
-                            @Html.DropDownList("SubBranchId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "SubBranchId", onchange = "onsubBranchChange(this)" })
-                        </div>
-                    </div>
+                    
                     <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label for="office">District</label>
-                            @Html.DropDownList("DistrictId", new SelectList(Enumerable.Empty<SelectListItem>()), new { @class = "form-control select2", @id = "DistrictId", onchange = "onDistrictChange(this)" })
+                            @Html.DropDownList("DistrictId", ViewBag.district as SelectList, "Select District", new { @class = "form-control select2", @id = "DistrictId", onchange = "onDistrictChange(this)" })
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
@@ -403,7 +398,7 @@
     }
     function filterTable() {
 
-        var branchId = $('#BranchId').val()===null? 0 :$('#BranchId').val();
+        var branchId = $('#TypeId').val()===null? 0 :$('#TypeId').val();
         var subbranch = $('#SubBranchId').val()===null? 0 :$('#SubBranchId').val();
         var district = $('#DistrictId').val()===null? 0 :$('#DistrictId').val();
         var division = $('#DivisionId').val()===null? 0 :$('#DivisionId').val();
@@ -477,7 +472,7 @@
          $('#scheduleBtn').prop('disabled', count === 0);
     }
 
-    function onBranchChange(dropdown) {
+    function onTypeChange(dropdown) {
 
 
         var branchId = dropdown.value;

@@ -39,7 +39,37 @@
             color: white;
         }
 
-    
+    .view-card {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 0.75rem; /* Rounded corners */
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1); /* Enhanced shadow */
+        width: 100%; /* Take full width of its column */
+        margin-bottom: 25px; /* Space between cards */
+    }
+
+    .category-header {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #343a40; /* Dark text */
+        margin-bottom: 5px; /* Adjust margin to accommodate title */
+        text-align: center;
+    }
+
+    .item-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d; /* Muted color for title */
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    /* Fixed carousel image height */
+    .view-card .carousel .carousel-item img {
+        height: 300px; /* Fixed height */
+        width: 100%; /* Full width of container */
+        object-fit: cover; /* Maintain aspect ratio, crop if needed */
+    }
 
 </style>
 
@@ -81,7 +111,7 @@
                                                 <td>@item.TokenDate.ToString("dd-MMM-yyy")</td>
                                                 <td>@item.CreateDate.ToString("dd-MMM-yyy")</td>
                                                 <td>
-                                                    <a class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                    <a class="btn btn-info btn-sm" data-bs-toggle="modal" data-sourceName="@item.SourceName"
                                                        data-bs-target="#detailsModal" data-id="@item.TokenId">Details</a>
                                                 </td>
                                             </tr>
@@ -107,16 +137,15 @@
 <!--Modal Open-->
 
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-top">
+    <div class="modal-dialog modal-xl modal-dialog-top modal-dialog-scrollable">
         <div class="modal-content shadow-lg">
-            <div class="modal-header">
+            <div class="modal-header" style="background:#f5f5f5;">
                 <h5 class="modal-title" id="detailsModalLabel">Token Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-green" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <!-- Content will be loaded dynamically -->
-                <div id="modalContent">
-                    <p class="text-center text-muted">Loading...</p>
+            <div class="modal-body" style="background-color:#eef5f2;">
+                <div class="row" id="categoriesContainer">
+                    <!-- Multiple Category Cards will be populated here by JavaScript -->
                 </div>
             </div>
             <div class="modal-footer">
@@ -149,12 +178,137 @@
         var detailsModal = document.getElementById('detailsModal');
         detailsModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget; // Button that triggered modal
-            var tokenId = button.getAttribute('data-id');
+            var tokenId = button.getAttribute('data-id');            
+            var source = button.getAttribute('data-sourceName');
+             if (source) {
+                source = source.charAt(0).toUpperCase() + source.slice(1).toLowerCase();
+             }
+            var headerTitle = document.getElementById('detailsModalLabel');
+            
+            headerTitle.textContent='Token Details For '+source;           
 
-          
-            document.getElementById("modalContent").innerHTML = "<p class='text-center text-muted'>Loading...</p>";
+            LoadTokenDetails(tokenId);
 
            
         });
     });
+
+
+    function LoadTokenDetails(tokenId)
+    {
+        $.ajax({
+                url: "@Url.Action("TokenDetailShow", "TokenGenerate", new { area = "TokenGenerate" })",
+                type: "GET",
+                data: {tokenId:tokenId},
+                success: function (res) {
+                // Get the redirect URL from response
+                    if (res.status)
+                    {
+                         if(res.data.length>0){
+
+                             renderAllCategories(res.data);
+                         }
+                    }
+                }
+                ,
+                error: function (xhr) {
+                   alert("Error Data:");
+                }
+        });
+
+    }
+   
+     const categoriesContainer = document.getElementById('categoriesContainer');
+
+    function createCategoryCard(item, index) {
+        const carouselId = `imageCarousel-${index}`;
+
+        const cardHtml = `
+            <div class="col-12 col-md-4 col-lg-4">
+                <div class="view-card">
+                    <h4 class="category-header">${item.category} Category</h4>
+                    <h5 class="item-title">${item.title}</h5>
+
+                    <div class="row g-4">
+                        <!-- Image Slider Column -->
+                        <div class="col-12">
+                            <div id="${carouselId}" class="carousel slide shadow rounded-3" data-bs-ride="carousel">
+                                <div class="carousel-inner"></div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#${carouselId}" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true" style="color:red;"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#${carouselId}" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Comment Section Column -->
+                        <div class="col-12">
+                            <div class="comment-section">
+                                <label class="form-label fw-bold text-dark mb-2"><strong style="color:#023613">Comments</strong></label>
+                                <p>${item.comments}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cardHtml;
+        const cardElement = tempDiv.firstElementChild;
+
+        // Populate carousel images with fixed height
+        const carouselInner = cardElement.querySelector(`#${carouselId} .carousel-inner`);
+        if (item.images && item.images.length > 0) {
+            item.images.forEach((imgUrl, idx) => {
+                const carouselItem = document.createElement('div');
+                carouselItem.classList.add('carousel-item');
+                if (idx === 0) carouselItem.classList.add('active');
+
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.classList.add('d-block', 'w-100');
+                img.alt = `${item.category} Image ${idx + 1}`;
+
+                // Fixed height with object-fit
+                img.style.height = "180px";
+                img.style.objectFit = "cover";
+
+                carouselItem.appendChild(img);
+                carouselInner.appendChild(carouselItem);
+            });
+        } else {
+            carouselInner.innerHTML = `
+                <div class="carousel-item active">
+                    <img src="https://placehold.co/800x600/e9ecef/6c757d/png?text=No+Image+Available"
+                         class="d-block w-100"
+                         alt="No images"
+                         style="height:180px; object-fit:cover;">
+                </div>
+            `;
+        }
+
+        return cardElement;
+    }
+
+    // Function to render all cards for a list
+    function renderAllCategories(categoriesData) {
+        categoriesContainer.innerHTML = '';
+        categoriesData.forEach((item, index) => {
+            const cardElement = createCategoryCard(item, index);
+            categoriesContainer.appendChild(cardElement);
+
+            // Initialize carousel
+            const carouselElement = cardElement.querySelector(`#imageCarousel-${index}`);
+            if (carouselElement) {
+                new bootstrap.Carousel(carouselElement, { interval: 5000 });
+            }
+        });
+    }
+
+
 </script>
