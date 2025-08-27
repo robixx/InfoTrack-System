@@ -17,7 +17,7 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
             _connection = connection;
         }
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int tokenId)
         {
             return View();
         }

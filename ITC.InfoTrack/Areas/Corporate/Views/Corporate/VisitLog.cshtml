@@ -1,4 +1,6 @@
-﻿@{
+﻿
+@model List<ITC.InfoTrack.Model.ViewModel.GetVisitLogScheduleDto>
+@{
     ViewBag.Title = "Visit Log";
     ViewBag.pTitle = "Visit Log";
     ViewBag.pageTitle = "InfoTrack";
@@ -37,7 +39,37 @@
             color: white;
         }
 
-   
+    .view-card {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 0.75rem; /* Rounded corners */
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1); /* Enhanced shadow */
+        width: 100%; /* Take full width of its column */
+        margin-bottom: 25px; /* Space between cards */
+    }
+
+    .category-header {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #343a40; /* Dark text */
+        margin-bottom: 5px; /* Adjust margin to accommodate title */
+        text-align: center;
+    }
+
+    .item-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d; /* Muted color for title */
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    /* Fixed carousel image height */
+    .view-card .carousel .carousel-item img {
+        height: 300px; /* Fixed height */
+        width: 100%; /* Full width of container */
+        object-fit: cover; /* Maintain aspect ratio, crop if needed */
+    }
 
 </style>
 
@@ -59,13 +91,51 @@
                                             <th>Sl.</th>
                                             <th>Assign Date</th>
                                             <th>Assign User</th>
-                                            <th>Source Name</th>
+                                            <th width="800">Source Name</th>
                                             <th>Time</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                       
+                                        @foreach(var item in Model)
+                                        {
+                                            var statusClass = item.Priority == "high" ? "bg-success" :
+                                            item.Priority =="medium" ? "bg-primary" :
+                                            item.Priority =="urgent" ? "bg-warning text-dark" :
+                                            item.Priority =="low" ? "bg-secondary" :
+                                            "bg-danger";
+                                            int i = 1;
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>@item.DateOfVisit.ToString("dd-MMM-yyyy")</td>
+                                                <td>
+                                                    <span style="width:35px; height:35px; display:inline-flex;
+                                                         align-items:center; justify-content:center;
+                                                             border-radius:50%; background-color:#9fa9b3;
+                                                         color:#fff; font-weight:bold; font-size:14px;">
+                                                        @item.UserName.Substring(0, 1).ToUpper()
+                                                    </span>
+                                                    <span style="margin-left:8px;">@item.UserName</span>
+                                                </td>
+                                                <td>
+                                                    <a href="#" data-id="@item.TokenId" data-sourceName="@item.UserName" onclick="ShowToken_Details(@item.TokenId)">
+                                                        <strong> @item.LocationText</strong><br />
+                                                        <span>@item.Address</span>
+                                                    </a>                                                  
+                                                   
+                                                </td>
+                                                <td>@DateTime.Today.Add(item.TimeOfVisit).ToString("hh:mm tt")</td>
+                                                <td>
+                                                    <span class="badge @statusClass">@(char.ToUpper(item.Priority[0]) + item.Priority.Substring(1).ToLower())</span>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-primary btn-sm" href="@Url.Action("Index", "Worker", new {area="Worker", tokenId = item.TokenId })" data-id="@item.TokenId">Visit</a>
+                                                </td>
+                                            </tr>
+                                            i++;
+                                        }
+
                                     </tbody>
                                 </table>
                             </div>
@@ -82,6 +152,29 @@
 </div>
 
 
+<!-- View Visit Details Modal -->
+
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-top modal-dialog-scrollable">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header" style="background:#f5f5f5;">
+                <h5 class="modal-title" id="detailsModalLabel">Token Details</h5>
+                <button type="button" class="btn-close btn-close-green" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color:#eef5f2;">
+                <div class="row" id="categoriesContainer">
+                    <!-- Multiple Category Cards will be populated here by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 
 
@@ -92,11 +185,171 @@
     <!-- Required datatable js -->
     <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
     <!-- Responsive examples -->
     <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
     <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
-    <!-- App js -->
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
     <script src="~/js/app.js"></script>
 
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+    function ShowToken_Details(TokenId)
+    {
+        // get the modal element
+            var detailsModal = document.getElementById('detailsModal');
+
+            // find the link/button that triggered this
+            var button = document.querySelector('[data-id="' + TokenId + '"]');
+
+            var source = button?.getAttribute('data-sourceName');
+            if (source) {
+                source = source.charAt(0).toUpperCase() + source.slice(1).toLowerCase();
+            }
+
+            // set modal header
+            var headerTitle = document.getElementById('detailsModalLabel');
+            headerTitle.textContent = 'Token Details For ' + (source ?? '');
+
+            // load details into modal body
+            LoadTokenDetails(TokenId);
+
+            // show modal (Bootstrap 5 API)
+            var modal = new bootstrap.Modal(detailsModal);
+            modal.show();
+  
+    }
+
+
+    function LoadTokenDetails(tokenId)
+    {
+        $.ajax({
+                url: "@Url.Action("getLogTokenDetailShow", "Corporate", new { area = "Corporate" })",
+                type: "GET",
+                data: {tokenId:tokenId},
+                success: function (res) {
+                // Get the redirect URL from response
+                    if (res.status)
+                    {
+                         if(res.data.length>0){
+
+                             renderAllCategories(res.data);
+                         }
+                    }
+                }
+                ,
+                error: function (xhr) {
+                   alert("Error Data:");
+                }
+        });
+
+    }
+
+     const categoriesContainer = document.getElementById('categoriesContainer');
+
+    function createCategoryCard(item, index) {
+       
+        const carouselId = `imageCarousel-${index}`;
+
+        const cardHtml = `
+            <div class="col-12 col-md-4 col-lg-4">
+                <div class="view-card">
+                    <h4 class="category-header">${item.category} Category</h4>
+                    <h5 class="item-title">${item.title}</h5>
+
+                    <div class="row g-4">
+                        <!-- Image Slider Column -->
+                        <div class="col-12">
+                            <div id="${carouselId}" class="carousel slide shadow rounded-3" data-bs-ride="carousel">
+                                <div class="carousel-inner"></div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#${carouselId}" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true" style="color:red;"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#${carouselId}" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Comment Section Column -->
+                        <div class="col-12">
+                            <div class="comment-section">
+                                <label class="form-label fw-bold text-dark mb-2"><strong style="color:#023613">Comments</strong></label>
+                                <p>${item.comments}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cardHtml;
+        const cardElement = tempDiv.firstElementChild;
+
+        // Populate carousel images with fixed height
+        const carouselInner = cardElement.querySelector(`#${carouselId} .carousel-inner`);
+        if (item.images && item.images.length > 0) {
+            item.images.forEach((imgUrl, idx) => {
+               
+                const carouselItem = document.createElement('div');
+                carouselItem.classList.add('carousel-item');
+                if (idx === 0) carouselItem.classList.add('active');
+
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.classList.add('d-block', 'w-100');
+                img.alt = `${item.category} Image ${idx + 1}`;
+
+                // Fixed height with object-fit
+                img.style.height = "180px";
+                img.style.objectFit = "cover";
+
+                carouselItem.appendChild(img);
+                carouselInner.appendChild(carouselItem);
+            });
+        } else {
+            carouselInner.innerHTML = `
+                <div class="carousel-item active">
+                    <img src="https://placehold.co/800x600/e9ecef/6c757d/png?text=No+Image+Available"
+                         class="d-block w-100"
+                         alt="No images"
+                         style="height:180px; object-fit:cover;">
+                </div>
+            `;
+        }
+
+        return cardElement;
+    }
+
+    // Function to render all cards for a list
+    function renderAllCategories(categoriesData) {
+        categoriesContainer.innerHTML = '';
+        categoriesData.forEach((item, index) => {
+            const cardElement = createCategoryCard(item, index);
+            categoriesContainer.appendChild(cardElement);
+
+            // Initialize carousel
+            const carouselElement = cardElement.querySelector(`#imageCarousel-${index}`);
+            if (carouselElement) {
+                new bootstrap.Carousel(carouselElement, { interval: 5000 });
+            }
+        });
+    }
+
+</script>

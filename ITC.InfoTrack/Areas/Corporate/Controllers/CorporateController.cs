@@ -4,6 +4,7 @@ using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -17,11 +18,13 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         private readonly ICorporate _corporate;
         private readonly IDropDown _dropdown;
         private readonly ICategoryData _category;
-        public CorporateController(ICorporate corporate, IDropDown dropDown, ICategoryData category)
+        private readonly string _imagePath;
+        public CorporateController(ICorporate corporate, IDropDown dropDown, ICategoryData category, IConfiguration configuration)
         {
             _corporate = corporate;
             _dropdown = dropDown;
             _category = category;
+            _imagePath = configuration["ImageStorage:TokenImagePath"];
         }
 
 
@@ -168,9 +171,67 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         [HttpGet]
         public async Task<IActionResult> VisitLog()
         {
-            
-            return View();
+            var userIdClaim = 0;
+            var RoleId =Convert.ToInt32(User.FindFirst("RoleId")?.Value);
+            if (RoleId != 1)
+            {
+                userIdClaim =Convert.ToInt32(User.FindFirst("UserId"));
+            }
 
+            var result = await _corporate.GetVisitLogScheduleAsync(userIdClaim);          
+          
+
+            return View(result);
+
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> getLogTokenDetailShow(string tokenId)
+        {
+            int TokentId = Convert.ToInt32(tokenId);
+
+            var result = await _category.getTokenDetailsShow(TokentId);
+            foreach (var product in result)
+            {
+                product.Images = product.Images
+                       .Select(img => $"/images/{img}") // Match the route exactly
+                       .ToList();
+            }
+
+            return Json(new { data = result, status = true });
+
+        }
+
+        [HttpGet("images/{fileName:regex(.+)}")]
+        public IActionResult Shows(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return NotFound();
+
+            var fullPath = Path.Combine(_imagePath, fileName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            var fileExt = Path.GetExtension(fullPath).ToLower();
+            var contentType = fileExt switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream"
+            };
+
+            var bytes = System.IO.File.ReadAllBytes(fullPath);
+            return File(bytes, contentType);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult>WorkVisited(int tokenId)
+        {
+            return View();
         }
     }
 }

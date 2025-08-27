@@ -1,0 +1,686 @@
+﻿@{
+    ViewBag.Title = "Work Visit";
+    ViewBag.pTitle = "Work Visit";
+    ViewBag.pageTitle = "InfoTrack";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@section styles {
+    <!-- jquery.vectormap css -->
+
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+
+<style>
+   
+    /* Header Styles */
+    .header-section {
+        /* background: linear-gradient(135deg, var(--city-red) 0%, var(--city-red-dark) 100%);
+                                            color: var(--city-white); */
+        background: linear-gradient(135deg, #fffbfb 0%, #f8f9fa 100%);
+        color: #9f2b2b;
+        padding: 0.5rem 0;
+        box-shadow: var(--shadow);
+        position: relative;
+        z-index: 1000;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .logo-container img {
+        height: 50px;
+        /* filter: brightness(0) invert(1); */
+    }
+
+    .header-text h1 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+
+    small {
+        font-size: 0.5rem !important;
+    }
+
+    .header-text p {
+        font-size: 0.7rem;
+        margin: 0;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
+    /* Success Badge */
+    .success-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--city-green);
+        color: var(--city-white);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Main Container */
+    .main-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    /* Form Sections */
+    .form-section {
+        background: var(--city-white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+        border: 1px solid var(--city-border);
+        overflow: visible; /* Changed from hidden to visible for dropdowns */
+        position: relative;
+    }
+
+    .section-header {
+        background: var(--city-light-gray);
+        padding: 0.5rem 1rem !important;
+        border-bottom: 1px solid var(--city-border);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .section-header h5 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--city-red);
+            font-size: 0.8rem;
+        }
+
+        .section-header i {
+            color: var(--city-red);
+            font-size: 1.2rem;
+        }
+
+    .section-body {
+        padding: 2rem 1.5rem;
+    }
+
+    /* Form Controls */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.7rem !important;
+    }
+
+        .form-label i {
+            color: var(--city-red);
+            font-size: 0.9rem;
+        }
+
+    .required {
+        color: var(--city-red);
+        margin-left: 0.25rem;
+    }
+
+    /* Custom Dropdown Styles - CORRECTED */
+    .custom-dropdown {
+        position: relative;
+        z-index: 10;
+    }
+
+        .custom-dropdown.active {
+            z-index: 1060; /* Higher z-index when active */
+        }
+
+    .dropdown-input {
+        width: 100%;
+        /*  padding: 0.75rem 2.5rem 0.75rem 1rem; */
+        padding: 0.4rem 0.4rem 0.4rem 1rem;
+        border: 1px solid var(--city-border);
+        border-radius: var(--border-radius);
+        background: var(--city-white);
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .dropdown-input:hover:not(:disabled) {
+            border-color: var(--city-red);
+        }
+
+        .dropdown-input:focus,
+        .dropdown-input.active {
+            border-color: var(--city-red);
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            outline: none;
+        }
+
+        .dropdown-input:disabled {
+            background-color: #f8f9fa;
+            color: var(--city-gray);
+            cursor: not-allowed;
+            border-color: var(--city-border);
+        }
+
+    .dropdown-arrow {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--city-gray);
+        pointer-events: none;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    .custom-dropdown.active .dropdown-arrow {
+        transform: translateY(-50%) rotate(180deg);
+        color: var(--city-red);
+    }
+
+    /* Dropdown Menu - CORRECTED */
+    .dropdown-menu-custom {
+        position: absolute;
+        top: calc(100% + 0.25rem);
+        left: 0;
+        right: 0;
+        background: var(--city-white);
+        border: 1px solid var(--city-red);
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        z-index: 1070;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 350px;
+        overflow: hidden;
+        min-width: 100%;
+    }
+
+        .dropdown-menu-custom.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+    .dropdown-search {
+        padding: 0.7rem;
+        border-bottom: 1px solid var(--city-border);
+        background: var(--city-light-gray);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+        .dropdown-search input {
+            width: 100%;
+            padding: 0.4rem 0.4rem;
+            border: 1px solid var(--city-border);
+            border-radius: calc(var(--border-radius) - 1px);
+            font-size: 0.7rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+            .dropdown-search input:focus {
+                border-color: var(--city-red);
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            }
+
+    .dropdown-list {
+        max-height: 250px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .dropdown-item-custom {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.7rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .dropdown-item-custom:hover {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+            color: var(--city-red);
+        }
+
+        .dropdown-item-custom:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item-custom i {
+            color: var(--city-red);
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item-custom.no-results {
+            color: var(--city-gray);
+            font-style: italic;
+            cursor: default;
+        }
+
+            .dropdown-item-custom.no-results:hover {
+                background: none;
+                color: var(--city-gray);
+            }
+
+    /* Textarea */
+    .form-textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 1rem;
+        border: 1px solid var(--city-border);
+        border-radius: var(--border-radius);
+        background: var(--city-white);
+        font-size: 0.7rem;
+        color: #2c3e50;
+        resize: vertical;
+        transition: all 0.3s ease;
+        outline: none;
+        font-family: inherit;
+    }
+
+        .form-textarea:focus {
+            border-color: var(--city-red);
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .form-textarea::placeholder {
+            color: var(--city-gray);
+        }
+
+    .form-text {
+        font-size: 0.6rem;
+        color: var(--city-gray);
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Upload Section */
+    .upload-zone {
+        border: 1px dashed var(--city-border);
+        border-radius: var(--border-radius);
+        /*  padding: 1.2rem; */
+        text-align: center;
+        background: var(--city-light-gray);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+    }
+
+        .upload-zone:hover {
+            border-color: var(--city-red);
+            background: rgba(220, 53, 69, 0.05);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--city-green);
+            background: rgba(40, 167, 69, 0.1);
+            transform: scale(1.02);
+        }
+
+    .upload-icon {
+        font-size: 2rem;
+        color: var(--city-red);
+        margin-bottom: 1rem;
+    }
+
+    .upload-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-subtext {
+        font-size: 0.7rem;
+        color: var(--city-gray);
+        margin-bottom: 0.5rem;
+    }
+
+    /* Buttons */
+    .btn-primary-custom {
+        background: linear-gradient(135deg, var(--city-red) 0%, var(--city-red-dark) 100%);
+        border: none;
+        color: var(--city-white);
+        padding: 0.4rem 1.5rem;
+        font-size: 0.8rem !important;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--city-red-dark) 0%, #a71e2a 100%);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+            color: var(--city-white);
+        }
+
+    .btn-outline-custom {
+        background: transparent;
+        border: 2px solid var(--city-red);
+        color: var(--city-red);
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .btn-outline-custom:hover {
+            background: var(--city-red);
+            color: var(--city-white);
+            transform: translateY(-1px);
+        }
+
+    /* File Preview */
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .preview-item {
+        position: relative;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        background: var(--city-light-gray);
+        border: 2px solid var(--city-border);
+        transition: all 0.3s ease;
+        aspect-ratio: 1;
+    }
+
+        .preview-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--city-red);
+        }
+
+    .preview-image,
+    .preview-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .remove-file {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: var(--city-red);
+        color: var(--city-white);
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .remove-file:hover {
+            background: var(--city-red-dark);
+            transform: scale(1.1);
+        }
+
+    /* Submit Section */
+    .submit-section {
+        text-align: center;
+        padding: 1rem;
+        background: var(--city-white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--city-border);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--city-green) 0%, #20c997 100%);
+        border: none;
+        color: var(--city-white);
+        padding: 0.4rem 0.4rem;
+        border-radius: var(--border-radius);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #ac5035 0%, #9c1f34 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            color: var(--city-white);
+        }
+
+        .btn-submit:disabled {
+            background: var(--city-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+    /* Progress Bar */
+    .upload-progress {
+        margin-top: 0.7rem;
+        display: none;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(220, 53, 69, 0.1);
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, var(--city-red), var(--city-red-dark));
+        border-radius: 3px;
+        transition: width 0.4s ease;
+    }
+    /* Custom Scrollbar */
+    .dropdown-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .dropdown-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .dropdown-list::-webkit-scrollbar-thumb {
+        background: var(--city-red);
+        border-radius: 3px;
+    }
+
+        .dropdown-list::-webkit-scrollbar-thumb:hover {
+            background: var(--city-red-dark);
+        }
+
+    /* Dropdown overlay for mobile */
+    .dropdown-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: 1050;
+        display: none;
+    }
+
+        .dropdown-overlay.show {
+            display: block;
+        }
+
+    .user-dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%; /* Position below the username */
+        min-width: 160px;
+        z-index: 1000;
+        background-color: white;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 0.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+        display: none; /* Hidden by default */
+        opacity: 0; /* For smooth fade-in */
+        transition: opacity 0.3s ease-in-out;
+        padding-top: 0.5rem; /* Adjust padding for better look */
+        padding-bottom: 0.5rem; /* Adjust padding for better look */
+    }
+
+        .user-dropdown-menu.show {
+            display: block;
+            opacity: 1;
+        }
+
+    .user-dropdown-toggle {
+        cursor: pointer;
+    }
+
+    /* Style for the dropdown items to include icons */
+    .user-dropdown-menu .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem; /* Consistent padding */
+    }
+
+        .user-dropdown-menu .dropdown-item i {
+            margin-right: 0.5rem; /* Space between icon and text */
+            font-size: 1.1em; /* Slightly larger icon */
+            color: #9f2b2b; /* Muted color for icons */
+        }
+
+    /* Style for the dropdown header */
+    .user-dropdown-menu .dropdown-header {
+        padding: 0.5rem 1rem;
+        font-size: 0.875em; /* Slightly smaller text */
+        color: #6c757d; /* Muted color */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.075); /* Subtle line below header */
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .user-dropdown-menu .dropdown-item:hover {
+        background: #fbe0e0;
+        border-left: 1px solid red;
+    }
+
+    .header-logo {
+        max-height: 40px; /* Adjust as needed */
+        width: auto;
+    }
+
+    .design-user {
+        color: #2c3e50;
+    }
+
+        .design-user:hover {
+            color: darkred;
+        }
+</style>
+
+<div class="">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="form-section">
+                    <div class="card-header" style="color:#741212;">
+                        <div class="section-header">
+                            <i class="bi bi-chat-text"></i>
+                            <h5>Comments & Observations</h5>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label for="comments" class="form-label" style="color:#741212;">
+                                <i class="bi bi-pencil-square"></i>
+                                Detailed Comments
+                            </label>
+                            <textarea class="form-control" id="comments" rows="4"
+                                      placeholder="Enter your detailed comments, observations, notes or any important information..."></textarea>
+                            <div class="form-text" style="color:#741212;">
+                                <i class="bi bi-info-circle"></i>
+                                Provide comprehensive information about reason.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- end row -->
+        </div>
+    </div>
+</div>
+
+
+
+
+@section scripts {
+    <!-- apexcharts -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- App js -->
+    <script src="~/js/app.js"></script>
+
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

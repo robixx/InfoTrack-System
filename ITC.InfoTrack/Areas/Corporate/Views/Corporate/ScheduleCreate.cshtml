@@ -775,7 +775,7 @@
             let currentMonth = new Date().getMonth();
             let currentYear = new Date().getFullYear();
             let selectedDate = today; // Initially select today
-            debugger;
+          
 
             // Function to format time for display (e.g., "14:30" to "02:30 PM")
             function formatTimeForDisplay(timeStr) {
@@ -833,7 +833,7 @@
                     cell.classList.add('calendar-cell');
                     cell.textContent = day;
                     const cellDateFormatted = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    debugger;
+                   
                     cell.dataset.date = cellDateFormatted;
 
                     // Add current day highlight
@@ -953,7 +953,7 @@
                     viewModalBodyContent.querySelectorAll('button[data-action="edit-from-view"]').forEach(button => {
                         button.addEventListener('click', (event) => {
                             const id = parseInt(event.target.dataset.scheduleId);
-                            debugger;
+                           
                             const visitToEdit = visits.find(v => v.scheduleId === id);
                             if (visitToEdit) {
                                 viewVisitModal.hide(); // Hide current modal

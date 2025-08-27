@@ -20,6 +20,7 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<OrganizationHierarchyDto>> GetOrganizationHierarchyAsync(int? branchId, int? subbranch, int? district, int? division);
 
         Task<List<CalenderVisitScheduleDto>> GetCalenderVisitScheduleAsync();
+        Task<List<GetVisitLogScheduleDto>> GetVisitLogScheduleAsync(int loginUser);
 
 
     }

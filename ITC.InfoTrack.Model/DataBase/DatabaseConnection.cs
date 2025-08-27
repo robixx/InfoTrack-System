@@ -60,6 +60,8 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<TokenDetailsShowDto> TokenDetailsShowDto { get; set; }
         public DbSet<MappingCustodian> MappingCustodian { get; set; }
         public DbSet<Custodian> Custodian { get; set; }
+        public DbSet<GetVisitLogScheduleDto> GetVisitLogScheduleDto { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -118,6 +120,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<LoginResponse>().HasNoKey();
             modelBuilder.Entity<TokenMasterDto>().HasNoKey();
             modelBuilder.Entity<TokenDetailsShowDto>().HasNoKey();
+            modelBuilder.Entity<GetVisitLogScheduleDto>().HasNoKey();
 
             base.OnModelCreating(modelBuilder);
         }

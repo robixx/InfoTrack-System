@@ -257,6 +257,14 @@ namespace ITC.InfoTrack.Model.DAO
                         };
 
                         await _connection.VisitScheduleDetails.AddAsync(detailstable);
+
+                        var update = await _connection.TokenMaster
+                            .Where(i => i.TokenId == Convert.ToInt32(item.tokenId)).FirstOrDefaultAsync();
+                        if (update != null)
+                        {
+                            update.IsSchedule = 1;
+                        }
+
                         await _connection.SaveChangesAsync();
                     }
                     await transaction.CommitAsync();
@@ -282,6 +290,28 @@ namespace ITC.InfoTrack.Model.DAO
             catch (Exception ex)
             { 
                 throw new Exception(ex.Message); 
+            }
+        }
+
+        public async Task<List<GetVisitLogScheduleDto>> GetVisitLogScheduleAsync( int LoginUserId)
+        {
+            try
+            {
+                var parameters = new[]
+                {
+                    new NpgsqlParameter("p_userid", LoginUserId),
+                   
+
+                };
+                var data = await _connection.GetVisitLogScheduleDto.FromSqlRaw("SELECT * FROM get_visit_Log_schedule({0})", parameters).ToListAsync();
+
+                return data;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);    
             }
         }
     }

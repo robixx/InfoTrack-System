@@ -15,6 +15,7 @@ namespace ITC.InfoTrack.Model.Entity
         public int DivisionId { get; set; }
         public int TypeId { get; set; }
         public int SourceId { get; set; }
+        public int IsSchedule { get; set; }
         public int? CreateBy { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime TokenDate { get; set; } 

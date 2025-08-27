@@ -114,6 +114,7 @@ namespace ITC.InfoTrack.Model.DAO
                     TypeId = Convert.ToInt32(model.TypeId),
                     SourceId = Convert.ToInt32(model.TypeNameId),
                     TokenDate = Convert.ToDateTime(model.DateValue),
+                    IsSchedule=0, /// when schedule create then update  1
                     CreateBy = loginUserId,
                     CreateDate = DateTime.Now,
 
