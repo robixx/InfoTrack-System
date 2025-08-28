@@ -21,5 +21,6 @@ namespace ITC.InfoTrack.Model.Entity
         public int? UpdateBy { get; set; }          // User ID who last updated
         public DateTime? UpdateDate { get; set; }   // Last update timestamp
         public int ScheduleStatus { get; set; }     // Status (e.g., active, cancelled)
+        public int IsVisited { get; set; }     // Status (e.g., active, cancelled)
     }
 }

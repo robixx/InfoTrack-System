@@ -234,6 +234,7 @@ namespace ITC.InfoTrack.Model.DAO
                             InsertBy = 1,
                             InsertDate = DateTime.Now,
                             ScheduleStatus = 1,
+                            IsVisited=0,
                             TokenId= Convert.ToInt32(item.tokenId)
 
                         };

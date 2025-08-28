@@ -5,7 +5,7 @@
     ViewBag.pTitle = "Visit Log";
     ViewBag.pageTitle = "InfoTrack";
     Layout = "~/Views/Shared/_Layout.cshtml";
-   
+    int i = 1;
 }
 
 @section styles {
@@ -89,15 +89,15 @@
                                     <thead class="fw-bolt" style="background-color:#f0f2f5;">
                                         <tr>
                                             <th>Sl.</th>
-                                            <th>Assign Date</th>
-                                            <th>Assign User</th>
-                                            <th width="800">Source Name</th>
+                                            <th width="80">Date</th>
+                                            <th width="220">Assign User</th>
+                                            <th>Source Name</th>
                                             <th>Time</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody style="font-size:12px;">
                                         @foreach(var item in Model)
                                         {
                                             var statusClass = item.Priority == "high" ? "bg-success" :
@@ -105,7 +105,7 @@
                                             item.Priority =="urgent" ? "bg-warning text-dark" :
                                             item.Priority =="low" ? "bg-secondary" :
                                             "bg-danger";
-                                            int i = 1;
+                                          
                                             <tr>
                                                 <td>@i</td>
                                                 <td>@item.DateOfVisit.ToString("dd-MMM-yyyy")</td>
