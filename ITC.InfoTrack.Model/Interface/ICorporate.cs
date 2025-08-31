@@ -16,11 +16,10 @@ namespace ITC.InfoTrack.Model.Interface
         Task<CorporateOffice> OfficeDataFind(long corpId);
         Task<List<ScheduleDataDto>> ScheduleDataFind(long? branch, long? subbranchid, int? districtid, int? divisionid);
         Task<List<UserDto>> GetUserDateWise(string dateValue);
-
         Task<List<OrganizationHierarchyDto>> GetOrganizationHierarchyAsync(int? branchId, int? subbranch, int? district, int? division);
-
         Task<List<CalenderVisitScheduleDto>> GetCalenderVisitScheduleAsync();
         Task<List<GetVisitLogScheduleDto>> GetVisitLogScheduleAsync(int loginUser);
+        Task<(string Message, bool Status)> SavedatacollectionAsync( DataCollection modle, int userid);
 
 
     }

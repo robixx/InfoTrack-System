@@ -315,5 +315,36 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception(ex.Message);    
             }
         }
+
+        public async Task<(string Message, bool Status)> SavedatacollectionAsync( DataCollection model, int userid)
+        {
+            try
+            {
+                if (model != null)
+                {
+                    var savelist = new DataCollection
+                    {
+                        TypeId=model.TypeId,
+                        ReferenceData=model.ReferenceData,
+                        DistrictId=model.DistrictId,
+                        DivisionId=model.DivisionId,
+                        SourceId=model.SourceId,
+                        CreateAt=DateTime.Now,
+                        CreateBy=userid,
+                        CollectionDate=model.CollectionDate,
+                        IsSchedule=0
+                    };
+                
+                    await _connection.DataCollection.AddRangeAsync(savelist);
+                    await _connection.SaveChangesAsync();
+                    return ("Data Collection Save Successfull", true);
+                }
+                return ("Data Collection Save Invalid", false);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

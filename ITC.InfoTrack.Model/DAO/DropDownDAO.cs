@@ -326,6 +326,7 @@ namespace ITC.InfoTrack.Model.DAO
             {
                 var parentElements = await _connection.MetaDataElements
                              .Where(p => p.PropertyId == type && p.DataElementStatus == 1)
+                             .OrderBy(i => i.MetaElementValue)
                              .Select(i => new DropDownDtos
                              {
                                  Id = i.DataElementId,
@@ -533,6 +534,7 @@ namespace ITC.InfoTrack.Model.DAO
                              Id = d.DataElementId,
                              Name = d.MetaElementValue
                          })
+                         .OrderBy(i=>i.Name)
                          .ToListAsync();
                 return datalist;
 
@@ -555,7 +557,7 @@ namespace ITC.InfoTrack.Model.DAO
                              Id = d.DataElementId,
                              Name = d.MetaElementValue
                          })
-                        
+                        .OrderBy(i=>i.Name)                        
                          .ToListAsync();
                 return datalist;
 

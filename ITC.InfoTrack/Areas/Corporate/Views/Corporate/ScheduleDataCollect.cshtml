@@ -1,0 +1,357 @@
+﻿@model List<ITC.InfoTrack.Model.Entity.CorporateOffice>
+
+@{
+    ViewBag.pTitle = "Schedule Data Collect";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Schedule Data Collect";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var today = DateTime.Now.ToString("yyyy-MM-dd");
+
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+</style>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Schedule Data Collection</h5>
+            </div>
+            <div class="card-body">
+                <div id="error"></div>
+                <div class="mt-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-2">
+                            <label for="metaelementTitle" class="form-label">Date Time<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="datevalue" id="datevalue" value="@today" />
+
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <label for="metaelementTitle" class="form-label">Type<span class="text-danger">*</span></label>
+                            @Html.DropDownList("typeId", ViewBag.type as SelectList, "Select Type", new { @class = "form-select", @id = "typeId", onchange = "TypeWiseSource()" })
+
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <label for="districtSelect" class="form-label">District<span class="text-danger">*</span></label>
+                            @Html.DropDownList("districtId", ViewBag.district as SelectList, "Select District", new { @class = "form-select", @id = "districtId" })
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <label for="metaelementTitle" class="form-label">Division<span class="text-danger">*</span></label>
+                            @Html.DropDownList("divisionId", ViewBag.division as SelectList, "Select Division", new { @class = "form-select w-100", @id = "divisionId" })
+
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="metaelementTitle" class="form-label" id="typelevel">Type Name<span class="text-danger">*</span></label>
+                            <select class="form-select w-100" name="typename" id="typename" onchange="LoadData()">
+                                <option value="0">Select Type Name</option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="row mt-2 g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="metaelementTitle" class="form-label" id="typelevel">Refarance Type</label>
+                            <textarea class="form-control" placeholder="please write somthing or anyting ..." id="refacenceby" name="refacenceby" rows="2"></textarea>
+                        </div>
+                        <div class="col-12 col-md-2" style="margin-top:50px;">
+                            <button class="btn btn-primary btn-sm" id="data_submit" name="submit">Save Data</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4"></div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table align-middle" id="datatable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sl.</th>
+                                        <th>Collection Date</th>
+                                        <th>Source Name</th>
+                                        <th>District</th>
+                                        <th>Disvision</th>
+                                        <th>Refarance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+
+<!--  Modal content for the above example -->
+<div class="modal fade bs-example-modal-xl" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myExtraLargeModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="noticeMessage" class="alert alert-danger alert-dismissible fade d-none" role="alert">
+                    <span id="noticeText"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div id="modalData"></div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="SaveChange" class="btn btn-sm btn-primary waves-effect waves-light"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/libs/select2/js/select2.min.js"></script>
+
+<script>
+    $('#typename').select2({
+           placeholder: "Select Type Name",
+           allowClear: true
+    });
+
+
+    function TypeWiseSource()
+    {
+          let typeId=$('#typeId').val();
+          let typeText = $('#typeId option:selected').text();
+          const typeNameLevel= document.getElementById('typelevel');
+         $('#typelevel').html(`${typeText} Name <span class="text-danger">*</span>`);
+
+         $.ajax({
+                 url: '/Corporate/Corporate/getDataElementData',
+                 type: 'GET',
+                 data: {typeId:typeId},
+                 success: function (res) {
+                      if(res.status){
+                           const dropdown = $('#typename');
+                           dropdown.empty();
+                           dropdown.append('<option value="0">Select Type Name </option>');
+                           res.data.forEach(item => {
+                              // const selected = item.value == selectedGroupId ? 'selected' : '';
+                               dropdown.append(`<option value="${item.id}">${item.name}</option>`);
+                           });
+                      }else{
+                           const dropdown = $('#typename');
+                           dropdown.empty();
+                           dropdown.append('<option value="0"> Select Type Name </option>');
+                      }
+
+                 },
+                   error: function (err) {
+                    alert('Error while saving.');
+                 }
+         });
+    }
+
+
+    function LoadData()
+    {
+        let typeName= $('#typename').val();
+        const error = document.getElementById('error');
+        const button = document.getElementById('submit');
+        const tableWrapper = document.getElementById('tableWrapper');
+        //const error = document.getElementById('categorywisebranding');
+        let innerHTML='';
+
+        if(typeName==='0'){
+            error.innerHTML =`
+             <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error! </strong> Please Valid Type Name..
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            document.getElementById('typename').focus();
+            
+            return;
+        }
+       
+
+        $.ajax({
+               url: '/Corporate/Corporate/TypeWiseTokenCollectData',
+               type: 'GET',
+               success: function (res) {
+                    if(res.status)
+                    {
+
+                        //loadTable(res.data);
+                    }
+
+                 },
+                 error: function (err) {
+                  alert('Error while saving.');
+               }
+        });
+    }
+
+
+    $('#data_submit').on('click', function(){
+
+        let dateValue = $('#datevalue').val();
+        let typeId = $('#typeId').val();
+        let districtId = $('#districtId').val();
+        let divisionId = $('#divisionId').val();
+        let typeName = $('#typename').val();
+        let referenceBy = $('#refacenceby').val();
+
+        // Check required fields
+        if (!dateValue) {
+            MessageShow("Please select a date.",false);
+            
+            return;
+        }
+        if (!typeId || typeId === "0") {
+           MessageShow("Please select a type",false);
+
+            return;
+            
+        }
+        if (!districtId || districtId === "0") {
+           MessageShow("Please select District",false);
+           return;
+        }
+        if (!divisionId || divisionId === "0") {
+            MessageShow("Please select Division.",false)
+             $('#divisionId').focus();
+            return;
+           
+        }
+        if (!typeName || typeName === "0") {
+        
+             MessageShow("Please select Type Name.",false)
+
+            return;
+        }
+
+
+        let data = 
+        {
+            ReferenceData: $('#refacenceby').val(),
+            CollectionDate: $('#datevalue').val(), // yyyy-MM-dd
+            TypeId: parseInt($('#typeId').val()) || 0,
+            DistrictId: parseInt($('#districtId').val()) || 0,
+            DivisionId: parseInt($('#divisionId').val()) || 0,
+            SourceId: parseInt($('#typename').val()) || 0,
+            
+        };
+
+        $.ajax({
+            url: '/Corporate/Corporate/SaveDataCollection',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=utf-8',
+            success: function (res) {
+                MessageShow(res.message, res.status);
+            },
+            error: function (xhr) {
+                MessageShow("Error saving data", false);
+            }
+        });
+
+
+        
+    });
+
+
+
+    function MessageShow(message, isSuccess)
+    {
+        
+        const errorContainer = document.getElementById('error');
+        // Clear previous messages
+        errorContainer.innerHTML = '';
+        // Determine alert type
+        const alertType = isSuccess ? 'success' : 'danger';
+        const strongText = isSuccess ? 'Success!' : 'Error!';
+
+        // Insert alert HTML
+        errorContainer.innerHTML = `
+            <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+                <strong>${strongText}</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    }
+
+
+
+</script>

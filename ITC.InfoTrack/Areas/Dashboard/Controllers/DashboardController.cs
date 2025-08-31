@@ -1,4 +1,5 @@
 ﻿using ITC.InfoTrack.Model.Entity;
+using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,13 @@ namespace ITC.InfoTrack.Areas.Dashboard.Controllers
     [Authorize]
     public class DashboardController : Controller
     {
+        private readonly IDashboard _dashboard;
+
+        public DashboardController(IDashboard dashboard)
+        {
+            _dashboard = dashboard;
+        }
+
         [HttpGet]       
         public IActionResult Index()
         {
@@ -20,6 +28,7 @@ namespace ITC.InfoTrack.Areas.Dashboard.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 HttpContext.Session.SetString("UserName", userName);
+
                 return View();
             }
             else
@@ -38,6 +47,14 @@ namespace ITC.InfoTrack.Areas.Dashboard.Controllers
 
             // Redirect to login page
             return RedirectToAction("Index", "Default", new { area = "Login" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult>getdataSummary(int id)
+        {
+            var result = await _dashboard.getDashboardSummary(id);
+
+            return Json(new {data=result});
         }
     }
 }

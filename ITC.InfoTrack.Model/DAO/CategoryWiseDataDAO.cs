@@ -44,7 +44,8 @@ namespace ITC.InfoTrack.Model.DAO
                                         ActiveDate = a.ActiveDate,
                                     }
 
-                    ).ToListAsync();
+                    ).OrderByDescending(i=>i.CategoryName)
+                    .ToListAsync();
                 return result;
 
             }

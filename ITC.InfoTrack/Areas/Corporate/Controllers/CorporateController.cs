@@ -1,4 +1,5 @@
 ﻿using ITC.InfoTrack.Model.DataBase;
+using ITC.InfoTrack.Model.Entity;
 using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -29,11 +30,31 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> CorporateOfficeRegister()
+        public async Task<IActionResult> ScheduleDataCollect()
         {
+            ViewBag.type = new SelectList(await _dropdown.GetTokenType(), "Id", "Name");
+            ViewBag.district = new SelectList(await _dropdown.getDistrict(), "Id", "Name");
+            ViewBag.division = new SelectList(await _dropdown.getDivision(), "Id", "Name");
             var result = await _corporate.getOfficeList();
             return View(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getDataElementData(string typeId)
+        {
+            int id = Convert.ToInt32(typeId);
+            var result = await _dropdown.getRootPropertyElement(id);
+            return Json(new { status = result.status, data = result.data });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> TypeWiseTokenCollectData()
+        {
+            var data = await _category.getCategoryWiseData();
+            return Json(new { status = true, data = data });
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> OfficeDataSave([FromBody] CorporateOfficeDto model)
@@ -229,9 +250,20 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult>WorkVisited(int tokenId)
+        public IActionResult WorkVisited(int tokenId)
         {
             return View();
+        }
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveDataCollection([FromBody] DataCollection data)
+        {
+            var userid = Convert.ToInt32(User.FindFirst("UserId").Value);
+            var result= await _corporate.SavedatacollectionAsync(data,userid);
+            return Json(new { message = result.Message, status = result.Status });
         }
     }
 }

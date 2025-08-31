@@ -47,7 +47,7 @@
                         <div class="d-flex">
                             <div class="flex-1 overflow-hidden">
                                 <p class="text-truncate font-size-14 mb-2">Total Schedule</p>
-                                <h4 class="mb-0">152</h4>
+                                <h4 class="mb-0" id="totalSchedule_data">152</h4>
                             </div>
                             <div class="text-primary ms-auto">
                                 <i class="ri-stack-line font-size-24"></i>
@@ -69,7 +69,7 @@
                         <div class="d-flex">
                             <div class="flex-1 overflow-hidden">
                                 <p class="text-truncate font-size-14 mb-2">Total Visited</p>
-                                <h4 class="mb-0"> 382</h4>
+                                <h4 class="mb-0" id="totalvisit_data"> 382</h4>
                             </div>
                             <div class="text-primary ms-auto">
                                 <i class="ri-store-2-line font-size-24"></i>
@@ -90,7 +90,7 @@
                         <div class="d-flex">
                             <div class="flex-1 overflow-hidden">
                                 <p class="text-truncate font-size-14 mb-2">Pending Visited</p>
-                                <h4 class="mb-0">85</h4>
+                                <h4 class="mb-0" id="totalpending_data">85</h4>
                             </div>
                             <div class="text-primary ms-auto">
                                 <i class="ri-briefcase-4-line font-size-24"></i>
@@ -111,7 +111,7 @@
                         <div class="d-flex">
                             <div class="flex-1 overflow-hidden">
                                 <p class="text-truncate font-size-14 mb-2">Total Done</p>
-                                <h4 class="mb-0"> 15</h4>
+                                <h4 class="mb-0" id="totaldone_data"> 15</h4>
                             </div>
                             <div class="text-primary ms-auto">
                                 <i class="ri-briefcase-4-line font-size-24"></i>
@@ -162,23 +162,24 @@
 
 <script>
 
+    getCradSummary(1); /// here default day wise card data loaded ...
 
     function FilterData (){
 
-        let data=$('#dash_filter').val();
-       
+        let data=parseInt($('#dash_filter').val(), 10);
+
         let totalScheduleText;
-        if(data==='1'){
+        if(data===1){
             totalScheduleText="From previous Day";
         }
-        else if(data==='2'){
+        else if(data===2){
             totalScheduleText="From previous last Month";
         }
-        else if(data==='3'){
+        else if(data===3){
             totalScheduleText="From previous last Year";
         }
         
-
+         getCradSummary(data);
          $('#total_schedule').text(totalScheduleText);
          $('#sch-visi').text(totalScheduleText);
          $('#sch-done').text(totalScheduleText);
@@ -186,6 +187,35 @@
     }
 
 
+
+
+    function getCradSummary(datavalue)
+    {
+       
+          fetch(`/Dashboard/Dashboard/getdataSummary?id=${datavalue}`, {
+              method: 'GET',
+              headers: {'Content-Type': 'application/json'}
+
+          })
+          .then(response => response.json())
+          .then(res => {
+
+                if(res.data !=null)
+                {
+                    
+                    $('#totalSchedule_data').text(res.data.totalSchedule);
+                    $('#totalvisit_data').text(res.data.totalVisit);
+                    $('#totalpending_data').text(res.data.totalPending);
+                    $('#totaldone_data').text(res.data.totalDone);
+                }
+          })
+          .catch(error => {
+
+              alert('Error while saving.');
+          });
+
+     
+    }
 
    
 </script>

@@ -49,6 +49,9 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<ProfileWiseOrganization> ProfileWiseOrganization { get; set; }
         public DbSet<OrganizationHierarchyDto> OrganizationHierarchyDto { get; set; }
         public DbSet<CalenderVisitScheduleDto> CalenderVisitScheduleDto { get; set; }
+
+
+        // Database Entity
         public DbSet<LoginResponse> LoginResponse { get; set; }
         public DbSet<Category> Category { get; set; }
         public DbSet<CategoryWiseDetails> CategoryWiseDetails { get; set; }
@@ -61,10 +64,20 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<MappingCustodian> MappingCustodian { get; set; }
         public DbSet<Custodian> Custodian { get; set; }
         public DbSet<GetVisitLogScheduleDto> GetVisitLogScheduleDto { get; set; }
+        public DbSet<DataCollection> DataCollection { get; set; }
+
+
+        // Model view Dto
+
+       public DbSet<DashboardCardSummaryDto> DashboardCardSummaryDto { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            /// database entity 
+            
             modelBuilder.Entity<CorporateOffice>().HasKey(x => x.CorpId);
             modelBuilder.Entity<OfficeBranch>().HasKey(x => x.BranchId);
             modelBuilder.Entity<OfficeBooth>().HasKey(x => x.BoothId);
@@ -109,6 +122,11 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<MappingCustodian>().HasKey(x => x.Id);
             modelBuilder.Entity<LocationMapping>().HasKey(x => x.Id);
             modelBuilder.Entity<Custodian>().HasKey(x => x.CustodianId);
+            modelBuilder.Entity<DataCollection>().HasKey(x => x.DataId);
+
+
+            // Get data from  Procrdure 
+
             modelBuilder.Entity<MenuSetUp>().HasNoKey();
             modelBuilder.Entity<ScheduleDataDto>().HasNoKey(); 
             modelBuilder.Entity<UserWiseRoleShowDto>().HasNoKey();
@@ -121,6 +139,8 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<TokenMasterDto>().HasNoKey();
             modelBuilder.Entity<TokenDetailsShowDto>().HasNoKey();
             modelBuilder.Entity<GetVisitLogScheduleDto>().HasNoKey();
+            modelBuilder.Entity<DashboardCardSummaryDto>().HasNoKey();
+
 
             base.OnModelCreating(modelBuilder);
         }
