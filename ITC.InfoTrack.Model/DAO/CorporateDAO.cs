@@ -259,8 +259,8 @@ namespace ITC.InfoTrack.Model.DAO
 
                         await _connection.VisitScheduleDetails.AddAsync(detailstable);
 
-                        var update = await _connection.TokenMaster
-                            .Where(i => i.TokenId == Convert.ToInt32(item.tokenId)).FirstOrDefaultAsync();
+                        var update = await _connection.DataCollection
+                            .Where(i => i.DataId == Convert.ToInt32(item.tokenId)).FirstOrDefaultAsync();
                         if (update != null)
                         {
                             update.IsSchedule = 1;
@@ -304,7 +304,7 @@ namespace ITC.InfoTrack.Model.DAO
                    
 
                 };
-                var data = await _connection.GetVisitLogScheduleDto.FromSqlRaw("SELECT * FROM get_visit_Log_schedule({0})", parameters).ToListAsync();
+                var data = await _connection.GetVisitLogScheduleDto.FromSqlRaw("SELECT * FROM get_visit_Log_schedule_v2({0})", parameters).ToListAsync();
 
                 return data;
 
@@ -342,6 +342,39 @@ namespace ITC.InfoTrack.Model.DAO
                 return ("Data Collection Save Invalid", false);
             }
             catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DataCollectionResultDto>> GetDataCollectionResultAsync()
+        {
+            try
+            {
+
+                var data = await _connection.DataCollectionResultDto.FromSqlRaw("SELECT * FROM get_data_collection()").ToListAsync();
+
+                
+
+                return data;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<VisitScheduleDetails> getSheduledata(int sehedularId)
+        {
+            try
+            {
+                var result= await _connection.VisitScheduleDetails
+                    .FirstOrDefaultAsync(i=>i.VisitId==sehedularId);
+                return result;
+
+            }catch(Exception ex)
             {
                 throw new Exception(ex.Message);
             }

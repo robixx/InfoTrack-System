@@ -1,15 +1,22 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Bank - Data Collection System</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+﻿@{
+    ViewBag.Title = "Visit User";
+    // ViewBag.pTitle = "Visit User";
+    // ViewBag.pageTitle = "InfoTrack";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //int i = 1;
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
     <link href="~/css/worker-custom.css" rel="stylesheet" />
     <style>
         :root {
@@ -267,13 +274,14 @@
                     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
                 }
 
-        .dropdown-list {
+ .dropdown-list {
             max-height: 250px;
             overflow-y: auto;
             overflow-x: hidden;
         }
 
-        .dropdown-item-custom {
+
+    .form-select .dropdown-item-custom {
             padding: 0.75rem 1rem;
             cursor: pointer;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -644,15 +652,27 @@
             color: darkred;
             
         }
+
+    .page-title-right{
+        display:none;
+    }
+
+    .page-title-box {
+        padding: 0 !important;
+    }
     </style>
-</head>
-<body>
+
+
+    @{
+        var user = Context.Session.GetString("UserName");
+    }
+
     <!-- Dropdown Overlay for Mobile -->
     <div class="dropdown-overlay" id="dropdownOverlay"></div>
 
     <!-- Header Section -->
     
-    <header class="navbar navbar-expand-lg navbar-light bg-light shadow-sm py-3">
+   @*  <header class="navbar navbar-expand-lg navbar-light bg-light shadow-sm py-3">
         <div class="container">
             <div class="d-flex flex-grow-1 align-items-center justify-content-between justify-content-lg-start">
                 <a class="navbar-brand d-flex align-items-center flex-column flex-lg-row navbar-brand-stacked" href="#">
@@ -673,15 +693,15 @@
                             <img src="https://placehold.co/40x40/2ecc71/ffffff?text=JS" width="25" alt="User Avatar" class="rounded-circle">
                         </a>
                         <div class="user-dropdown-menu" aria-labelledby="navbarDropdown" style="font-size:0.8rem;">
-                            <h6 class="dropdown-header">Logged in as Jaks Sparo</h6>
-                            <a class="dropdown-item" href="#">
+                            <h6 class="dropdown-header">@user</h6>
+                             <a class="dropdown-item" href="#">
                                 <i class="bi bi-person-circle"></i> Profile
                             </a>
                             <a class="dropdown-item" href="#">
                                 <i class="bi bi-gear-fill"></i> Settings
                             </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">
+                            <div class="dropdown-divider"></div> 
+                            <a class="dropdown-item" href="@Url.Action("LogOut", "Dashboard", new { Area = "Dashboard" })">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </div>
@@ -689,12 +709,13 @@
                 </ul>
             </div>
         </div>
-    </header>
+    </header> *@
     
 
     <!-- Main Container -->
     <div class="main-container">
-        <form id="bankDataForm" enctype="multipart/form-data">
+   @*  <form asp-action="SubmitVisitLog" method="post" enctype="multipart/form-data" id="visitLogForm"> *@
+        <form asp-action="SubmitVisitLog" method="post" enctype="multipart/form-data">
             <!-- Banking Information Section -->
             <div class="form-section">
                 <div class="section-header">
@@ -710,18 +731,9 @@
                                     <i class="bi bi-bank"></i>
                                     Select Bank <span class="required">*</span>
                                 </label>
-                                <div class="custom-dropdown" id="bankDropdown">
-                                    <input type="text" class="dropdown-input" id="bankInput"
-                                           placeholder="Choose Bank..." readonly required>
-                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
-                                    <div class="dropdown-menu-custom" id="bankMenu">
-                                        <div class="dropdown-search">
-                                            <input type="text" id="bankSearch" placeholder="Search banks...">
-                                        </div>
-                                        <div class="dropdown-list" id="bankList"></div>
-                                    </div>
-                                    <input type="hidden" id="selectedBank" name="bank">
-                                </div>
+                            @Html.DropDownList("BankId", ViewBag.Banks as SelectList,  new { @class = "form-select form-select-sm ", @id = "BankId",
+                            disabled = "disabled" })
+                               
                             </div>
                         </div>
 
@@ -730,20 +742,10 @@
                             <div class="form-group">
                                 <label class="form-label">
                                     <i class="bi bi-geo-alt"></i>
-                                    Select Branch <span class="required">*</span>
+                                    Select District <span class="required">*</span>
                                 </label>
-                                <div class="custom-dropdown" id="branchDropdown">
-                                    <input type="text" class="dropdown-input" id="branchInput"
-                                           placeholder="Choose Branch..." readonly disabled required>
-                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
-                                    <div class="dropdown-menu-custom" id="branchMenu">
-                                        <div class="dropdown-search">
-                                            <input type="text" id="branchSearch" placeholder="Search branches...">
-                                        </div>
-                                        <div class="dropdown-list" id="branchList"></div>
-                                    </div>
-                                    <input type="hidden" id="selectedBranch" name="branch">
-                                </div>
+                            @Html.DropDownList("DristictId", ViewBag.district as SelectList, new { @class = "form-select form-select-sm ", @id = "DristictId", disabled = "disabled" })
+                               
                             </div>
                         </div>
 
@@ -752,20 +754,9 @@
                             <div class="form-group">
                                 <label class="form-label">
                                     <i class="bi bi-diagram-3"></i>
-                                    Select Sub-Branch
+                                    Select Division
                                 </label>
-                                <div class="custom-dropdown" id="subBranchDropdown">
-                                    <input type="text" class="dropdown-input" id="subBranchInput"
-                                           placeholder="Choose Sub-Branch..." readonly disabled>
-                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
-                                    <div class="dropdown-menu-custom" id="subBranchMenu">
-                                        <div class="dropdown-search">
-                                            <input type="text" id="subBranchSearch" placeholder="Search sub-branches...">
-                                        </div>
-                                        <div class="dropdown-list" id="subBranchList"></div>
-                                    </div>
-                                    <input type="hidden" id="selectedSubBranch" name="subBranch">
-                                </div>
+                            @Html.DropDownList("DivisionId", ViewBag.division as SelectList, new { @class = "form-select form-select-sm ", @id = "DivisionId", disabled = "disabled" })
                             </div>
                         </div>
 
@@ -774,20 +765,9 @@
                             <div class="form-group">
                                 <label class="form-label">
                                     <i class="bi bi-shop"></i>
-                                    Select Booth
+                                    Select Venue
                                 </label>
-                                <div class="custom-dropdown" id="boothDropdown">
-                                    <input type="text" class="dropdown-input" id="boothInput"
-                                           placeholder="Choose Booth..." readonly disabled>
-                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
-                                    <div class="dropdown-menu-custom" id="boothMenu">
-                                        <div class="dropdown-search">
-                                            <input type="text" id="boothSearch" placeholder="Search booths...">
-                                        </div>
-                                        <div class="dropdown-list" id="boothList"></div>
-                                    </div>
-                                    <input type="hidden" id="selectedBooth" name="booth">
-                                </div>
+                            @Html.DropDownList("SourceId", ViewBag.source as SelectList, new { @class = "form-select form-select-sm ", @id = "SourceId", disabled = "disabled" })
                             </div>
                         </div>
                     </div>
@@ -904,9 +884,35 @@
     <!-- Toast Container -->
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
 
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+
+@section scripts {
+    <!-- apexcharts -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+ <script>
          document.addEventListener('DOMContentLoaded', function () {
             const userDropdownToggle = document.querySelector('.user-dropdown-toggle');
             const userDropdownMenu = document.querySelector('.user-dropdown-menu');
@@ -1130,7 +1136,7 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function () {
-            initializeDropdowns();
+            //initializeDropdowns();
             initializeEventListeners();
             initializeDragAndDrop();
             updateFileCount();
@@ -1145,45 +1151,45 @@
         }
 
         // Setup dropdown events - CORRECTED FOR SELECTION
-        function setupDropdownEvents(type, options, onSelect) {
-            const dropdown = document.getElementById(`${type}Dropdown`);
-            const input = document.getElementById(`${type}Input`);
-            const menu = document.getElementById(`${type}Menu`);
-            const searchInput = document.getElementById(`${type}Search`);
-            const overlay = document.getElementById('dropdownOverlay');
+        // function setupDropdownEvents(type, options, onSelect) {
+        //     const dropdown = document.getElementById(`${type}Dropdown`);
+        //     const input = document.getElementById(`${type}Input`);
+        //     const menu = document.getElementById(`${type}Menu`);
+        //     const searchInput = document.getElementById(`${type}Search`);
+        //     const overlay = document.getElementById('dropdownOverlay');
 
-            // Toggle dropdown on input click
-            input.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!this.disabled) {
-                    toggleDropdown(type);
-                }
-            });
+        //     // Toggle dropdown on input click
+        //     input.addEventListener('click', function (e) {
+        //         e.preventDefault();
+        //         e.stopPropagation();
+        //         if (!this.disabled) {
+        //             toggleDropdown(type);
+        //         }
+        //     });
 
-            // Search functionality
-            if (searchInput) {
-                searchInput.addEventListener('input', function (e) {
-                    e.stopPropagation();
-                    const query = this.value.toLowerCase();
-                    filterDropdownOptions(type, options, query, onSelect);
-                });
+        //     // Search functionality
+        //     if (searchInput) {
+        //         searchInput.addEventListener('input', function (e) {
+        //             e.stopPropagation();
+        //             const query = this.value.toLowerCase();
+        //             filterDropdownOptions(type, options, query, onSelect);
+        //         });
 
-                searchInput.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
+        //         searchInput.addEventListener('click', function (e) {
+        //             e.stopPropagation();
+        //         });
 
-                // Clear search on dropdown open
-                searchInput.addEventListener('focus', function() {
-                    this.select();
-                });
-            }
+        //         // Clear search on dropdown open
+        //         searchInput.addEventListener('focus', function() {
+        //             this.select();
+        //         });
+        //     }
 
-            // Close dropdown when clicking overlay
-            overlay.addEventListener('click', function() {
-                closeAllDropdowns();
-            });
-        }
+        //     // Close dropdown when clicking overlay
+        //     overlay.addEventListener('click', function() {
+        //         closeAllDropdowns();
+        //     });
+        // }
 
         // Populate dropdown with options - CORRECTED FOR SELECTION
         function populateDropdown(type, options, onSelect = null) {
@@ -1249,145 +1255,145 @@
         }
 
         // Get display text for option
-        function getDisplayText(option, type) {
-            try {
-                if (type === 'bank') {
-                    return bankData[option]?.name || option;
-                } else if (type === 'branch') {
-                    const bankKey = document.getElementById('selectedBank').value;
-                    return bankData[bankKey]?.branches[option]?.name || option;
-                } else if (type === 'subBranch') {
-                    const bankKey = document.getElementById('selectedBank').value;
-                    const branchKey = document.getElementById('selectedBranch').value;
-                    return bankData[bankKey]?.branches[branchKey]?.subBranches[option]?.name || option;
-                } else if (type === 'booth') {
-                    return option;
-                }
-                return option;
-            } catch (error) {
-                console.error('Error getting display text:', error);
-                return option;
-            }
-        }
+        // function getDisplayText(option, type) {
+        //     try {
+        //         if (type === 'bank') {
+        //             return bankData[option]?.name || option;
+        //         } else if (type === 'branch') {
+        //             const bankKey = document.getElementById('selectedBank').value;
+        //             return bankData[bankKey]?.branches[option]?.name || option;
+        //         } else if (type === 'subBranch') {
+        //             const bankKey = document.getElementById('selectedBank').value;
+        //             const branchKey = document.getElementById('selectedBranch').value;
+        //             return bankData[bankKey]?.branches[branchKey]?.subBranches[option]?.name || option;
+        //         } else if (type === 'booth') {
+        //             return option;
+        //         }
+        //         return option;
+        //     } catch (error) {
+        //         console.error('Error getting display text:', error);
+        //         return option;
+        //     }
+        // }
 
-        // Selection handlers
-        function selectBank(bankKey) {
-            try {
-                const bankInfo = bankData[bankKey];
-                if (!bankInfo) return;
+        // // Selection handlers
+        // function selectBank(bankKey) {
+        //     try {
+        //         const bankInfo = bankData[bankKey];
+        //         if (!bankInfo) return;
 
-                document.getElementById('selectedBank').value = bankKey;
-                document.getElementById('bankInput').value = bankInfo.name;
+        //         document.getElementById('selectedBank').value = bankKey;
+        //         document.getElementById('bankInput').value = bankInfo.name;
 
-                // Enable and populate branch dropdown
-                const branchKeys = Object.keys(bankInfo.branches);
-                enableDropdown('branch');
-                populateDropdown('branch', branchKeys, selectBranch);
-                setupDropdownEvents('branch', branchKeys, selectBranch);
+        //         // Enable and populate branch dropdown
+        //         const branchKeys = Object.keys(bankInfo.branches);
+        //         enableDropdown('branch');
+        //         populateDropdown('branch', branchKeys, selectBranch);
+        //         setupDropdownEvents('branch', branchKeys, selectBranch);
 
-                // Reset dependent dropdowns
-                resetDropdown('subBranch');
-                resetDropdown('booth');
+        //         // Reset dependent dropdowns
+        //         resetDropdown('subBranch');
+        //         resetDropdown('booth');
 
-                showToast(`Selected: ${bankInfo.name}`, 'success');
-                updateSuccessBadge(`Selected: ${bankInfo.name}`);
-            } catch (error) {
-                console.error('Error selecting bank:', error);
-                showToast('Error selecting bank', 'danger');
-            }
-        }
+        //         // showToast(`Selected: ${bankInfo.name}`, 'success');
+        //         updateSuccessBadge(`Selected: ${bankInfo.name}`);
+        //     } catch (error) {
+        //         console.error('Error selecting bank:', error);
+        //         showToast('Error selecting bank', 'danger');
+        //     }
+        // }
 
-        function selectBranch(branchKey) {
-            try {
-                const bankKey = document.getElementById('selectedBank').value;
-                const branchInfo = bankData[bankKey]?.branches[branchKey];
-                if (!branchInfo) return;
+        // function selectBranch(branchKey) {
+        //     try {
+        //         const bankKey = document.getElementById('selectedBank').value;
+        //         const branchInfo = bankData[bankKey]?.branches[branchKey];
+        //         if (!branchInfo) return;
 
-                document.getElementById('selectedBranch').value = branchKey;
-                document.getElementById('branchInput').value = branchInfo.name;
+        //         document.getElementById('selectedBranch').value = branchKey;
+        //         document.getElementById('branchInput').value = branchInfo.name;
 
-                // Enable and populate sub-branch dropdown
-                const subBranchKeys = Object.keys(branchInfo.subBranches);
-                enableDropdown('subBranch');
-                populateDropdown('subBranch', subBranchKeys, selectSubBranch);
-                setupDropdownEvents('subBranch', subBranchKeys, selectSubBranch);
+        //         // Enable and populate sub-branch dropdown
+        //         const subBranchKeys = Object.keys(branchInfo.subBranches);
+        //         enableDropdown('subBranch');
+        //         populateDropdown('subBranch', subBranchKeys, selectSubBranch);
+        //         setupDropdownEvents('subBranch', subBranchKeys, selectSubBranch);
 
-                // Reset booth dropdown
-                resetDropdown('booth');
+        //         // Reset booth dropdown
+        //         resetDropdown('booth');
 
-                showToast(`Selected: ${branchInfo.name}`, 'success');
-                updateSuccessBadge(`Selected: ${branchInfo.name}`);
-            } catch (error) {
-                console.error('Error selecting branch:', error);
-                showToast('Error selecting branch', 'danger');
-            }
-        }
+        //         showToast(`Selected: ${branchInfo.name}`, 'success');
+        //         updateSuccessBadge(`Selected: ${branchInfo.name}`);
+        //     } catch (error) {
+        //         console.error('Error selecting branch:', error);
+        //         showToast('Error selecting branch', 'danger');
+        //     }
+        // }
 
-        function selectSubBranch(subBranchKey) {
-            try {
-                const bankKey = document.getElementById('selectedBank').value;
-                const branchKey = document.getElementById('selectedBranch').value;
-                const subBranchInfo = bankData[bankKey]?.branches[branchKey]?.subBranches[subBranchKey];
-                if (!subBranchInfo) return;
+        // function selectSubBranch(subBranchKey) {
+        //     try {
+        //         const bankKey = document.getElementById('selectedBank').value;
+        //         const branchKey = document.getElementById('selectedBranch').value;
+        //         const subBranchInfo = bankData[bankKey]?.branches[branchKey]?.subBranches[subBranchKey];
+        //         if (!subBranchInfo) return;
 
-                document.getElementById('selectedSubBranch').value = subBranchKey;
-                document.getElementById('subBranchInput').value = subBranchInfo.name;
+        //         document.getElementById('selectedSubBranch').value = subBranchKey;
+        //         document.getElementById('subBranchInput').value = subBranchInfo.name;
 
-                // Enable and populate booth dropdown
-                const booths = subBranchInfo.booths;
-                enableDropdown('booth');
-                populateDropdown('booth', booths, selectBooth);
-                setupDropdownEvents('booth', booths, selectBooth);
+        //         // Enable and populate booth dropdown
+        //         const booths = subBranchInfo.booths;
+        //         enableDropdown('booth');
+        //         populateDropdown('booth', booths, selectBooth);
+        //         setupDropdownEvents('booth', booths, selectBooth);
 
-                showToast(`Selected: ${subBranchInfo.name}`, 'success');
-                updateSuccessBadge(`Selected: ${subBranchInfo.name}`);
-            } catch (error) {
-                console.error('Error selecting sub-branch:', error);
-                showToast('Error selecting sub-branch', 'danger');
-            }
-        }
+        //         showToast(`Selected: ${subBranchInfo.name}`, 'success');
+        //         updateSuccessBadge(`Selected: ${subBranchInfo.name}`);
+        //     } catch (error) {
+        //         console.error('Error selecting sub-branch:', error);
+        //         showToast('Error selecting sub-branch', 'danger');
+        //     }
+        // }
 
-        function selectBooth(boothName) {
-            try {
-                document.getElementById('selectedBooth').value = boothName;
-                document.getElementById('boothInput').value = boothName;
+        // function selectBooth(boothName) {
+        //     try {
+        //         document.getElementById('selectedBooth').value = boothName;
+        //         document.getElementById('boothInput').value = boothName;
 
-                showToast(`Selected: ${boothName}`, 'success');
-                updateSuccessBadge(`Selected: ${boothName}`);
-            } catch (error) {
-                console.error('Error selecting booth:', error);
-                showToast('Error selecting booth', 'danger');
-            }
-        }
+        //         showToast(`Selected: ${boothName}`, 'success');
+        //         updateSuccessBadge(`Selected: ${boothName}`);
+        //     } catch (error) {
+        //         console.error('Error selecting booth:', error);
+        //         showToast('Error selecting booth', 'danger');
+        //     }
+        // }
 
-        // Update success badge
-        function updateSuccessBadge(text) {
-            const badge = document.getElementById('successBadge');
-            const badgeText = document.getElementById('successText');
-            if (badge && badgeText) {
-                badgeText.textContent = text;
-                badge.classList.remove('d-none');
-            }
-        }
+        // // Update success badge
+        // function updateSuccessBadge(text) {
+        //     const badge = document.getElementById('successBadge');
+        //     const badgeText = document.getElementById('successText');
+        //     if (badge && badgeText) {
+        //         badgeText.textContent = text;
+        //         badge.classList.remove('d-none');
+        //     }
+        // }
 
-        // Enable dropdown
-        function enableDropdown(type) {
-            const input = document.getElementById(`${type}Input`);
-            const searchInput = document.getElementById(`${type}Search`);
+        // // Enable dropdown
+        // function enableDropdown(type) {
+        //     const input = document.getElementById(`${type}Input`);
+        //     const searchInput = document.getElementById(`${type}Search`);
 
-            if (input) {
-                input.disabled = false;
-                input.value = '';
-            }
-            if (searchInput) {
-                searchInput.value = '';
-            }
+        //     if (input) {
+        //         input.disabled = false;
+        //         input.value = '';
+        //     }
+        //     if (searchInput) {
+        //         searchInput.value = '';
+        //     }
 
-            const hiddenInput = document.getElementById(`selected${type.charAt(0).toUpperCase() + type.slice(1)}`);
-            if (hiddenInput) {
-                hiddenInput.value = '';
-            }
-        }
+        //     const hiddenInput = document.getElementById(`selected${type.charAt(0).toUpperCase() + type.slice(1)}`);
+        //     if (hiddenInput) {
+        //         hiddenInput.value = '';
+        //     }
+        // }
 
         // Reset dropdown
         function resetDropdown(type) {
@@ -1915,5 +1921,3 @@
             }
         });
     </script>
-</body>
-</html>

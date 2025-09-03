@@ -33,5 +33,6 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<DropDownDtos>> getCategory();
         Task<List<DropDownDtos>> getDistrict();
         Task<List<DropDownDtos>> getDivision();
+        Task<List<DropDownDtos>> getTypeOFelement(int type, int SourceId);
     }
 }

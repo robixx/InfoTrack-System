@@ -19,7 +19,10 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<OrganizationHierarchyDto>> GetOrganizationHierarchyAsync(int? branchId, int? subbranch, int? district, int? division);
         Task<List<CalenderVisitScheduleDto>> GetCalenderVisitScheduleAsync();
         Task<List<GetVisitLogScheduleDto>> GetVisitLogScheduleAsync(int loginUser);
+        Task<List<DataCollectionResultDto>> GetDataCollectionResultAsync();
         Task<(string Message, bool Status)> SavedatacollectionAsync( DataCollection modle, int userid);
+
+        Task<VisitScheduleDetails> getSheduledata(int sehedularId);
 
 
     }

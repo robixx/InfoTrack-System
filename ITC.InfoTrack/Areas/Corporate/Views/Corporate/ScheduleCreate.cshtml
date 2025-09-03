@@ -268,7 +268,7 @@
                             <thead style=" background-color:#c9ccd3; font-weight:600;">
                                 <tr>
                                     <th width="40"><input type="checkbox" id="selectAll"/> All</th>
-                                    <th width="100">Token Date</th>
+                                    <th width="100">Request Date</th>
                                     <th>Source Data</th>                                   
                                     
                                 </tr>
@@ -423,8 +423,8 @@
             $.each(data, function (index, item) {
                 
                 table.row.add([
-                    `<input type="checkbox" class="rowCheckbox"
-                     data-tokenid="${item.tokenId}"
+                    `<input type="checkbox" class="rowCheckbox"  
+                     data-tokenid="${item.dataId}"
                      data-districtid="${item.districtId}"
                      data-divisionid="${item.divisionId}"
                      data-typeid="${item.typeId}"
@@ -433,7 +433,7 @@
                      data-division="${item.divisionName}"
                      data-source="${item.sourceName}"
                      />`,
-                     item.tokenDate.split('T')[0],
+                     item.collectionDate.split('T')[0],
                     `<strong>District : </strong> ${item.districtName} →
                       <strong>Division : </strong> ${item.divisionName} →
                       <strong>SourceName : </strong> ${item.sourceName} <span>(${item.typeName})</span> <br>

@@ -35,7 +35,7 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
             ViewBag.type = new SelectList(await _dropdown.GetTokenType(), "Id", "Name");
             ViewBag.district = new SelectList(await _dropdown.getDistrict(), "Id", "Name");
             ViewBag.division = new SelectList(await _dropdown.getDivision(), "Id", "Name");
-            var result = await _corporate.getOfficeList();
+            var result = await _corporate.GetDataCollectionResultAsync();
             return View(result);
         }
 
@@ -99,7 +99,25 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
             int disId = districtId ?? 0;
             int divId = divisionId ?? 0;
             int vTypeId = ValueTypeId ?? 0;
-            var data = await _category.getTokenDataFilter(typeid, disId, divId, vTypeId);
+            var data1 = await _corporate.GetDataCollectionResultAsync();
+            //var data = await _category.getTokenDataFilter(typeid, disId, divId, vTypeId);
+            var data = data1.AsQueryable();
+            if (typeid > 0)
+                data = data.Where(i => i.TypeId == typeid);
+
+            if (disId > 0)
+                data = data.Where(i => i.DistrictId == disId);
+
+            if (divId > 0)
+                data = data.Where(i => i.DivisionId == divId);
+
+            if (vTypeId > 0)
+                data = data.Where(i => i.SourceId == vTypeId); // adjust property name
+
+            var result = data.ToList();
+
+
+
             return Json(data);
         }
 

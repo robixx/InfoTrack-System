@@ -567,5 +567,28 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<DropDownDtos>> getTypeOFelement(int type, int SourceId)
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == type && i.DataElementId==SourceId)
+                         .OrderBy(v => v.PropertyViewOrder)
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                        .OrderBy(i => i.Name)
+                         .ToListAsync();
+                return datalist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model List<ITC.InfoTrack.Model.Entity.CorporateOffice>
+﻿@model List<ITC.InfoTrack.Model.ViewModel.DataCollectionResultDto>
 
 @{
     ViewBag.pTitle = "Schedule Data Collect";
@@ -6,6 +6,7 @@
     ViewBag.Title = "Schedule Data Collect";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var today = DateTime.Now.ToString("yyyy-MM-dd");
+    int i = 1;
 
 }
 @section styles {
@@ -98,20 +99,26 @@
                                         <th>Sl.</th>
                                         <th>Collection Date</th>
                                         <th>Source Name</th>
+                                        <th>Refarance</th>
                                         <th>District</th>
                                         <th>Disvision</th>
-                                        <th>Refarance</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
+                                    @foreach(var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>@item.CollectionDate.ToString("dd-MMM-yyyy")</td>
+                                            <td>@item.SourceName</td>
+                                            <td>@item.ReferenceData</td>
+                                            <td>@item.DistrictName</td>
+                                            <td>@item.DivisionName</td>
+                                        </tr>
+                                        i++;
+                                    }
+                                   
                                 </tbody>
                             </table>
                         </div>

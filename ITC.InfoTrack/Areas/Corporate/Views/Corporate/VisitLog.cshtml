@@ -5,7 +5,7 @@
     ViewBag.pTitle = "Visit Log";
     ViewBag.pageTitle = "InfoTrack";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int i = 1;
+    //int i = 1;
 }
 
 @section styles {
@@ -71,9 +71,122 @@
         object-fit: cover; /* Maintain aspect ratio, crop if needed */
     }
 
+    .card-body h5.location-text {
+        color: #343a40;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-body .location-address {
+        color: #6c757d;
+        font-size: 0.7rem;
+        line-height: 1.4;
+    }
+
+    .user-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .comment-section{
+        display:flex;
+        align-items: center;
+        margin-top: 1.5rem;
+        gap:10px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .user-avatar {
+        width: 25px;
+        height: 25px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #6c757d;
+        color: #fff;
+        font-weight: bold;
+        font-size: 14px;
+        flex-shrink: 0; /* Prevents shrinking */
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: #343a40;
+        font-size: 0.8rem;
+        flex-grow: 1;
+    }
+
+    .priority-badge {
+        font-weight: 600;
+        padding: 0.4em 0.8em;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        white-space: nowrap; /* Prevents wrapping */
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+   /*  .btn-visit {
+        border-radius: 0.75rem;
+        font-weight: 600;
+        padding: 0.5rem ; 
+        font-size: 0.9rem;
+    } */
+
 </style>
 
+<div class="row">
+    @foreach (var item in Model)
+    {
+        var statusClass = item.Priority == "high" ? "bg-success" :
+        item.Priority == "medium" ? "bg-primary" :
+        item.Priority == "urgent" ? "bg-warning text-dark" :
+        item.Priority == "low" ? "bg-secondary" :
+        "bg-danger";
+        <div class="col-12 col-md-3 mb-3">
+            <div class="card h-100" style="color:#5a0b0b;">
+                <div class="card-header ">
+                   <strong>Visit Date :</strong> @item.DateOfVisit.ToString("dd-MMM-yyyy")
+                    <strong class="float-end">Time :   @DateTime.Today.Add(item.TimeOfVisit).ToString("hh:mm tt")</strong>
+                </div>
+                <div class="card-body">
+                    <h5 class="location-text">Location:</h5>
+                    <strong style="font-size:0.9rem;">@item.LocationText</strong><br />
+                    <span class="location-address">@item.Address</span>
+                    <div class="comment-section">
+                        <span>Comments : @item.Comments</span>
+                    </div>
+                    <div class="user-section">
+                        <div class="user-avatar">
+                            @item.UserName.Substring(0, 1).ToUpper()
+                        </div>
+                        <div class="user-name">@item.UserName</div>
+                        <span class="badge @statusClass priority-badge">
+                            @(char.ToUpper(item.Priority[0]) + item.Priority.Substring(1).ToLower())
+                        </span>
+                    </div>
+                    <div class="button-container">
+                       @*  <button class="btn btn-primary btn-sm">Visit</button> *@
+                        <a class="btn btn-primary btn-sm" href="@Url.Action("Index", "Worker", new { area = "Worker", scheduleId = item.ScheduleId })" data-id="@item.ScheduleId">Visit</a>
+                   </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
+@* 
 <div class="row">
     <div class="col-xl-12">
         <div class="card">
@@ -150,7 +263,7 @@
         <!-- end row -->
     </div>
 </div>
-
+ *@
 
 <!-- View Visit Details Modal -->
 
