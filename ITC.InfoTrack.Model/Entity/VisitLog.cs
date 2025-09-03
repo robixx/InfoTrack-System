@@ -18,6 +18,7 @@ namespace ITC.InfoTrack.Model.Entity
         public TimeSpan? VisitTime { get; set; }       // time
         public TimeSpan? CheckOutTime { get; set; }    // time
         public DateTime? CreateDate { get; set; }      // timestamp
-        public string? Comments { get; set; }          // varchar
+        public string Comments { get; set; }          // varchar
+        public int CreateBy { get; set; }          // varchar
     }
 }

@@ -2,6 +2,7 @@
 using ITC.InfoTrack.Model.DataBase;
 using ITC.InfoTrack.Model.Entity;
 using ITC.InfoTrack.Model.Interface;
+using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,10 +19,12 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
         
         private readonly IDropDown _dropdown;
         private readonly ICorporate _corporate;
-        public WorkerController(IDropDown dropDown, ICorporate corporate)
+        private readonly IWorker _worker;
+        public WorkerController(IDropDown dropDown, ICorporate corporate,IWorker worker)
         {
             _corporate = corporate;
             _dropdown = dropDown;
+            _worker = worker;
         }
         [HttpGet]
         public async Task<IActionResult> Index(int scheduleId)
@@ -44,9 +47,34 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitVisitLog(int BankId, int DistrictId, int DivisionId, int SourceId, string comments, IFormFile[] files)
+        public async Task<IActionResult> SubmitVisitLog(int scheduleId, [FromForm] IFormCollection form, List<IFormFile> files)
         {
-            return View();
+
+            int userId= Convert.ToInt32(User.FindFirst("UserId").Value);
+            var bankId = form["BankId"].ToString();
+            var districtId = form["DristictId"].ToString();
+            var divisionId = form["DivisionId"].ToString();
+            var sourceId = form["SourceId"].ToString();
+            var comments = form["comments"].ToString();
+            var schedId = form["scheduleId"].ToString();
+
+            var visitLog = new VisitLogInsertDto
+            {
+                ScheduleId =Convert.ToInt32(schedId),
+                ResourceId = 0,
+                CreateBy = userId,
+                DistrictId=Convert.ToInt32(districtId),
+                DivisionId=Convert.ToInt32(divisionId),
+                SourceId=Convert.ToInt32(sourceId),
+                Comments = comments,
+                
+            };
+
+            var result = await _worker.SaveWorkerLogAsync(visitLog, files);
+
+            return Json(new { message = result.message, status = result.status, redirectUrl = Url.Action("VisitLog", "Corporate", new { area = "Corporate" }) });
+
+            
         }
 
 
