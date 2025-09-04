@@ -6,12 +6,14 @@ using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Drawing.Processing;
+using Npgsql;
 using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System.Drawing.Imaging;
+using System.Net.NetworkInformation;
 
 
 namespace ITC.InfoTrack.Model.DAO
@@ -26,6 +28,8 @@ namespace ITC.InfoTrack.Model.DAO
             _connection = connection;
             _imagePath = configuration["ImageStorage:TokenImagePath"];
         }
+
+       
 
         public async Task<(string message, bool status)> SaveWorkerLogAsync(VisitLogInsertDto model, List<IFormFile> files)
         {
@@ -129,6 +133,61 @@ namespace ITC.InfoTrack.Model.DAO
             catch (Exception ex)
             {
                 return ($"Error: {ex.Message}", false);
+            }
+        }
+
+
+        public async Task<List<DataMappingDto>> getDataMapAsync(int Id)
+        {
+            try
+            {
+                var parameters = new[]
+                     {
+                            new NpgsqlParameter("p_param", Id),
+
+                    };
+
+                var summarylist = await _connection.DataMappingDto
+                    .FromSqlRaw("SELECT * FROM get_datamapping(@p_param)", parameters)
+                    .ToListAsync();
+
+                return summarylist;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string message, bool status)> SaveDataMapAsync(int divisionId, List<DataMappingDto> dto)
+        {
+            try
+            {
+                using var transaction = await _connection.Database.BeginTransactionAsync();
+
+                foreach (var item in dto)
+                {
+                    // Option 1: Check if record exists for this division, type, source
+                    var existing = await _connection.DataMapping
+                        .FirstOrDefaultAsync(d => d.TypeId == item.TypeId &&
+                                                  d.SourceId == item.SourceId);
+                    if (existing != null)
+                    {
+                        existing.DivisionId = divisionId;
+                        existing.CreatedAt= DateTime.Now;
+                    }
+                    
+                }
+
+                await _connection.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return ("Data saved successfully", true);
+
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

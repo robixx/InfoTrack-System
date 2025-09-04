@@ -23,6 +23,7 @@ namespace ITC.InfoTrack.Model.Interface
         Task<(string Message, bool Status)> SavedatacollectionAsync( DataCollection modle, int userid);
 
         Task<VisitScheduleDetails> getSheduledata(int sehedularId);
+ 
 
 
     }

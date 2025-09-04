@@ -67,12 +67,14 @@ namespace ITC.InfoTrack.Model.DataBase
         public DbSet<DataCollection> DataCollection { get; set; }
         public DbSet<VisitLog> VisitLog { get; set; }
         public DbSet<VisitLogDetails> VisitLogDetails { get; set; }
+        public DbSet<DataMapping> DataMapping { get; set; }
 
 
         // Model view Dto
 
        public DbSet<DashboardCardSummaryDto> DashboardCardSummaryDto { get; set; }
        public DbSet<DataCollectionResultDto> DataCollectionResultDto { get; set; }
+       public DbSet<DataMappingDto> DataMappingDto { get; set; }
 
 
 
@@ -128,6 +130,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<DataCollection>().HasKey(x => x.DataId);
             modelBuilder.Entity<VisitLog>().HasKey(x => x.VisitLogId);
             modelBuilder.Entity<VisitLogDetails>().HasKey(x => x.VisitLogDetailsId);
+            modelBuilder.Entity<DataMapping>().HasKey(x => x.Id);
 
 
             // Get data from  Procrdure 
@@ -146,6 +149,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<GetVisitLogScheduleDto>().HasNoKey();
             modelBuilder.Entity<DashboardCardSummaryDto>().HasNoKey();
             modelBuilder.Entity<DataCollectionResultDto>().HasNoKey();
+            modelBuilder.Entity<DataMappingDto>().HasNoKey();
 
 
             base.OnModelCreating(modelBuilder);
