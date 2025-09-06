@@ -18,5 +18,6 @@ namespace ITC.InfoTrack.Model.ViewModel
         public string CommentValue { get; set; } = string.Empty;
         public string Priority { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public int IsVisit { get; set; } = 0;
     }
 }

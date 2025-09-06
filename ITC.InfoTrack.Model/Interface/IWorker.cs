@@ -10,7 +10,7 @@ namespace ITC.InfoTrack.Model.Interface
 {
     public interface IWorker
     {
-        Task<(string message, bool status)> SaveWorkerLogAsync(VisitLogInsertDto model, List<IFormFile> files);
+        Task<(string message, bool status)> SaveWorkerLogAsync(VisitLogInsertDto model, List<IFormFile> files, string LoginUserName);
         Task<List<DataMappingDto>> getDataMapAsync(int Id);
         Task<(string message, bool status)> SaveDataMapAsync(int divisionId, List<DataMappingDto> dto);
     }

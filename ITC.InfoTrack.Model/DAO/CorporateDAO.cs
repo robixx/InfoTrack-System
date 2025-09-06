@@ -339,7 +339,7 @@ namespace ITC.InfoTrack.Model.DAO
                     await _connection.SaveChangesAsync();
                     return ("Data Collection Save Successfull", true);
                 }
-                return ("Data Collection Save Invalid", false);
+                return ("Data Collection Invalid", false);
             }
             catch(Exception ex)
             {

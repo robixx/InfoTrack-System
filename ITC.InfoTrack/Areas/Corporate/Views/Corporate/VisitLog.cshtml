@@ -132,7 +132,7 @@
 
     .button-container {
         display: flex;
-        justify-content: center;
+        justify-content: right;
         width: 100%;
         margin-top: 1rem;
     }
@@ -147,6 +147,21 @@
 </style>
 
 <div class="row">
+
+    @if (Model.Count == 0)
+    {
+        <div class="col-12 mb-3">
+            <div class="card h-100" style="color:#5a0b0b;">
+                
+                <div class="card-body text-center">
+                  <h5>No Shedule Yet.....</h5>
+                </div>
+            </div>
+        </div>
+    }
+
+
+
     @foreach (var item in Model)
     {
         var statusClass = item.Priority == "high" ? "bg-success" :
@@ -154,17 +169,17 @@
         item.Priority == "urgent" ? "bg-warning text-dark" :
         item.Priority == "low" ? "bg-secondary" :
         "bg-danger";
-        <div class="col-12 col-md-3 mb-3">
+        <div class="col-12 col-md-4 mb-3">
             <div class="card h-100" style="color:#5a0b0b;">
                 <div class="card-header ">
                    <strong>Visit Date :</strong> @item.DateOfVisit.ToString("dd-MMM-yyyy")
                     <strong class="float-end">Time :   @DateTime.Today.Add(item.TimeOfVisit).ToString("hh:mm tt")</strong>
                 </div>
                 <div class="card-body">
-                    <h5 class="location-text">Location:</h5>
-                    <strong style="font-size:0.9rem;">@item.LocationText</strong><br />
-                    <span class="location-address">@item.Address</span>
-                    <div class="comment-section">
+                   @*  <h5 class="location-text">Location:</h5> *@
+                    <strong style="font-size:0.9rem;"><i class="fa fa-map"></i>  @item.SourceName</strong><br />
+                  @*   <span class="location-address">@item.Address</span> *@
+                    <div class="location-address mt-2 mb-3">
                         <span>Comments : @item.Comments</span>
                     </div>
                     <div class="user-section">
@@ -176,7 +191,7 @@
                             @(char.ToUpper(item.Priority[0]) + item.Priority.Substring(1).ToLower())
                         </span>
                     </div>
-                    <div class="button-container">
+                    <div class="button-container float-end">
                        @*  <button class="btn btn-primary btn-sm">Visit</button> *@
                         <a class="btn btn-primary btn-sm" href="@Url.Action("Index", "Worker", new { area = "Worker", scheduleId = item.ScheduleId })" data-id="@item.ScheduleId">Visit</a>
                    </div>

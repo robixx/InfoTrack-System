@@ -50,26 +50,25 @@
                 <div id="error"></div>
                 <div class="mt-4">
                     <div class="row g-3">
-                        <div class="col-12 col-md-2">
+                        <div class="col-12 col-md-3">
                             <label for="metaelementTitle" class="form-label">Date Time<span class="text-danger">*</span></label>
                             <input type="date" class="form-control" name="datevalue" id="datevalue" value="@today" />
 
                         </div>
-                        <div class="col-12 col-md-2">
+                        <div class="col-12 col-md-3">
                             <label for="metaelementTitle" class="form-label">Type<span class="text-danger">*</span></label>
                             @Html.DropDownList("typeId", ViewBag.type as SelectList, "Select Type", new { @class = "form-select", @id = "typeId", onchange = "TypeWiseSource()" })
 
                         </div>
-                        <div class="col-12 col-md-2">
+                       @*  <div class="col-12 col-md-2">
                             <label for="districtSelect" class="form-label">District<span class="text-danger">*</span></label>
                             @Html.DropDownList("districtId", ViewBag.district as SelectList, "Select District", new { @class = "form-select", @id = "districtId" })
                         </div>
                         <div class="col-12 col-md-2">
                             <label for="metaelementTitle" class="form-label">Division<span class="text-danger">*</span></label>
                             @Html.DropDownList("divisionId", ViewBag.division as SelectList, "Select Division", new { @class = "form-select w-100", @id = "divisionId" })
-
                         </div>
-
+ *@
                         <div class="col-12 col-md-3">
                             <label for="metaelementTitle" class="form-label" id="typelevel">Type Name<span class="text-danger">*</span></label>
                             <select class="form-select w-100" name="typename" id="typename" onchange="LoadData()">
@@ -100,8 +99,8 @@
                                         <th>Collection Date</th>
                                         <th>Source Name</th>
                                         <th>Refarance</th>
-                                        <th>District</th>
-                                        <th>Disvision</th>
+                                       @*  <th>District</th>
+                                        <th>Disvision</th> *@
                                         
                                     </tr>
                                 </thead>
@@ -113,8 +112,8 @@
                                             <td>@item.CollectionDate.ToString("dd-MMM-yyyy")</td>
                                             <td>@item.SourceName</td>
                                             <td>@item.ReferenceData</td>
-                                            <td>@item.DistrictName</td>
-                                            <td>@item.DivisionName</td>
+                                            @* <td>@item.DistrictName</td>
+                                            <td>@item.DivisionName</td> *@
                                         </tr>
                                         i++;
                                     }
@@ -292,16 +291,7 @@
             return;
             
         }
-        if (!districtId || districtId === "0") {
-           MessageShow("Please select District",false);
-           return;
-        }
-        if (!divisionId || divisionId === "0") {
-            MessageShow("Please select Division.",false)
-             $('#divisionId').focus();
-            return;
-           
-        }
+     
         if (!typeName || typeName === "0") {
         
              MessageShow("Please select Type Name.",false)
@@ -328,6 +318,9 @@
             contentType: 'application/json; charset=utf-8',
             success: function (res) {
                 MessageShow(res.message, res.status);
+                  setTimeout(() => {
+                        window.location.reload();
+                  }, 3000);
             },
             error: function (xhr) {
                 MessageShow("Error saving data", false);

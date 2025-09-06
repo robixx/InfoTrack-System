@@ -31,7 +31,7 @@ namespace ITC.InfoTrack.Model.DAO
 
        
 
-        public async Task<(string message, bool status)> SaveWorkerLogAsync(VisitLogInsertDto model, List<IFormFile> files)
+        public async Task<(string message, bool status)> SaveWorkerLogAsync(VisitLogInsertDto model, List<IFormFile> files, string LoginUserName)
         {
             if (model == null)
                 return ("Invalid data", false);
@@ -65,7 +65,7 @@ namespace ITC.InfoTrack.Model.DAO
                 await _connection.VisitLog.AddAsync(visitdata);
                 await _connection.SaveChangesAsync();
 
-                var fontFamily = SystemFonts.Families.First();
+                var fontFamily = SystemFonts.CreateFont("Arial", 13, FontStyle.Regular);  //SystemFonts.Families.First();
 
                 foreach (var file in files)
                 {
@@ -78,27 +78,27 @@ namespace ITC.InfoTrack.Model.DAO
                     using (var image = Image.Load<Rgba32>(file.OpenReadStream()))
                     {
                         var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
+                        var text = $"{LoginUserName} | {timestamp}";
                         // Set proportional font size (1/10th of image width)
-                        float fontSize = image.Width / 17f;
-                        var font = new Font(fontFamily, fontSize, FontStyle.Bold);
+                        //float fontSize = 12f;
+                        var font = SystemFonts.CreateFont("Arial", 12, FontStyle.Regular); //new Font(fontFamily, fontSize, FontStyle.Bold);
                         var textOptions = new TextOptions(font)
                         {
-                            HorizontalAlignment = HorizontalAlignment.Right,
-                            VerticalAlignment = VerticalAlignment.Top
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Bottom
                         };
 
 
                        
-                        var textSize = TextMeasurer.MeasureSize(timestamp, textOptions);
-                        var position = new PointF(image.Width - textSize.Width - 10, 10);
+                        var textSize = TextMeasurer.MeasureSize(text, textOptions);
+                        var position = new PointF(10, image.Height - textSize.Height - 10);
 
                         // Draw timestamp
                         image.Mutate(ctx =>
                         {
                             // Optional: add shadow for better visibility
-                            ctx.DrawText(timestamp, font, Color.Black, new PointF(position.X + 2, position.Y + 2));
-                            ctx.DrawText(timestamp, font, Color.Yellow, position);
+                            ctx.DrawText(text, font, Color.Black, new PointF(position.X + 2, position.Y + 2));
+                            ctx.DrawText(text, font, Color.Yellow, position);
                         });
 
                        
@@ -165,24 +165,39 @@ namespace ITC.InfoTrack.Model.DAO
             {
                 using var transaction = await _connection.Database.BeginTransactionAsync();
 
-                foreach (var item in dto)
+                if (dto==null || dto.Count==0) 
                 {
-                    // Option 1: Check if record exists for this division, type, source
                     var existing = await _connection.DataMapping
-                        .FirstOrDefaultAsync(d => d.TypeId == item.TypeId &&
-                                                  d.SourceId == item.SourceId);
-                    if (existing != null)
+                          .Where(d=>d.DivisionId==divisionId).ToListAsync();
+                    if (existing != null  || existing.Count!=0)
                     {
-                        existing.DivisionId = divisionId;
-                        existing.CreatedAt= DateTime.Now;
+                        foreach (var d in existing)
+                        {
+                            d.DivisionId = 0;
+                        }
                     }
-                    
                 }
+                else
+                {
+                    foreach (var item in dto)
+                    {
+                        // Option 1: Check if record exists for this division, type, source
+                        var existing = await _connection.DataMapping
+                            .FirstOrDefaultAsync(d => d.TypeId == item.TypeId &&
+                                                      d.SourceId == item.SourceId);
+                        if (existing != null)
+                        {
+                            existing.DivisionId = divisionId;
+                            existing.CreatedAt = DateTime.Now;
+                        }
+
+                    }
+                }                    
 
                 await _connection.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return ("Data saved successfully", true);
+                return ("Data Updated successfully", true);
 
             }
             catch(Exception ex)

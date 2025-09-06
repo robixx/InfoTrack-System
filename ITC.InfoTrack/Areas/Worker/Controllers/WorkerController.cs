@@ -51,6 +51,9 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
         {
 
             int userId= Convert.ToInt32(User.FindFirst("UserId").Value);
+
+            string loginuser= User.Identity?.Name;
+
             var bankId = form["BankId"].ToString();
             var districtId = form["DristictId"].ToString();
             var divisionId = form["DivisionId"].ToString();
@@ -70,7 +73,7 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
                 
             };
 
-            var result = await _worker.SaveWorkerLogAsync(visitLog, files);
+            var result = await _worker.SaveWorkerLogAsync(visitLog, files, loginuser);
 
             return Json(new { message = result.message, status = result.status, redirectUrl = Url.Action("VisitLog", "Corporate", new { area = "Corporate" }) });
 

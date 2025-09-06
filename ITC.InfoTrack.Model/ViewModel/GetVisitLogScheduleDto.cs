@@ -19,6 +19,15 @@ namespace ITC.InfoTrack.Model.ViewModel
         public string LocationText { get; set; }  // text
         public int TypeId { get; set; }           // int
         public int ValueTypeId { get; set; }      // int
-        public string Address { get; set; }       // from COALESCE
+        public string Address { get; set; }      // from COALESCE      
+
+        private string _sourceName;
+        public string SourceName
+        {
+            get => string.IsNullOrEmpty(_sourceName)
+                   ? _sourceName
+                   : char.ToUpper(_sourceName[0]) + _sourceName.Substring(1).ToLower();
+            set => _sourceName = value;
+        }
     }
 }

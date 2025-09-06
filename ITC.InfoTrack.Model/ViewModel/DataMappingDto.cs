@@ -12,6 +12,7 @@ namespace ITC.InfoTrack.Model.ViewModel
         public int TypeId { get; set; }
         public string TypeName { get; set; }
         public int SourceId { get; set; }
+        public int DivisionId { get; set; }
 
         private string _sourceName;
         public string SourceName

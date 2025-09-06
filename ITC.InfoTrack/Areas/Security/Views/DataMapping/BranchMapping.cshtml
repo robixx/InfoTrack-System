@@ -124,7 +124,11 @@
                                 <tr class="custom-bg">
                                     <th scope="col"><input type="checkbox" id="allcheck" /> All Select</th>
                                     <th scope="col">Type Name</th>
-                                    <th scope="col">Source Name</th>
+                                    <th scope="col">
+                                        Source Name
+                                        <br />
+                                        <input type="text" id="sourceFilter" class="form-control form-control-sm" placeholder="Search..." />
+                                    </th>
                                     <th scope="col">Mapping</th>
 
                                 </tr>
@@ -198,6 +202,17 @@
             width: '100%',
             placeholder: "Select Division"
         });
+
+        $("#sourceFilter").on("keyup", function () {
+            let value = $(this).val().toLowerCase();
+
+            $("#projectTable tbody tr").filter(function () {
+                $(this).toggle(
+                    $(this).find("td[data-label='sourceName']").text().toLowerCase().indexOf(value) > -1
+                );
+            });
+        });
+
     });
     
     function getdataLoad(typeId){
@@ -232,7 +247,7 @@
 
     function TableDesign(data) {
 
-      
+        const id=$('#divisionId').val();
 
         const tableBody = document.querySelector('#projectTable tbody');
         tableBody.innerHTML = ""; // clear old rows
@@ -244,7 +259,7 @@
            
 
             row.innerHTML = `
-                <td><input type="checkbox" data-id="${item.id}" data-typeid="${item.typeId}" data-divisionid="${item.divisionId}" data-sourceid="${item.sourceId}" class="row-check" ${item.isActive ? 'checked' : ''} /></td>
+                <td><input type="checkbox" data-id="${item.id}" data-typeid="${item.typeId}" data-divisionid="${item.divisionId}" data-sourceid="${item.sourceId}" class="row-check" ${item.isActive ? 'checked' : ''}  ${(item.divisionId == 0 || item.divisionId == id) ? '' : 'disabled'} /></td>
                 <td data-label="typeName">${item.typeName}</td>
                 <td data-label="sourceName">${item.sourceName}</td>
                 <td data-label="Progress">
@@ -275,11 +290,6 @@
         const divisionId = $('#divisionId').val();
         const selected = $('.row-check:checked'); // only checked rows
 
-        if (selected.length === 0) {
-            alert("Please select at least one row");
-            return;
-        }
-
         const formData = new FormData();
         formData.append('DivisionId', divisionId);
 
@@ -297,7 +307,9 @@
         .then(res => res.json())
         .then(data => {
             if(data.status){
-                alert(data.message);
+                showNotice(data.message, 'success');
+
+
             } else {
                 alert('Save failed!');
             }
@@ -316,7 +328,7 @@
     $(document).on('change', '.row-check', function () {
         const divisionid = $(this).data('divisionid');
         const isChecked = $(this).is(':checked');
-        debugger;
+        
         if (divisionid !== 0) {
             currentCheckbox = $(this);  // keep reference
             currentState = isChecked;
@@ -345,6 +357,25 @@
             currentCheckbox.prop('checked', !currentState);
         }
     });
-    
+
+
+    function showNotice(message, type = "success") {
+        // type can be: success, danger, warning, info
+        const notice = $("#noticeMessage");
+        const noticeText = $("#noticeText");
+
+        // Reset classes and set new type
+        notice.removeClass("d-none alert-success alert-danger alert-warning alert-info")
+              .addClass(`alert-${type} show`);
+
+        // Set text
+        noticeText.text(message);
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            notice.removeClass("show").addClass("d-none");
+            location.reload(); // reloads the page
+        }, 3000);
+    }
   
 </script>

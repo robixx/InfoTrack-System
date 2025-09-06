@@ -228,7 +228,7 @@
     <div class="col-xl-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Visit Schedule Create</h5>
+                <h5 class="mb-0">Schedule Create</h5>
                 <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2" id="scheduleBtn" disabled>
                     <span id="countCheckdata">(0)</span><i class="bi bi-calendar-check"></i>
                     Create Schedule
@@ -939,9 +939,11 @@
                                     <p class="mb-2 text-muted small"><i class="fa fa-map-marker me-1"></i> ${visit.address}</p>
                                     <p class="mb-2 text-muted small"><i class="fa fa-comment me-1"></i> ${visit.commentValue}</p>
                                     <div class="text-end">
-                                        <button class="btn btn-sm btn-danger" data-id="${visit.scheduleId}" data-action="delete-from-view">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
+                                        ${visit.isVisit == 0
+                                            ? `<button class="btn btn-sm btn-danger" data-id="${visit.scheduleId}" data-action="delete-from-view">
+                                                   <i class="fas fa-trash-alt"></i> Delete
+                                               </button>`
+                                            : `<span class="badge bg-success">Visited</span>`}
                                     </div>
                                 </div>
                             </div>
