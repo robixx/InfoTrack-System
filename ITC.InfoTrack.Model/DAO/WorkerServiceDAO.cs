@@ -205,5 +205,24 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<VisitLogGallarayDto>> GetGallaryDataAsync()
+        {
+            try
+            {
+                var visitLogs = await _connection.VisitLogGallarayDto
+                           .FromSqlRaw("Select * from public.get_gallery_data()") // or use your SQL query
+                           .ToListAsync();
+
+               
+
+                return visitLogs;
+
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

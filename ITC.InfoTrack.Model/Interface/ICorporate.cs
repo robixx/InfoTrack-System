@@ -22,7 +22,7 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<DataCollectionResultDto>> GetDataCollectionResultAsync();
         Task<(string Message, bool Status)> SavedatacollectionAsync( DataCollection modle, int userid);
 
-        Task<VisitScheduleDetails> getSheduledata(int sehedularId);
+        Task<ScheduleWiseDropdownDto> getSheduledata(int sehedularId);
  
 
 

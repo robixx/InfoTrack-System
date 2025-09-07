@@ -4,7 +4,7 @@
     ViewBag.pTitle = "Visit Log Approval";
     ViewBag.pageTitle = "InfoTrack";
     Layout = "~/Views/Shared/_Layout.cshtml";
-   
+
 }
 
 @section styles {
@@ -23,86 +23,62 @@
 <style>
     .division-section {
         background-color: #fff;
-        padding: 2rem;
+        padding: 1.5rem;
         border-radius: 1rem;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         margin-bottom: 2rem;
     }
 
-    .division-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .division-title {
-        font-weight: 600;
-        color: #495057;
-        margin: 0;
-    }
-
-    .gallery-item, .view-more-tile {
-        position: relative;
-        overflow: hidden;
+    .branch-card {
         border-radius: 1rem;
+        overflow: hidden;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         cursor: pointer;
-        height: 250px;
-        background-color: #fff;
+        position: relative;
     }
 
-        .gallery-item:hover, .view-more-tile:hover {
+        .branch-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .gallery-item img {
+        .branch-card img {
             width: 100%;
-            height: 100%;
+            height: 200px;
             object-fit: cover;
             display: block;
-            border-radius: 1rem;
-            transition: transform 0.3s ease;
         }
 
-        .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-
-    /* The overlay is now always visible on the thumbnails */
-    .image-info-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.2));
-        color: #fff;
-        padding: 1.5rem 1rem 0.75rem 1rem;
-        opacity: 1; /* Always visible */
+    .branch-card-body {
+        padding: 1rem;
     }
 
-        .image-info-overlay p {
-            margin: 0;
+        .branch-card-body h5 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #495057;
+        }
+
+        .branch-card-body p {
             font-size: 0.875rem;
-            font-weight: 500;
+            color: #6c757d;
+            margin: 0;
         }
 
-    .view-more-tile {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #ebe3e4;
-        border: 2px dashed #efb2c4;
-        color: #6c757d;
-        font-size: 2.5rem;
-    }
-
-    .back-button {
-        border-radius: 50px;
-        padding: 0.5rem 1.5rem;
-        font-weight: 500;
+    /* Photo count badge */
+    .photo-count-badge {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 0.5rem;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
     }
 
     /* Modal for the slider */
@@ -139,21 +115,22 @@
         width: 5%;
     }
 
+
 </style>
 
 
 <div class="row">
-    <h3 class="text-center fw-bold mb-3">Our Image Gallery</h3>
-    <p class="text-center text-muted mb-4">Browse through our collection of images by division.</p>
+    <h1 class="text-center fw-bold mb-3">Our Image Gallery</h1>
+    <p class="text-center text-muted mb-4">Browse images by division and branch.</p>
 
     <!-- Search bar -->
     <div class="input-group mb-5">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" id="searchInput" class="form-control" placeholder="Search for a division or branch name...">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search for a division or branch...">
     </div>
 
     <div id="galleryContainer">
-        <!-- Division sections will be dynamically inserted here -->
+        <!-- Division and branch sections will be dynamically inserted here -->
     </div>
 </div>
 
@@ -212,135 +189,188 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 
-<script>
+<script>  
+
     document.addEventListener('DOMContentLoaded', () => {
             const galleryContainer = document.getElementById('galleryContainer');
             const searchInput = document.getElementById('searchInput');
             const imageCarouselInner = document.querySelector('#imageCarousel .carousel-inner');
-            const allDivisions = [];
-            const divisionsData = {};
-
-            // Helper function to generate a random date in the last year
-            const getRandomDate = () => {
-                const now = new Date();
-                const daysAgo = Math.floor(Math.random() * 365);
-                const randomDate = new Date(now.setDate(now.getDate() - daysAgo));
-                return randomDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            };
-
-            const branches = ['Engineering', 'Marketing', 'Sales', 'Human Resources', 'Operations', 'Finance'];
-
-            // Generate mock data for 20 divisions
-            for (let i = 1; i <= 20; i++) {
-                const divisionName = `Division ${i}`;
-                allDivisions.push(divisionName);
-                divisionsData[divisionName] = [];
-                const numImages = Math.floor(Math.random() * 5) + 3; // 3-7 images per division
-                for (let j = 0; j < numImages; j++) {
-                    const imageId = Math.floor(Math.random() * 1000) + 1;
-                    const randomBranch = branches[Math.floor(Math.random() * branches.length)];
-                    divisionsData[divisionName].push({
-                        src: `https://picsum.photos/seed/${imageId}${i}${j}/600/400`,
-                        alt: `Image for ${divisionName}`,
-                        branch: randomBranch,
-                        uploadDate: getRandomDate(),
+            const galleryData = {};
+            
+             fetch('/ManagementApproval/ManagementApproval/GetGalleryData')
+                .then(response => response.json())
+                .then(data => {
+                    
+                    data.forEach(division => {
+                        galleryData[division.divisionName] = division.branches;
                     });
-                }
-            }
 
-            // Function to render a single division section, now accepts images to display
-            const renderDivisionSection = (divisionName, imagesToDisplay, isExpanded = false) => {
-                const sectionId = `section-${divisionName.replace(/\s/g, '-')}`;
+                    // Initial render
+                    renderGalleries('');
+                })
+                .catch(err => {
+                    console.error("Error loading gallery data:", err);
+                    galleryContainer.innerHTML = `
+                        <div class="text-center text-danger p-5">
+                            Failed to load data from server.
+                        </div>`;
+                });
+
+
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return 'N/A';
+                    const date = new Date(dateStr.split('.')[0]); // Remove fractional seconds if any
+                    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                    return date.toLocaleDateString('en-US', options); // Example: "Sep 7, 2025"
+                };
+
+               // Nameing Format
+                const capitalizeFirstLetter = (str) => {
+                    if (!str) return '';
+                    str = str.toLowerCase(); // convert all letters to lowercase
+                    return str.charAt(0).toUpperCase() + str.slice(1);
+                };
+            
+
+            const renderDivisionSection = (divisionName, branchesToRender) => {
                 const divisionSection = document.createElement('div');
                 divisionSection.className = 'division-section';
-                divisionSection.id = sectionId;
                 divisionSection.setAttribute('data-division', divisionName);
-                divisionSection.setAttribute('data-expanded', isExpanded ? 'true' : 'false');
 
-                const showBackButton = isExpanded;
-                const showMoreButton = !isExpanded && imagesToDisplay.length > 3;
+                const branchNames = Object.keys(branchesToRender);
+                const initialBranches = branchNames.slice(0, 4);
+                const hiddenBranches = branchNames.slice(4);
 
                 divisionSection.innerHTML = `
-                    <div class="division-header">
-                        <h3 class="division-title">${divisionName}</h3>
-                        <button class="btn btn-primary back-button ${showBackButton ? '' : 'd-none'}" data-action="collapse">Back to Preview</button>
-                    </div>
-                    <div class="row g-4 division-grid"></div>
+                    <h3 class="fw-bold mb-3">${divisionName}</h3>
+                    <div class="row g-4 branch-grid"></div>
                 `;
-
-                const galleryGrid = divisionSection.querySelector('.division-grid');
-                const imagesToRender = isExpanded ? imagesToDisplay : imagesToDisplay.slice(0, 3);
-
-                if (imagesToRender.length === 0) {
-                    galleryGrid.innerHTML = '<p class="text-center text-muted col-12">No images found for this category.</p>';
-                } else {
-                    imagesToRender.forEach(image => {
+               
+                const branchGrid = divisionSection.querySelector('.branch-grid');
+               
+                initialBranches.forEach(branchName => {
+                    const branchImages = branchesToRender[branchName];
+                    const photoCount = branchImages.length;
+                    if (photoCount > 0) {
+                       
+                        const latestImage = branchImages[0];
+                        const formattedDate =formatDate(latestImage.uploadDate);                                    
+                        const formattedBranchName = capitalizeFirstLetter(branchName);
+                               
                         const col = document.createElement('div');
-                        col.className = 'col-12 col-md-4 col-lg-3';
+                        col.className = 'col-12 col-sm-12 col-md-4 col-lg-3';
                         col.innerHTML = `
-                            <div class="gallery-item">
-                                <img src="${image.src}" alt="${image.alt}">
-                                <div class="image-info-overlay">
-                                    <p>Branch: ${image.branch}</p>
-                                    <p>Last Uploaded: ${image.uploadDate}</p>
+                            <div class="branch-card" data-branch-name="${branchName}">
+                                <img src="${latestImage.src}" alt="${latestImage.alt}">
+                                <span class="photo-count-badge">${photoCount} photo${photoCount > 1 ? 's' : ''}</span>
+                                <div class="branch-card-body">
+                                    <h5 class="mb-1" style="font-size:15px;">${formattedBranchName}</h5>
+                                    <p style="font-size:11px;">Last Uploaded: ${formattedDate}</p>
                                 </div>
                             </div>
                         `;
-                        galleryGrid.appendChild(col);
+                        branchGrid.appendChild(col);
+                    }
+                });
+
+                // Add "See More" section if there are more than 4 branches
+                if (hiddenBranches.length > 0) {
+                    const seeMoreContainer = document.createElement('div');
+                    seeMoreContainer.className = 'collapse show-more-container';
+                    seeMoreContainer.id = `collapse-${divisionName.replace(/\s/g, '-')}`;
+
+                    const hiddenBranchesGrid = document.createElement('div');
+                    hiddenBranchesGrid.className = 'row g-4 mt-3';
+
+                    hiddenBranches.forEach(branchName => {
+                        const branchImages = branchesToRender[branchName];
+                        const photoCount = branchImages.length;
+                        if (photoCount > 0) {
+                            const latestImage = branchImages[0];
+                            const formattedDate =formatDate(latestImage.uploadDate);
+                            const formattedBranchName = capitalizeFirstLetter(branchName);
+                            const col = document.createElement('div');
+                            col.className = 'col-12 col-sm-12 col-md-4 col-lg-3';
+                            col.innerHTML = `
+                                <div class="branch-card" data-branch-name="${branchName}">
+                                    <img src="${latestImage.src}" alt="${latestImage.alt}">
+                                    <span class="photo-count-badge">${photoCount} photo${photoCount > 1 ? 's' : ''}</span>
+                                    <div class="branch-card-body">
+                                        <h5 class="mb-1" style="font-size:15px;">${formattedBranchName}</h5>
+                                        <p style="font-size:11px;">Last Uploaded: ${formattedDate}</p>
+                                    </div>
+                                </div>
+                            `;
+                            hiddenBranchesGrid.appendChild(col);
+                        }
                     });
+
+                    seeMoreContainer.appendChild(hiddenBranchesGrid);
+                    divisionSection.appendChild(seeMoreContainer);
+
+                    const seeMoreBtn = document.createElement('button');
+                    seeMoreBtn.className = 'btn btn-outline-primary mt-4';
+                    seeMoreBtn.textContent = 'See More Branches';
+                    seeMoreBtn.setAttribute('data-bs-toggle', 'collapse');
+                    seeMoreBtn.setAttribute('data-bs-target', `#${seeMoreContainer.id}`);
+                    seeMoreBtn.setAttribute('aria-expanded', 'false');
+
+                    seeMoreBtn.addEventListener('click', (e) => {
+                        e.target.textContent = e.target.textContent.includes('More') ? 'See Less Branches' : 'See More Branches';
+                    });
+
+                    divisionSection.appendChild(seeMoreBtn);
                 }
 
-                if (showMoreButton) {
-                    const col = document.createElement('div');
-                    col.className = 'col-12 col-md-4 col-lg-3';
-                    col.innerHTML = `
-                        <div class="view-more-tile" data-action="expand">
-                            <i class="bi bi-plus-circle-fill"></i>
-                        </div>
-                    `;
-                    galleryGrid.appendChild(col);
-                }
                 return divisionSection;
             };
 
-            const renderCarousel = (images, startIndex) => {
+            const renderCarousel = (images) => {
                 imageCarouselInner.innerHTML = '';
+                if (images.length === 0) {
+                     imageCarouselInner.innerHTML = `<div class="p-5 text-center text-white-50">No images to display.</div>`;
+                     return;
+                }
                 images.forEach((image, index) => {
+                     const uploadDate = formatDate(image.uploadDate);
+                      const formattedBranchName = capitalizeFirstLetter(image.branch);
                     const carouselItem = document.createElement('div');
-                    carouselItem.className = `carousel-item ${index === startIndex ? 'active' : ''}`;
+                    carouselItem.className = `carousel-item ${index === 0 ? 'active' : ''}`;
                     carouselItem.innerHTML = `
                         <img src="${image.src}" class="d-block w-100" alt="${image.alt}">
-                        <!-- Caption is now visible on all devices -->
                         <div class="carousel-caption">
-                            <h5 class="fw-bold text-white-50">${image.branch}</h5>
-                            <p class="text-white-50">Last Uploaded: ${image.uploadDate}</p>
+                            <h5 class="fw-bold text-white-50" style="font-size:15px">${formattedBranchName}</h5>
+                            <p class="text-white-50" style="font-size:11px">last Updated : ${uploadDate}</p>
                         </div>
                     `;
                     imageCarouselInner.appendChild(carouselItem);
                 });
             };
 
-            const filterAndRenderGalleries = (query) => {
+            const renderGalleries = (filterQuery = '') => {
                 galleryContainer.innerHTML = '';
-                const lowerCaseQuery = query.toLowerCase();
+                const lowerCaseQuery = filterQuery.toLowerCase();
                 let resultsFound = false;
 
-                allDivisions.forEach(divisionName => {
-                    const divisionImages = divisionsData[divisionName];
+                Object.keys(galleryData).forEach(divisionName => {
+                    const branchesInDivision = galleryData[divisionName];
                     const lowerCaseDivisionName = divisionName.toLowerCase();
+                    const matchingBranches = {};
 
-                    let imagesToRender = [];
+                    // Check if division name matches query
                     if (lowerCaseDivisionName.includes(lowerCaseQuery)) {
-                        // If the division name matches, show all images in that division
-                        imagesToRender = divisionImages;
+                        Object.assign(matchingBranches, branchesInDivision);
                     } else {
-                        // Otherwise, filter images by branch name
-                        imagesToRender = divisionImages.filter(img => img.branch.toLowerCase().includes(lowerCaseQuery));
+                        // Check if any branch name within the division matches
+                        Object.keys(branchesInDivision).forEach(branchName => {
+                            if (branchName.toLowerCase().includes(lowerCaseQuery)) {
+                                matchingBranches[branchName] = branchesInDivision[branchName];
+                            }
+                        });
                     }
 
-                    if (imagesToRender.length > 0) {
-                        // Render the division with the filtered/all images
-                        galleryContainer.appendChild(renderDivisionSection(divisionName, imagesToRender));
+                    if (Object.keys(matchingBranches).length > 0) {
+                        galleryContainer.appendChild(renderDivisionSection(divisionName, matchingBranches));
                         resultsFound = true;
                     }
                 });
@@ -349,59 +379,45 @@
                     galleryContainer.innerHTML = `
                         <div class="text-center text-muted p-5">
                             <i class="bi bi-x-circle-fill" style="font-size: 3rem;"></i>
-                            <p class="mt-3 fs-5">No results found for "${query}".</p>
+                            <p class="mt-3 fs-5">No results found for "${filterQuery}".</p>
                         </div>
                     `;
                 }
             };
 
-            const renderInitialGallery = () => {
-                galleryContainer.innerHTML = '';
-                allDivisions.forEach(divisionName => {
-                    const images = divisionsData[divisionName];
-                    galleryContainer.appendChild(renderDivisionSection(divisionName, images));
-                });
-            };
-
             // Event listener for search input
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.trim();
-                if (query.length > 0) {
-                    filterAndRenderGalleries(query);
-                } else {
-                    renderInitialGallery();
-                }
+                renderGalleries(query);
             });
 
+            // Event listener for image clicks
             galleryContainer.addEventListener('click', (e) => {
-                const divisionSection = e.target.closest('.division-section');
-                if (!divisionSection) return;
+                const branchCard = e.target.closest('.branch-card');
+                if (branchCard) {
+                    const branchName = branchCard.getAttribute('data-branch-name');
 
-                const divisionName = divisionSection.getAttribute('data-division');
-                const images = divisionsData[divisionName];
-
-                if (e.target.closest('[data-action="expand"]')) {
-                    const newSection = renderDivisionSection(divisionName, images, true);
-                    divisionSection.replaceWith(newSection);
-                } else if (e.target.closest('[data-action="collapse"]')) {
-                    const newSection = renderDivisionSection(divisionName, images);
-                    divisionSection.replaceWith(newSection);
-                } else {
-                    const galleryItem = e.target.closest('.gallery-item');
-                    if (galleryItem) {
-                        const imgElement = galleryItem.querySelector('img');
-                        const clickedIndex = images.findIndex(img => img.src === imgElement.src);
-
-                        if (clickedIndex !== -1) {
-                            renderCarousel(images, clickedIndex);
-                            const imageSliderModal = new bootstrap.Modal(document.getElementById('imageSliderModal'));
-                            imageSliderModal.show();
+                    let allImagesInBranch = [];
+                    // Find the images for the clicked branch across all divisions
+                    Object.values(galleryData).forEach(division => {
+                        if (division[branchName]) {
+                            allImagesInBranch = division[branchName];
                         }
+                    });
+
+                    // We only want to show the slider if there's more than one image
+                    if (allImagesInBranch.length > 1) {
+                        renderCarousel(allImagesInBranch);
+                        const imageSliderModal = new bootstrap.Modal(document.getElementById('imageSliderModal'));
+                        imageSliderModal.show();
+                    } else if (allImagesInBranch.length === 1) {
+                        // If there's only one image, show a message instead of the slider
+                        alert("There are no more images to display for this branch.");
                     }
                 }
             });
 
             // Initial render of the gallery
-            renderInitialGallery();
-        });
+            renderGalleries('');
+    });
 </script>

@@ -366,13 +366,23 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
-        public async Task<VisitScheduleDetails> getSheduledata(int sehedularId)
+        public async Task<ScheduleWiseDropdownDto> getSheduledata(int sehedularId)
         {
             try
             {
-                var result= await _connection.VisitScheduleDetails
+                var sourceId= await _connection.VisitScheduleDetails
                     .FirstOrDefaultAsync(i=>i.VisitId==sehedularId);
-                return result;
+
+                var result = await _connection.DataMapping.FirstOrDefaultAsync(i => i.SourceId == sourceId.ValueTypeId && i.TypeId==sourceId.TypeId);
+
+                var data = new ScheduleWiseDropdownDto
+                {
+                    SourceId = sourceId.ValueTypeId,
+                    TypeId = sourceId.TypeId,
+                    DivisionId = result.DivisionId,
+                    DistrictId = 0,
+                };
+                return data;
 
             }catch(Exception ex)
             {

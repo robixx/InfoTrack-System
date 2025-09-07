@@ -545,6 +545,37 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
+
+        public async Task<List<DropDownDtos>> getFilterWiseDistrict( int DistrictId)
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == 8 && i.DataElementId==DistrictId)
+                         .OrderBy(v => v.PropertyViewOrder)
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                         .OrderBy(i => i.Name)
+                         .ToListAsync();
+                datalist.Insert(0, new DropDownDtos
+                {
+                    Id = 0,             // Or any default value you prefer
+                    Name = "None of District"
+                });
+                return datalist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+
         public async Task<List<DropDownDtos>> getDivision()
         {
             try
@@ -567,6 +598,31 @@ namespace ITC.InfoTrack.Model.DAO
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<DropDownDtos>> getFilterDivisionAsync(int DivisionId)
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == 9 && i.DataElementId==DivisionId)
+                         .OrderBy(v => v.PropertyViewOrder)
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                        .OrderBy(i => i.Name)
+                         .ToListAsync();
+                return datalist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
 
         public async Task<List<DropDownDtos>> getTypeOFelement(int type, int SourceId)
         {

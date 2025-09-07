@@ -75,6 +75,7 @@ namespace ITC.InfoTrack.Model.DataBase
        public DbSet<DashboardCardSummaryDto> DashboardCardSummaryDto { get; set; }
        public DbSet<DataCollectionResultDto> DataCollectionResultDto { get; set; }
        public DbSet<DataMappingDto> DataMappingDto { get; set; }
+       public DbSet<VisitLogGallarayDto> VisitLogGallarayDto { get; set; }
 
 
 
@@ -150,6 +151,7 @@ namespace ITC.InfoTrack.Model.DataBase
             modelBuilder.Entity<DashboardCardSummaryDto>().HasNoKey();
             modelBuilder.Entity<DataCollectionResultDto>().HasNoKey();
             modelBuilder.Entity<DataMappingDto>().HasNoKey();
+            modelBuilder.Entity<VisitLogGallarayDto>().HasNoKey();
 
 
             base.OnModelCreating(modelBuilder);

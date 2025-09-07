@@ -693,6 +693,17 @@
 
                     </div>
                 </div>
+                <!-- Sub-Branch Selection -->
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="bi bi-diagram-3"></i>
+                            Select Division
+                        </label>
+                        @Html.DropDownList("DivisionId", ViewBag.division as SelectList, new { @class = "form-select form-select-sm ", @id = "DivisionId", disabled = "disabled" })
+                    </div>
+                </div>
+
 
                 <!-- Branch Selection -->
                 <div class="col-lg-6">
@@ -706,17 +717,7 @@
                     </div>
                 </div>
 
-                <!-- Sub-Branch Selection -->
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="bi bi-diagram-3"></i>
-                            Select Division
-                        </label>
-                        @Html.DropDownList("DivisionId", ViewBag.division as SelectList, new { @class = "form-select form-select-sm ", @id = "DivisionId", disabled = "disabled" })
-                    </div>
-                </div>
-
+                
                 <!-- Booth Selection -->
                 <div class="col-lg-6">
                     <div class="form-group">

@@ -39,9 +39,9 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
 
             ViewBag.Banks = new SelectList(banks, "BankId", "BankName");
            // ViewBag.type = new SelectList(await _dropdown.GetTokenType(), "Id", "Name");
-            ViewBag.district = new SelectList(await _dropdown.getDistrict(), "Id", "Name",selected_data.DistrictId);
-            ViewBag.division = new SelectList(await _dropdown.getDivision(), "Id", "Name",selected_data.DivisionId);
-            ViewBag.source = new SelectList(await _dropdown.getTypeOFelement(selected_data.TypeId, selected_data.ValueTypeId), "Id", "Name"); 
+            ViewBag.district = new SelectList(await _dropdown.getFilterWiseDistrict(selected_data.DistrictId), "Id", "Name");
+            ViewBag.division = new SelectList(await _dropdown.getFilterDivisionAsync(selected_data.DivisionId), "Id", "Name");
+            ViewBag.source = new SelectList(await _dropdown.getTypeOFelement(selected_data.TypeId, selected_data.SourceId), "Id", "Name"); 
 
             return View();
         }
