@@ -39,6 +39,25 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
             return View(result);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> PlanVisit()
+        {
+            var banks = new List<object>
+                {
+                    new { BankId = 1, BankName = "City Bank Limited" },
+                };
+
+            var selected_data = await _corporate.getSheduledata(25);
+
+            ViewBag.area = new SelectList(await _dropdown.getArea(), "Id", "Name");
+            ViewBag.Banks = new SelectList(banks, "BankId", "BankName");
+            ViewBag.type = new SelectList(await _dropdown.GetTokenType(), "Id", "Name");
+            ViewBag.source = new SelectList(await _dropdown.getTypeOFelement(selected_data.TypeId, selected_data.SourceId), "Id", "Name");
+            return View();
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> getDataElementData(string typeId)
         {
@@ -88,8 +107,22 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         {
             int id = Convert.ToInt32(typeid);
             var result = await _dropdown.getRootPropertyElement(id);
+            return Json(new {  data = result.data, status = result.status });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> getTypeNdisvElementName(string typeid, string divid)
+        {
+            int tid = Convert.ToInt32(typeid);
+            int areaType = Convert.ToInt32(divid);
+            var result = await _dropdown.getTypeNDdivElement(tid, areaType);
             return Json(new { status = result.status, data = result.data });
         }
+
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> GetScheduleData(int? typeId, int? districtId, int? divisionId, int? ValueTypeId)

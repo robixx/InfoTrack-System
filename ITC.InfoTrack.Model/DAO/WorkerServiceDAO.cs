@@ -45,6 +45,9 @@ namespace ITC.InfoTrack.Model.DAO
                 var datetyime = await _connection.VisitSchedule
                     .FirstOrDefaultAsync(i => i.ScheduleId == model.ScheduleId);
 
+                var division = await _connection.DataMapping
+                   .FirstOrDefaultAsync(i => i.SourceId == model.SourceId && i.ElementTypeId == model.Elementid);
+
                 if (datetyime == null)
                     return ("Schedule not found", false);
 
@@ -55,6 +58,8 @@ namespace ITC.InfoTrack.Model.DAO
                     Comments = model.Comments,
                     AssignedLog = datetyime.AssignUserId,
                     ResourceId = model.ResourceId,
+                    DivisionId= division.DivisionId,
+                    SourceId=model.SourceId,
                     CreateBy = model.CreateBy,
                     CreateDate = DateTime.Now,
                     AssignDateTime = datetyime.DateOfVisit,
@@ -137,6 +142,108 @@ namespace ITC.InfoTrack.Model.DAO
         }
 
 
+
+        public async Task<(string message, bool status)> SaveWithoutScheduleLogAsync(VisitLogInsertDto model, List<IFormFile> files, string LoginUserName,int UserId)
+        {
+            if (model == null)
+                return ("Invalid data", false);
+
+            try
+            {
+                // Begin transaction
+                await using var transaction = await _connection.Database.BeginTransactionAsync();
+
+                // Get schedule
+                // 
+                var division = await _connection.DataMapping
+                    .FirstOrDefaultAsync(i => i.SourceId == model.SourceId && i.ElementTypeId == model.Elementid);
+
+                // Save visit log
+                var visitdata = new VisitLog
+                {
+                    ScheduleId = model.ScheduleId,
+                    Comments = model.Comments,
+                    AssignedLog = UserId,
+                    ResourceId = model.ResourceId,
+                    DivisionId= division.DivisionId,
+                    SourceId=model.SourceId,
+                    CreateBy = model.CreateBy,
+                    CreateDate = DateTime.Now,
+                    AssignDateTime = DateTime.Now,
+                    CheckOutTime = DateTime.Now.TimeOfDay,
+                    VisitTime = DateTime.Now.TimeOfDay,
+                };
+
+                await _connection.VisitLog.AddAsync(visitdata);
+                await _connection.SaveChangesAsync();
+
+                var fontFamily = SystemFonts.CreateFont("Arial", 13, FontStyle.Regular);  //SystemFonts.Families.First();
+
+                foreach (var file in files)
+                {
+                    if (file.Length == 0) continue;
+
+                    var safeName = Path.GetFileName(file.FileName);
+                    var fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}_{safeName}";
+                    var filePath = Path.Combine(_imagePath, fileName);
+
+                    using (var image = Image.Load<Rgba32>(file.OpenReadStream()))
+                    {
+                        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        var text = $"{LoginUserName} | {timestamp}";
+                        // Set proportional font size (1/10th of image width)
+                        //float fontSize = 12f;
+                        var font = SystemFonts.CreateFont("Arial", 12, FontStyle.Regular); //new Font(fontFamily, fontSize, FontStyle.Bold);
+                        var textOptions = new TextOptions(font)
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Bottom
+                        };
+
+
+
+                        var textSize = TextMeasurer.MeasureSize(text, textOptions);
+                        var position = new PointF(10, image.Height - textSize.Height - 10);
+
+                        // Draw timestamp
+                        image.Mutate(ctx =>
+                        {
+                            // Optional: add shadow for better visibility
+                            ctx.DrawText(text, font, Color.Black, new PointF(position.X + 2, position.Y + 2));
+                            ctx.DrawText(text, font, Color.Yellow, position);
+                        });
+
+
+                        await image.SaveAsync(filePath);
+                    }
+
+
+                    var imageRecord = new VisitLogDetails
+                    {
+                        VisitLogId = visitdata.VisitLogId,
+                        AssignedLog = model.CreateBy,
+                        ImageName = fileName,
+                    };
+
+                    _connection.VisitLogDetails.Add(imageRecord);
+
+                }              
+
+                await _connection.SaveChangesAsync();
+
+
+                await transaction.CommitAsync();
+
+                return ("Images and visit log saved successfully", true);
+            }
+            catch (Exception ex)
+            {
+                return ($"Error: {ex.Message}", false);
+            }
+        }
+
+
+
         public async Task<List<DataMappingDto>> getDataMapAsync(int Id)
         {
             try
@@ -206,7 +313,7 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
-        public async Task<List<VisitLogGallarayDto>> GetGallaryDataAsync()
+        public async Task<List<VisitLogGallarayDto>> GetGallaryDataAsync(int userId, int RoleId)
         {
             try
             {
@@ -214,7 +321,10 @@ namespace ITC.InfoTrack.Model.DAO
                            .FromSqlRaw("Select * from public.get_gallery_data()") // or use your SQL query
                            .ToListAsync();
 
-               
+               if(RoleId != 1)
+                {
+                    visitLogs= visitLogs.Where(i=>i.CreateBy==userId).ToList();
+                }
 
                 return visitLogs;
 

@@ -26,5 +26,7 @@ namespace ITC.InfoTrack.Model.Entity
 
         [Column(TypeName = "timestamp without time zone")]
         public DateTime CreatedAt { get; set; } = DateTime.Now.Date;
+
+        public int ElementTypeId { get; set; }
     }
 }

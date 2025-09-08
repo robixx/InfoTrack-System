@@ -26,6 +26,7 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<DropDownDto>> GetCustomTypeWiseLocation( long OrgId, long TypeId);
         Task<(List<DropDownDtos> data, bool status)> getRootMetaPropertyElement();
         Task<(List<DropDownDtos> data, bool status)> getRootPropertyElement( int type);
+        Task<(List<DropDownDtos> data, bool status)> getTypeNDdivElement( int typeid, int divid);
         Task<(List<DropDownDto> data, bool status)> getTypePropertyElement();
         Task<(List<DropDownDto> data, bool status)> getLevelRootPropertyElement( int type);
         Task<List<DropDownDtos>> getChildenPropertyElement( int type);
@@ -33,6 +34,7 @@ namespace ITC.InfoTrack.Model.Interface
         Task<List<DropDownDtos>> getCategory();
         Task<List<DropDownDtos>> getDistrict();
         Task<List<DropDownDtos>> getDivision();
+        Task<List<DropDownDtos>> getArea();
         Task<List<DropDownDtos>> getTypeOFelement(int type, int SourceId);
         Task<List<DropDownDtos>> getFilterDivisionAsync(int DivisionId);
         Task<List<DropDownDtos>> getFilterWiseDistrict(int DistrictId);

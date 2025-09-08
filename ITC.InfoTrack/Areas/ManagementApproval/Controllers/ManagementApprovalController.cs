@@ -3,6 +3,7 @@ using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ITC.InfoTrack.Areas.ManagementApproval.Controllers
 {
@@ -28,7 +29,11 @@ namespace ITC.InfoTrack.Areas.ManagementApproval.Controllers
         [HttpGet]
         public async Task<IActionResult> GetGalleryData()
         {
-            var visitLogs = await _worker.GetGallaryDataAsync();
+            int userId = Convert.ToInt32(User.FindFirst("UserId").Value);
+
+            int roleid = Convert.ToInt32(User.FindFirst("RoleId").Value);
+
+            var visitLogs = await _worker.GetGallaryDataAsync(userId, roleid);
             // Group by DivisionName
             var result = visitLogs
                 .GroupBy(v => v.DivisionName)
@@ -46,7 +51,8 @@ namespace ITC.InfoTrack.Areas.ManagementApproval.Controllers
                                     Src = Url.Action("GetImage", "ManagementApproval", new { fileName = img.ImageName }, Request.Scheme),           // your image path/url
                                     Alt = $"Image for {img.SourceName}",
                                     Branch = img.SourceName,       // BranchName from SourceName
-                                    UploadDate = img.CreateDate
+                                    UploadDate = img.CreateDate,
+                                    Comments=img.Comments
                                 }).ToList()
                         )
                 }).ToList();

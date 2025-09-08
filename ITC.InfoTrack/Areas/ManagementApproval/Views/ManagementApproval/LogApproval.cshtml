@@ -1,7 +1,7 @@
 ﻿@model List<ITC.InfoTrack.Model.ViewModel.GetVisitLogScheduleDto>
 @{
-    ViewBag.Title = "Approval";
-    ViewBag.pTitle = "Visit Log Approval";
+    ViewBag.Title = "Visit Gallery";
+    ViewBag.pTitle = "Visit Gallery";
     ViewBag.pageTitle = "InfoTrack";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
@@ -21,6 +21,10 @@
 }
 
 <style>
+    body{
+        background-color: #f8f9fa;
+    }
+
     .division-section {
         background-color: #fff;
         padding: 1.5rem;
@@ -81,50 +85,57 @@
         -webkit-backdrop-filter: blur(5px);
     }
 
-    /* Modal for the slider */
-    #imageSliderModal .modal-content {
-        background-color: transparent;
-        border: none;
-    }
-
-    #imageSliderModal .modal-body {
-        padding: 0;
-    }
-
-    #imageSliderModal .carousel-item img {
-        max-width: 100%;
-        height: auto;
-        max-height: 90vh;
-        display: block;
-        margin: auto;
+    /* Modal for the all images view */
+    #imageModal .modal-content {
         border-radius: 1rem;
     }
 
-    #imageSliderModal .carousel-caption {
-        background-color: rgba(0, 0, 0, 0.6);
-        border-radius: 1rem;
+    #imageModal .modal-body {
         padding: 1rem;
-        bottom: 1rem;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 500px;
     }
 
-    .carousel-control-prev, .carousel-control-next {
-        width: 5%;
+    #imageModal .image-container {
+        border-radius: 1rem;
+        overflow: hidden;
+        background-color: #f1f1f1;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
+        #imageModal .image-container img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+    #imageModal .image-caption {
+        padding: 0.75rem;
+        text-align: center;
+    }
+
+        #imageModal .image-caption h6 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        #imageModal .image-caption p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+   
 
 </style>
+<link href="~/css/planvisit.css" rel="stylesheet" />
 
 
 <div class="row">
-    <h1 class="text-center fw-bold mb-3">Our Image Gallery</h1>
+    <h3 class="text-center fw-bold mb-3">Our Image Gallery</h3>
     <p class="text-center text-muted mb-4">Browse images by division and branch.</p>
 
     <!-- Search bar -->
-    <div class="input-group mb-5">
+    <div class="input-group mb-4">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input type="text" id="searchInput" class="form-control" placeholder="Search for a division or branch...">
     </div>
@@ -135,29 +146,22 @@
 </div>
 
 
-<!-- Image Slider Modal -->
-<div class="modal fade" id="imageSliderModal" tabindex="-1" aria-labelledby="imageSliderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered">
+<!-- All Images Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-top modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-body p-0">
-                <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        <!-- Carousel items will be inserted here -->
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Branch Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalImageGrid" class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+                    <!-- All images for the branch will be inserted here -->
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 
 
 @section scripts {
@@ -194,6 +198,8 @@
     document.addEventListener('DOMContentLoaded', () => {
             const galleryContainer = document.getElementById('galleryContainer');
             const searchInput = document.getElementById('searchInput');
+            const modalImageGrid = document.getElementById('modalImageGrid');
+            const imageModalLabel = document.getElementById('imageModalLabel');
             const imageCarouselInner = document.querySelector('#imageCarousel .carousel-inner');
             const galleryData = {};
             
@@ -347,6 +353,42 @@
                 });
             };
 
+         const renderModalContent = (images) => {
+                modalImageGrid.innerHTML = '';
+                const totalImages = images.length;
+
+                if (totalImages === 0) {
+                     modalImageGrid.innerHTML = `<div class="col-12 p-5 text-center text-muted">No images to display.</div>`;
+                     imageModalLabel.textContent = "Branch Images";
+                     return;
+                }
+
+                imageModalLabel.textContent = `Images for ${images[0].branch} (${totalImages} photos)`;
+
+                images.forEach((image, index) => {
+                     const uploadDate = formatDate(image.uploadDate);
+                      const formattedBranchName = capitalizeFirstLetter(image.branch);
+                    const col = document.createElement('div');
+                    col.className = 'col';
+                    col.innerHTML = `
+                        <div class="image-container">
+                            <img src="${image.src}" alt="${image.alt}">
+                            <div class="image-caption">
+                                <h6>${formattedBranchName}</h6>
+                                <p class="mb-1 text-primary fw-bold">Image ${index + 1} of ${totalImages}</p>
+                                <p>Uploaded: ${uploadDate}</p>
+                                <p class="text-secondary">${image.comments}</p>
+                            </div>
+                        </div>
+                    `;
+                    modalImageGrid.appendChild(col);
+                });
+            };
+
+
+
+
+
             const renderGalleries = (filterQuery = '') => {
                 galleryContainer.innerHTML = '';
                 const lowerCaseQuery = filterQuery.toLowerCase();
@@ -391,7 +433,8 @@
                 renderGalleries(query);
             });
 
-            // Event listener for image clicks
+
+             // Event listener for image clicks
             galleryContainer.addEventListener('click', (e) => {
                 const branchCard = e.target.closest('.branch-card');
                 if (branchCard) {
@@ -401,21 +444,44 @@
                     // Find the images for the clicked branch across all divisions
                     Object.values(galleryData).forEach(division => {
                         if (division[branchName]) {
+                            // This ensures the number of images shown in the modal is
+                            // the same as the number indicated on the branch card.
                             allImagesInBranch = division[branchName];
                         }
                     });
 
-                    // We only want to show the slider if there's more than one image
-                    if (allImagesInBranch.length > 1) {
-                        renderCarousel(allImagesInBranch);
-                        const imageSliderModal = new bootstrap.Modal(document.getElementById('imageSliderModal'));
-                        imageSliderModal.show();
-                    } else if (allImagesInBranch.length === 1) {
-                        // If there's only one image, show a message instead of the slider
-                        alert("There are no more images to display for this branch.");
-                    }
+                    renderModalContent(allImagesInBranch);
+                    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                    imageModal.show();
                 }
             });
+
+
+            // Event listener for image clicks
+            // galleryContainer.addEventListener('click', (e) => {
+            //     const branchCard = e.target.closest('.branch-card');
+            //     if (branchCard) {
+            //         const branchName = branchCard.getAttribute('data-branch-name');
+
+            //         let allImagesInBranch = [];
+            //         // Find the images for the clicked branch across all divisions
+            //         Object.values(galleryData).forEach(division => {
+            //             if (division[branchName]) {
+            //                 allImagesInBranch = division[branchName];
+            //             }
+            //         });
+
+            //         // We only want to show the slider if there's more than one image
+            //         if (allImagesInBranch.length > 1) {
+            //             renderCarousel(allImagesInBranch);
+            //             const imageSliderModal = new bootstrap.Modal(document.getElementById('imageSliderModal'));
+            //             imageSliderModal.show();
+            //         } else if (allImagesInBranch.length === 1) {
+            //             // If there's only one image, show a message instead of the slider
+            //             alert("There are no more images to display for this branch.");
+            //         }
+            //     }
+            // });
 
             // Initial render of the gallery
             renderGalleries('');

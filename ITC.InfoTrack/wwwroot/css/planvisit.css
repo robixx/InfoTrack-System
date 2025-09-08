@@ -1,0 +1,25 @@
+﻿/* Mobile-specific adjustments */
+@media (max-width: 992px) {
+    .division-section {
+        padding: 1rem; /* Reduced padding on mobile */
+    }
+
+    .branch-card {
+        margin-bottom: 1rem; /* Added spacing between cards on mobile */
+    }
+}
+
+/* Ensure the modal is full-width on mobile */
+@media (max-width: 576px) {
+    #imageModal .modal-dialog {
+        margin: 0.5rem; /* Small margin for phones */
+    }
+
+    #imageModal .modal-body {
+        padding: 0.5rem; /* Reduced padding for smaller screens */
+    }
+
+    #imageModal .modal-title {
+        font-size: 1rem; /* Adjusted title font size */
+    }
+}

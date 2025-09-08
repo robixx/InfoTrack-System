@@ -129,6 +129,7 @@
                                         <br />
                                         <input type="text" id="sourceFilter" class="form-control form-control-sm" placeholder="Search..." />
                                     </th>
+                                    <th>Area</th>
                                     <th scope="col">Mapping</th>
 
                                 </tr>
@@ -262,6 +263,7 @@
                 <td><input type="checkbox" data-id="${item.id}" data-typeid="${item.typeId}" data-divisionid="${item.divisionId}" data-sourceid="${item.sourceId}" class="row-check" ${item.isActive ? 'checked' : ''}  ${(item.divisionId == 0 || item.divisionId == id) ? '' : 'disabled'} /></td>
                 <td data-label="typeName">${item.typeName}</td>
                 <td data-label="sourceName">${item.sourceName}</td>
+                <td data-label="sourceName">${item.elementName}</td>
                 <td data-label="Progress">
                  <span class="badge bg-primary">${item.divisionName}</span>
                 </td>

@@ -12,5 +12,6 @@ namespace ITC.InfoTrack.Model.ViewModel
         public string Alt { get; set; }
         public string Branch { get; set; }
         public DateTime UploadDate { get; set; }
+        public string Comments { get; set; }
     }
 }

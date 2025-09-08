@@ -28,5 +28,6 @@ namespace ITC.InfoTrack.Model.ViewModel
         public DateTime CreatedAt { get; set; }
         public int IsActive { get; set; }
 
+        public string ElementName { get; set; }
     }
 }

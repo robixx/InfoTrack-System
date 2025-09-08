@@ -20,5 +20,7 @@ namespace ITC.InfoTrack.Model.Entity
         public DateTime? CreateDate { get; set; }      // timestamp
         public string Comments { get; set; }          // varchar
         public int CreateBy { get; set; }          // varchar
+        public int DivisionId { get; set; }          // varchar
+        public int SourceId { get; set; }          // varchar
     }
 }

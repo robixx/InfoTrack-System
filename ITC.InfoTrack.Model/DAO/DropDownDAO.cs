@@ -575,6 +575,28 @@ namespace ITC.InfoTrack.Model.DAO
         }
 
 
+        public async Task<List<DropDownDtos>> getArea()
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataType
+                         .Where(i => i.PropertyId == 10 || i.PropertyId==11)                         
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.PropertyId,
+                             Name = d.PropertyName
+                         })
+                        .OrderByDescending(i => i.Id)
+                         .ToListAsync();
+                return datalist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public async Task<List<DropDownDtos>> getDivision()
         {
@@ -642,6 +664,45 @@ namespace ITC.InfoTrack.Model.DAO
 
             }
             catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(List<DropDownDtos> data, bool status)> getTypeNDdivElement(int typeid, int areaType)
+        {
+            try
+            {
+
+                var rowdata = await _connection.DataMapping
+                    .Where(i => i.TypeId == typeid && i.ElementTypeId == areaType).Select(i=>i.SourceId).ToListAsync();
+
+                if(rowdata.Count <= 0) 
+                    return(new  List<DropDownDtos>(), false);
+
+
+                var metaElements = await _connection.MetaDataElements
+                                    .Where(i => rowdata.Contains(i.DataElementId))
+                                    .OrderBy(v => v.PropertyViewOrder)
+                                    .ToListAsync(); // Materialize the query in memory
+
+                // Now format the Name in memory
+                var datalist = metaElements
+                    .Select(d => new DropDownDtos
+                    {
+                        Id = d.DataElementId,
+                        Name = !string.IsNullOrEmpty(d.MetaElementValue)
+                               ? char.ToUpper(d.MetaElementValue[0]) + d.MetaElementValue.Substring(1).ToLower()
+                               : string.Empty
+                    })
+                    .OrderBy(i => i.Name)
+                    .ToList();
+
+                return (datalist, true);
+
+
+            }
+            catch(Exception ex)
             {
                 throw new Exception(ex.Message);
             }

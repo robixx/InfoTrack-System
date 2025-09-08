@@ -56,7 +56,7 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
 
             var bankId = form["BankId"].ToString();
             var districtId = form["DristictId"].ToString();
-            var divisionId = form["DivisionId"].ToString();
+            var elementid = form["ElementTypeId"].ToString();
             var sourceId = form["SourceId"].ToString();
             var comments = form["comments"].ToString();
             var schedId = form["scheduleId"].ToString();
@@ -67,7 +67,7 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
                 ResourceId = 0,
                 CreateBy = userId,
                 DistrictId=Convert.ToInt32(districtId),
-                DivisionId=Convert.ToInt32(divisionId),
+                Elementid=Convert.ToInt32(elementid),
                 SourceId=Convert.ToInt32(sourceId),
                 Comments = comments,
                 
@@ -80,6 +80,37 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
             
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SubmitPlanVisit([FromForm] IFormCollection form, List<IFormFile> files)
+        {
+            int userId = Convert.ToInt32(User.FindFirst("UserId").Value);
+
+            string loginuser = User.Identity?.Name;
+
+            var bankId = form["BankId"].ToString();
+            var TypeId = form["TypeId"].ToString();
+            var elementid = form["ElementTypeId"].ToString();
+            var sourceId = form["SourceId"].ToString();
+            var comments = form["comments"].ToString();
+            var schedId = form["scheduleId"].ToString();
+
+            var visitLog = new VisitLogInsertDto
+            {
+                ScheduleId =0,
+                ResourceId = Convert.ToInt32(TypeId),
+                CreateBy = userId,
+                DistrictId = 0,
+                Elementid = Convert.ToInt32(elementid),
+                SourceId = Convert.ToInt32(sourceId),
+                Comments = comments,
+
+            };
+
+            var result = await _worker.SaveWithoutScheduleLogAsync(visitLog, files, loginuser, userId);
+
+            return Json(new { message = result.message, status = result.status, redirectUrl = Url.Action("VisitLog", "Corporate", new { area = "Corporate" }) });
+
+        }
 
         [HttpGet]
         public IActionResult ExeclInsert()

@@ -18,5 +18,6 @@ namespace ITC.InfoTrack.Model.ViewModel
         public string SourceName { get; set; }     // From vt.MetaElementValue
         public int DivisionId { get; set; }
         public string DivisionName { get; set; }   // From div.MetaElementValue
+        public int CreateBy { get; set; }
     }
 }
