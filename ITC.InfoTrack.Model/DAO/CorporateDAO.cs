@@ -331,7 +331,7 @@ namespace ITC.InfoTrack.Model.DAO
                         SourceId=model.SourceId,
                         CreateAt=DateTime.Now,
                         CreateBy=userid,
-                        CollectionDate=model.CollectionDate,
+                        CollectionDate=DateTime.Now,
                         IsSchedule=0
                     };
                 

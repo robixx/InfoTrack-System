@@ -52,13 +52,12 @@
                     <div class="row g-3">
                         <div class="col-12 col-md-2">
                             <label for="metaelementTitle" class="form-label">Type Area<span class="text-danger">*</span></label>
-                            @Html.DropDownList("AreaId", ViewBag.area as SelectList, "Select Type", new { @class = "form-control select2", @id = "AreaId",
-                            onchnage="AreaWiseDataLoad(this)"})
+                            @Html.DropDownList("AreaId", ViewBag.area as SelectList, "Select Type", new { @class = "form-control select2", @id = "AreaId", onchange = "AreaWiseDataLoad(this)"})
 
                         </div>
                         <div class="col-12 col-md-2">
                             <label for="metaelementTitle" class="form-label">Division<span class="text-danger">*</span></label>
-                            @Html.DropDownList("DivisionId", ViewBag.division as SelectList, "Select Division", new { @class = "form-control select2", @id = "DivisionId" })
+                            @Html.DropDownList("DivisionId", new SelectList(Enumerable.Empty<SelectListItem>()), "Select Division", new { @class = "form-control select2", @id = "DivisionId" })
 
                         </div>
                         <div class="col-12 col-md-3">
@@ -187,16 +186,50 @@
 
 }
 
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 
 <script>
-   
+
+    $('#AreaId').on('change', function () {
+        AreaWiseDataLoad(this);
+    });
+    function AreaWiseDataLoad(dropdown)
+    {
+      
+         var typeid = dropdown.value;
+        $('#DivisionId').empty().append('<option>Loading...</option>');
+
+        $.ajax({
+            url: '/Corporate/Corporate/TypeWiseDivision',
+            type: 'GET',
+            data: { typeid: typeid },
+            dataType: 'json',
+            success: function (res) {
+                debugger;
+                $('#DivisionId').empty().append('<option>Select Division</option>');
+                $.each(res.data, function (i, item) {
+                    $('#DivisionId').append($('<option>', {
+                        value: item.id, // use lowercase if using JsonResult without property casing fix
+                        text: item.name
+                    }));
+                });
+                 
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching branches:', error);
+            }
+        });
+
+    }
 
 
     function TypeWiseSource()
     {
           let typeId=$('#typeId').val();
+          let areaid =$('#AreaId').val();
+          let divisionid =$('#DivisionId').val();
           let typeText = $('#typeId option:selected').text();
           const typeNameLevel= document.getElementById('typelevel');
          $('#typelevel').html(`${typeText} Name <span class="text-danger">*</span>`);
@@ -204,7 +237,7 @@
          $.ajax({
                  url: '/Corporate/Corporate/getDataElementData',
                  type: 'GET',
-                 data: {typeId:typeId},
+                 data: {typeId:typeId,areaid:areaid,divisionId:divisionid},
                  success: function (res) {
                       if(res.status){
                            const dropdown = $('#typename');
@@ -270,16 +303,16 @@
 
     $('#data_submit').on('click', function(){
 
-        let dateValue = $('#datevalue').val();
+        let area = $('#AreaId').val();
         let typeId = $('#typeId').val();
         let districtId = $('#districtId').val();
-        let divisionId = $('#divisionId').val();
+        let divisionId = $('#DivisionId').val();
         let typeName = $('#typename').val();
         let referenceBy = $('#refacenceby').val();
 
         // Check required fields
-        if (!dateValue) {
-            MessageShow("Please select a date.",false);
+        if (!area) {
+            MessageShow("Please select a Type.",false);
             
             return;
         }
@@ -289,7 +322,14 @@
             return;
             
         }
-     
+        if (!divisionId || divisionId === "0") {
+           MessageShow("Please select a Division",false);
+
+            return;
+
+        }
+
+
         if (!typeName || typeName === "0") {
         
              MessageShow("Please select Type Name.",false)
@@ -301,10 +341,10 @@
         let data = 
         {
             ReferenceData: $('#refacenceby').val(),
-            CollectionDate: $('#datevalue').val(), // yyyy-MM-dd
+            // CollectionDate: $('#datevalue').val(), // yyyy-MM-dd
             TypeId: parseInt($('#typeId').val()) || 0,
             DistrictId: parseInt($('#districtId').val()) || 0,
-            DivisionId: parseInt($('#divisionId').val()) || 0,
+            DivisionId: parseInt($('#DivisionId').val()) || 0,
             SourceId: parseInt($('#typename').val()) || 0,
             
         };

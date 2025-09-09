@@ -1,4 +1,5 @@
-﻿using ITC.InfoTrack.Model.DataBase;
+﻿using DocumentFormat.OpenXml.Presentation;
+using ITC.InfoTrack.Model.DataBase;
 using ITC.InfoTrack.Model.Entity;
 using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
@@ -40,6 +41,14 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
             return View(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> TypeWiseDivision(string typeid)
+        {
+            int id = Convert.ToInt32(typeid);
+            var result = await _dropdown.getTypeWiseElement(id);
+            return Json(new { data = result.data, status = result.status });
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> PlanVisit()
@@ -60,10 +69,14 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> getDataElementData(string typeId)
+        public async Task<IActionResult> getDataElementData(string typeId, string areaId, string divisionId)
         {
             int id = Convert.ToInt32(typeId);
-            var result = await _dropdown.getRootPropertyElement(id);
+            int area = Convert.ToInt32(areaId);
+            int division = Convert.ToInt32(divisionId);
+            //var result = await _dropdown.getRootPropertyElement(id);
+            var result = await _dropdown.getAreaDivisonWiseSourceName(id, area, division);
+
             return Json(new { status = result.status, data = result.data });
         }
 

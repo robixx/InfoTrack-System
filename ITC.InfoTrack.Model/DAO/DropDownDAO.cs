@@ -70,17 +70,17 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 var branch = await _connection.ProfileWiseOrganization
-                        .Where(i => i.PropertyId == BranchId ) // handle nullable input
-                        .Select(i=>i.Id)
+                        .Where(i => i.PropertyId == BranchId) // handle nullable input
+                        .Select(i => i.Id)
                         .FirstOrDefaultAsync(); // fetch first match or null
 
                 var subbranchulist = await _connection.ProfileWiseOrganization
                     .Where(i => i.ParentId == branch)
-                    .OrderBy(i=>i.OrderView)
-                    .Select(i=>new DropDownDto
+                    .OrderBy(i => i.OrderView)
+                    .Select(i => new DropDownDto
                     {
-                        Id=i.Id,
-                        Name=i.LevelName,
+                        Id = i.Id,
+                        Name = i.LevelName,
                     })
                     .ToListAsync();
 
@@ -324,19 +324,60 @@ namespace ITC.InfoTrack.Model.DAO
         {
             try
             {
-                var parentElements = await _connection.MetaDataElements
-                             .Where(p => p.PropertyId == type && p.DataElementStatus == 1)
-                             .OrderBy(i => i.MetaElementValue)
-                             .Select(i => new DropDownDtos
-                             {
-                                 Id = i.DataElementId,
-                                 Name = i.MetaElementValue != null && i.MetaElementValue.Length > 0
-            ? char.ToUpper(i.MetaElementValue[0]) + i.MetaElementValue.Substring(1).ToLower()
-            : i.MetaElementValue
-                             })
-                             .ToListAsync();
+                List<DropDownDtos> datalist = new List<DropDownDtos>();
 
-                return (parentElements, true);
+                if (type == 7)
+                {
+                    var metaElements = await _connection.MetaDataElements
+                                       .Where(i => i.PropertyId == type)
+                                       .OrderBy(v => v.PropertyViewOrder)
+                                       .ToListAsync(); // Materialize the query in memory
+
+                    var loc = (from l in metaElements
+                               join a in _connection.LocationMapping
+                               on l.DataElementId equals a.TypeId
+                               join c in _connection.MetaDataElements
+                               on a.LocationId equals c.DataElementId
+                               orderby l.PropertyViewOrder
+                               select new
+                               {
+                                   l.DataElementId,
+                                   Name = l.MetaElementValue + " (" + c.MetaElementValue + ")"
+                               }
+                              ).ToList();
+
+
+                    // Now format the Name in memory
+                    datalist = loc
+                       .Select(d => new DropDownDtos
+                       {
+                           Id = d.DataElementId,
+                           Name = !string.IsNullOrEmpty(d.Name)
+                                  ? char.ToUpper(d.Name[0]) + d.Name.Substring(1).ToLower()
+                                  : string.Empty
+                       })
+                       .OrderBy(i => i.Name)
+                       .ToList();
+
+
+                }
+                else
+                {
+                    datalist = await _connection.MetaDataElements
+                           .Where(p => p.PropertyId == type && p.DataElementStatus == 1)
+                           .OrderBy(i => i.MetaElementValue)
+                           .Select(i => new DropDownDtos
+                           {
+                               Id = i.DataElementId,
+                               Name = i.MetaElementValue != null && i.MetaElementValue.Length > 0
+                                  ? char.ToUpper(i.MetaElementValue[0]) + i.MetaElementValue.Substring(1).ToLower()
+                                  : i.MetaElementValue
+                           })
+                           .ToListAsync();
+
+                }
+
+                return (datalist, true);
             }
             catch (Exception ex)
             {
@@ -415,17 +456,17 @@ namespace ITC.InfoTrack.Model.DAO
             {
                 int parentId = Convert.ToInt32(id);
 
-              
+
                 // Step 1: get the first propertyId
                 var acualvalue = await _connection.LevelSetting
                     .Where(i => i.IsActive == 1 && i.Status == parentId)
                     .Select(p => p.PropertyId)
-                    .FirstOrDefaultAsync();               
+                    .FirstOrDefaultAsync();
 
                 // Step 2: get all propertyIds that should be excluded
                 var excludedIds = await _connection.ProfileWiseOrganization
-                    .Where(i => i.IsActive == 1 && i.ParentId== parentId)
-                    .Select(p =>  p.PropertyId)
+                    .Where(i => i.IsActive == 1 && i.ParentId == parentId)
+                    .Select(p => p.PropertyId)
                     .ToListAsync();
 
                 // Step 3: fetch MetaDataElements for acualvalue but not already in excludedIds
@@ -445,7 +486,7 @@ namespace ITC.InfoTrack.Model.DAO
 
             }
             catch (Exception ex)
-            { 
+            {
                 throw new Exception(ex.Message);
             }
         }
@@ -471,7 +512,7 @@ namespace ITC.InfoTrack.Model.DAO
 
                 return subbranchulist;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -493,7 +534,7 @@ namespace ITC.InfoTrack.Model.DAO
                 return categorylist;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -505,7 +546,7 @@ namespace ITC.InfoTrack.Model.DAO
             {
                 var categorylist = await _connection.LevelSetting
                     .Where(c => c.IsActive == 1)
-                    .OrderBy (c => c.OrderView)
+                    .OrderBy(c => c.OrderView)
                     .Select(i => new DropDownDtos
                     {
                         Id = i.PropertyId,
@@ -528,7 +569,7 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 var categorylist = await _connection.LevelSetting
-                    .Where(c => c.IsActive == 1 && c.IsType==1)
+                    .Where(c => c.IsActive == 1 && c.IsType == 1)
                     .OrderBy(c => c.OrderView)
                     .Select(i => new DropDownDtos
                     {
@@ -558,7 +599,7 @@ namespace ITC.InfoTrack.Model.DAO
                              Id = d.DataElementId,
                              Name = d.MetaElementValue
                          })
-                         .OrderBy(i=>i.Name)
+                         .OrderBy(i => i.Name)
                          .ToListAsync();
                 return datalist;
 
@@ -570,12 +611,12 @@ namespace ITC.InfoTrack.Model.DAO
         }
 
 
-        public async Task<List<DropDownDtos>> getFilterWiseDistrict( int DistrictId)
+        public async Task<List<DropDownDtos>> getFilterWiseDistrict(int DistrictId)
         {
             try
             {
                 var datalist = await _connection.MetaDataElements
-                         .Where(i => i.PropertyId == 8 && i.DataElementId==DistrictId)
+                         .Where(i => i.PropertyId == 8 && i.DataElementId == DistrictId)
                          .OrderBy(v => v.PropertyViewOrder)
                          .Select(d => new DropDownDtos
                          {
@@ -604,7 +645,7 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 var datalist = await _connection.MetaDataType
-                         .Where(i => i.PropertyId == 10 || i.PropertyId==11)                         
+                         .Where(i => i.PropertyId == 10 || i.PropertyId == 11)
                          .Select(d => new DropDownDtos
                          {
                              Id = d.PropertyId,
@@ -634,7 +675,7 @@ namespace ITC.InfoTrack.Model.DAO
                              Id = d.DataElementId,
                              Name = d.MetaElementValue
                          })
-                        .OrderBy(i=>i.Name)                        
+                        .OrderBy(i => i.Name)
                          .ToListAsync();
                 return datalist;
 
@@ -650,7 +691,7 @@ namespace ITC.InfoTrack.Model.DAO
             try
             {
                 var datalist = await _connection.MetaDataElements
-                         .Where(i => i.PropertyId == 9 && i.DataElementId==DivisionId)
+                         .Where(i => i.PropertyId == 9 && i.DataElementId == DivisionId)
                          .OrderBy(v => v.PropertyViewOrder)
                          .Select(d => new DropDownDtos
                          {
@@ -674,16 +715,20 @@ namespace ITC.InfoTrack.Model.DAO
         {
             try
             {
+
+
                 var datalist = await _connection.MetaDataElements
-                         .Where(i => i.PropertyId == type && i.DataElementId==SourceId)
-                         .OrderBy(v => v.PropertyViewOrder)
-                         .Select(d => new DropDownDtos
-                         {
-                             Id = d.DataElementId,
-                             Name = d.MetaElementValue
-                         })
-                        .OrderBy(i => i.Name)
-                         .ToListAsync();
+                        .Where(i => i.PropertyId == type && i.DataElementId == SourceId)
+                        .OrderBy(v => v.PropertyViewOrder)
+                        .Select(d => new DropDownDtos
+                        {
+                            Id = d.DataElementId,
+                            Name = d.MetaElementValue
+                        })
+                       .OrderBy(i => i.Name)
+                        .ToListAsync();
+
+
                 return datalist;
 
             }
@@ -697,36 +742,44 @@ namespace ITC.InfoTrack.Model.DAO
         {
             try
             {
+                List<DropDownDtos> datalist = new List<DropDownDtos>();
 
                 var rowdata = await _connection.DataMapping
-                    .Where(i => i.TypeId == typeid && i.ElementTypeId == areaType).Select(i=>i.SourceId).ToListAsync();
+                    .Where(i => i.TypeId == typeid && i.ElementTypeId == areaType).Select(i => i.SourceId).ToListAsync();
 
-                if(rowdata.Count <= 0) 
-                    return(new  List<DropDownDtos>(), false);
+                if (rowdata.Count <= 0)
+                    return (new List<DropDownDtos>(), false);
 
 
                 var metaElements = await _connection.MetaDataElements
-                                    .Where(i => rowdata.Contains(i.DataElementId))
-                                    .OrderBy(v => v.PropertyViewOrder)
-                                    .ToListAsync(); // Materialize the query in memory
+                                     .Where(i => rowdata.Contains(i.DataElementId))
+                                     .OrderBy(v => v.PropertyViewOrder)
+                                     .ToListAsync(); // Materialize the query in memory
+
+
+
 
                 // Now format the Name in memory
-                var datalist = metaElements
-                    .Select(d => new DropDownDtos
-                    {
-                        Id = d.DataElementId,
-                        Name = !string.IsNullOrEmpty(d.MetaElementValue)
-                               ? char.ToUpper(d.MetaElementValue[0]) + d.MetaElementValue.Substring(1).ToLower()
-                               : string.Empty
-                    })
-                    .OrderBy(i => i.Name)
-                    .ToList();
+                datalist = metaElements
+                   .Select(d => new DropDownDtos
+                   {
+                       Id = d.DataElementId,
+                       Name = !string.IsNullOrEmpty(d.MetaElementValue)
+                              ? char.ToUpper(d.MetaElementValue[0]) + d.MetaElementValue.Substring(1).ToLower()
+                              : string.Empty
+                   })
+                   .OrderBy(i => i.Name)
+                   .ToList();
+
+
+
+
 
                 return (datalist, true);
 
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -771,6 +824,94 @@ namespace ITC.InfoTrack.Model.DAO
                          .ToListAsync();
                 return datalist;
 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(List<DropDownDtos> data, bool status)> getTypeWiseElement(int type)
+        {
+            try
+            {
+                var result = await (
+                                from m in _connection.MetaDataElements
+                                where _connection.DataMapping
+                                    .Where(dm => dm.ElementTypeId == type)
+                                    .Select(dm => dm.DivisionId)
+                                    .Distinct()
+                                    .Contains(m.DataElementId)
+                                orderby m.MetaElementValue
+                                select new DropDownDtos
+                                {
+                                    Id = m.DataElementId,
+                                    Name = m.MetaElementValue
+                                }
+                            ).ToListAsync();
+
+                return (result, true);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(List<DropDownDtos> data, bool status)> getAreaDivisonWiseSourceName(int type, int area, int division)
+        {
+            try
+            {
+                var sourceIds = await _connection.DataMapping
+                       .Where(p => p.ElementTypeId == area && p.DivisionId == division && p.TypeId == type)
+                       .Select(p => p.SourceId)
+                       .Distinct()
+                       .ToListAsync();
+
+                List<DropDownDtos> datalist;
+
+                if (type == 7)
+                {
+                    // Build query fully in EF (no in-memory joins)
+                    datalist = await (
+                        from l in _connection.MetaDataElements
+                        join a in _connection.LocationMapping on l.DataElementId equals a.TypeId
+                        join c in _connection.MetaDataElements on a.LocationId equals c.DataElementId
+                        where l.PropertyId == type && sourceIds.Contains(l.DataElementId)
+                        orderby l.PropertyViewOrder
+                        select new DropDownDtos
+                        {
+                            Id = l.DataElementId,
+                            Name = l.MetaElementValue + " (" + c.MetaElementValue + ")"
+                        }
+                    ).ToListAsync();
+
+                    // Format names in memory
+                    datalist.ForEach(d =>
+                    {
+                        if (!string.IsNullOrEmpty(d.Name))
+                        {
+                            d.Name = char.ToUpper(d.Name[0]) + d.Name.Substring(1).ToLower();
+                        }
+                    });
+                }
+                else
+                {
+                    datalist = await _connection.MetaDataElements
+                        .Where(p => sourceIds.Contains(p.DataElementId) && p.DataElementStatus == 1)
+                        .OrderBy(i => i.MetaElementValue)
+                        .Select(i => new DropDownDtos
+                        {
+                            Id = i.DataElementId,
+                            Name = !string.IsNullOrEmpty(i.MetaElementValue)
+                                   ? char.ToUpper(i.MetaElementValue[0]) + i.MetaElementValue.Substring(1).ToLower()
+                                   : i.MetaElementValue
+                        })
+                        .ToListAsync();
+                }
+
+                return (datalist, true);
             }
             catch (Exception ex)
             {
