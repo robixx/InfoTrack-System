@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.pTitle = "Data Insert";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "Data Insert";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="~/libs/spectrum-colorpicker2/spectrum.min.css" rel="stylesheet" type="text/css">
+    <link href="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css/select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    /*  .hierarchy-tree {
+                                        font-family: Arial, sans-serif;
+                                    } */
+
+    .tree-node {
+        margin-left: 25px;
+        border-left: 1px solid #ddd;
+        padding-left: 15px;
+        margin-top: 8px;
+    }
+
+    .tree-item {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 5px 0;
+        background: #fff;
+    }
+
+        .tree-item:hover {
+            background: #f8f9fa;
+        }
+
+    .level-0 {
+        font-weight: bold;
+    }
+
+    .level-1 {
+        padding-left: 10px;
+    }
+
+    .level-2 {
+        padding-left: 20px;
+    }
+
+    .level-3 {
+        padding-left: 30px;
+    }
+
+    .level-4 {
+        padding-left: 40px;
+    }
+
+    .bg-light {
+        --bs-bg-opacity: 1;
+        background-color: rgb(234 235 241) !important;
+    }
+
+    .border {
+        border: var(--bs-border-width) var(--bs-border-style) #277850 !important;
+    }
+
+    .img_color {
+        color: #930f26;
+    }
+</style>
+
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="noticeMessage" class="alert alert-dismissible fade d-none" role="alert">
+            <span id="noticeText"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="card mt-2">
+            <!-- Main Content -->
+            <div class="card-body">
+
+                <form asp-area="Corporate" asp-controller="Corporate" asp-action="SaveBoothLocation" method="post">
+
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="metaelementTitle" class="form-label">Booth<span class="text-danger">*</span></label>
+                                @Html.DropDownList("boothId", ViewBag.booth as SelectList, "Select Type", new { @class = "form-select select2", @id = "boothId" })
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+
+                                <label for="metaelementTitle" class="form-label">Location<span class="text-danger">*</span></label>
+                                @Html.DropDownList("locationid", ViewBag.Address as SelectList, new { @class = "form-select select2", @id = "locationid" })
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="margin-top:25px;">
+                            <button class="btn btn-primary"> submit</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+
+
+
+@section scripts {
+
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/select2/js/select2.min.js"></script>
+    <script src="~/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/libs/spectrum-colorpicker2/spectrum.min.js"></script>
+    <script src="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="~/libs/admin-resources/bootstrap-filestyle/bootstrap-filestyle.min.js"></script>
+    <script src="~/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+    <script src="~/js/pages/form-advanced.init.js"></script>
+    <script src="~/js/app.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+
+
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+

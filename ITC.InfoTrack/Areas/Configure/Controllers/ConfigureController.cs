@@ -2,6 +2,7 @@
 using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ITC.InfoTrack.Areas.Configure.Controllers
 {
@@ -117,6 +118,35 @@ namespace ITC.InfoTrack.Areas.Configure.Controllers
                 text = p.Name,
             });
             return Json(new { group = g, parent = gv });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Resource()
+        {
+
+            ViewBag.booth = new SelectList(await _dropdown.getBoothName(), "Id", "Name");
+            ViewBag.Address = new SelectList(await _dropdown.getAddressName(), "Id", "Name");
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Resource(int boothId, int locationid)
+        {
+            if (boothId == 0 || locationid == 0)
+            {
+                TempData["Error"] = "Please select both booth and location.";
+                return RedirectToAction("VisitLog"); // your view
+            }
+
+            var result=await _orglocation.loactionmapping(boothId, locationid);
+            // Save to database
+            // Example: _context.BoothLocations.Add(new BoothLocation { BoothId = boothId, LocationId = locationid });
+            // await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Data saved successfully!";
+            return RedirectToAction("Resource"); // reload or redirect
         }
 
     }

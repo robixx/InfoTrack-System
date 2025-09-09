@@ -32,7 +32,8 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         [HttpGet]
         public async Task<IActionResult> ScheduleDataCollect()
         {
-            ViewBag.type = new SelectList(await _dropdown.GetTokenType(), "Id", "Name");
+            ViewBag.area = new SelectList(await _dropdown.getArea(), "Id", "Name");
+            ViewBag.type = new SelectList(await _dropdown.GetTokenTypeRequest(), "Id", "Name");
             ViewBag.district = new SelectList(await _dropdown.getDistrict(), "Id", "Name");
             ViewBag.division = new SelectList(await _dropdown.getDivision(), "Id", "Name");
             var result = await _corporate.GetDataCollectionResultAsync();
@@ -243,12 +244,8 @@ namespace ITC.InfoTrack.Areas.Corporate.Controllers
         [HttpGet]
         public async Task<IActionResult> VisitLog()
         {
-            var userIdClaim = 0;
-            var RoleId =Convert.ToInt32(User.FindFirst("RoleId")?.Value);
-            if (RoleId != 1)
-            {
-                userIdClaim =Convert.ToInt32(User.FindFirst("UserId"));
-            }
+
+            int userIdClaim = Convert.ToInt32(User.FindFirst("UserId")?.Value ?? "0");
 
             var result = await _corporate.GetVisitLogScheduleAsync(userIdClaim);          
           

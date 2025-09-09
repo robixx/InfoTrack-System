@@ -522,6 +522,30 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
+
+        public async Task<List<DropDownDtos>> GetTokenTypeRequest()
+        {
+            try
+            {
+                var categorylist = await _connection.LevelSetting
+                    .Where(c => c.IsActive == 1 && c.IsType==1)
+                    .OrderBy(c => c.OrderView)
+                    .Select(i => new DropDownDtos
+                    {
+                        Id = i.PropertyId,
+                        Name = i.LevelName,
+                    })
+                    .ToListAsync();
+
+                return categorylist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<List<DropDownDtos>> getDistrict()
         {
             try
@@ -703,6 +727,52 @@ namespace ITC.InfoTrack.Model.DAO
 
             }
             catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropDownDtos>> getBoothName()
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == 7)
+                         .OrderBy(v => v.PropertyViewOrder)
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                        .OrderBy(i => i.Name)
+                         .ToListAsync();
+                return datalist;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropDownDtos>> getAddressName()
+        {
+            try
+            {
+                var datalist = await _connection.MetaDataElements
+                         .Where(i => i.PropertyId == 3)
+                         .OrderBy(v => v.PropertyViewOrder)
+                         .Select(d => new DropDownDtos
+                         {
+                             Id = d.DataElementId,
+                             Name = d.MetaElementValue
+                         })
+                        .OrderBy(i => i.Name)
+                         .ToListAsync();
+                return datalist;
+
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

@@ -154,6 +154,11 @@ namespace ITC.InfoTrack.Areas.Configuration.Controllers
         }
 
 
+       
+
+
+
+
         public class DeleteRequestDto
         {
             public int Id { get; set; }

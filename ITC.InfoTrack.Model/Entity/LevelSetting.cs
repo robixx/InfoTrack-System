@@ -24,5 +24,6 @@ namespace ITC.InfoTrack.Model.Entity
 
         public int PropertyId { get; set; }
         public int Status { get; set; }
+        public int IsType { get; set; }
     }
 }

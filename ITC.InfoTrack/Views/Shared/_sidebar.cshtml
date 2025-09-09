@@ -4,8 +4,8 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @{
-    // long userid = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId") ?? 0;
-    ViewBag.userRoles = await menuSet.getMenuList();
+    int userid = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId") ?? 0;
+    ViewBag.userRoles = await menuSet.getMenuList(userid);
 }
 <style>
     .vertical-menu {

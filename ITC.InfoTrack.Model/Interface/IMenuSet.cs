@@ -10,7 +10,7 @@ namespace ITC.InfoTrack.Model.Interface
 {
     public interface IMenuSet
     {
-        Task<List<MenuDto>> getMenuList();
+        Task<List<MenuDto>> getMenuList(int UserId);
         Task<(string message, bool status)> SaveRoleWisePagePer(RolePermissionDto model);
     }
 }

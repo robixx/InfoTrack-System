@@ -65,8 +65,13 @@ namespace ITC.InfoTrack.Model.DAO
                     var principal = new ClaimsPrincipal(identity);
 
                     var httpContext = _httpContextAccessor.HttpContext;
+
                     if (httpContext != null)
                     {
+                        
+                        httpContext.Session.SetInt32("UserId", (int)user.UserId); // 🔑 Save UserId
+                         
+                       
                         await httpContext.SignInAsync("CookieAuth", principal);
                     }
 

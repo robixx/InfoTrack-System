@@ -3,6 +3,7 @@ using ITC.InfoTrack.Model.Entity;
 using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -20,15 +21,21 @@ namespace ITC.InfoTrack.Model.DAO
             _connection = connection;
         }
 
-        public async Task<List<MenuDto>> getMenuList()
+        public async Task<List<MenuDto>> getMenuList(int UserId)
         {
             try
             {
                 List<MenuDto> Menulist = new List<MenuDto>();
-               
+
+                var parameters = new[]
+                {
+                    new NpgsqlParameter("p_userId", SqlDbType.Int) { Value = UserId },
+                    
+
+                };
 
                 var list = await _connection.MenuSetUp
-                           .FromSqlRaw("select * from  get_menulist()")
+                           .FromSqlRaw("select * from  get_menulist({0})",parameters)
                            .ToListAsync();
                 if (list != null)
                 {

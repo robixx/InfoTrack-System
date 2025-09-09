@@ -53,6 +53,8 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
+        
+
         public async Task<(string message, bool status)> SaveOrgLocation(InsertOrgDto model)
         {
             try
@@ -83,5 +85,30 @@ namespace ITC.InfoTrack.Model.DAO
             }
 
         }
+
+
+        public async Task<(bool status, string message)> loactionmapping(int bootid, int locationid)
+        {
+            try
+            {
+                var Location = new LocationMapping
+                {
+                    LocationId = locationid,
+                    TypeId = bootid,
+                    LocationType = 7,
+                    IsActive = 1
+                };
+                await _connection.LocationMapping.AddRangeAsync(Location);
+                await _connection.SaveChangesAsync();
+
+                return (true, "Success");
+
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
     }
 }

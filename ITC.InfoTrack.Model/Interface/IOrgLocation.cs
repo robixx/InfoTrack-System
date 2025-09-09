@@ -12,5 +12,6 @@ namespace ITC.InfoTrack.Model.Interface
     {
         Task<(string message, bool status)> SaveOrgLocation(InsertOrgDto model);
         Task<List<LocationShowDto>> getOrgLocation();
+        Task<(bool status, string message)> loactionmapping( int bootid, int locationid);
     }
 }

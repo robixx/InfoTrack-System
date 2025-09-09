@@ -321,10 +321,7 @@ namespace ITC.InfoTrack.Model.DAO
                            .FromSqlRaw("Select * from public.get_gallery_data()") // or use your SQL query
                            .ToListAsync();
 
-               if(RoleId != 1)
-                {
-                    visitLogs= visitLogs.Where(i=>i.CreateBy==userId).ToList();
-                }
+               
 
                 return visitLogs;
 

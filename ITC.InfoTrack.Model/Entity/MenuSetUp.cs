@@ -20,5 +20,6 @@ namespace ITC.InfoTrack.Model.Entity
         public int ParentId { get; set; }
         public int IsActive { get; set; }
         public int ViewOrder { get; set; }
+        public int UserId { get; set; }
     }
 }
