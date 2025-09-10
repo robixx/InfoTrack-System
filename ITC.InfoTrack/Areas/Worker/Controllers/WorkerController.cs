@@ -47,7 +47,7 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitVisitLog(int scheduleId, [FromForm] IFormCollection form, List<IFormFile> files)
+        public async Task<IActionResult> SubmitVisitLog(int scheduleId, [FromForm] IFormCollection form, [FromForm] List<IFormFile> files)
         {
 
             int userId= Convert.ToInt32(User.FindFirst("UserId").Value);
@@ -67,7 +67,7 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
                 ResourceId = 0,
                 CreateBy = userId,
                 DistrictId=Convert.ToInt32(districtId),
-                Elementid=Convert.ToInt32(elementid),
+                Elementid=0,
                 SourceId=Convert.ToInt32(sourceId),
                 Comments = comments,
                 
@@ -81,7 +81,7 @@ namespace ITC.InfoTrack.Areas.Worker.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitPlanVisit([FromForm] IFormCollection form, List<IFormFile> files)
+        public async Task<IActionResult> SubmitPlanVisit([FromForm] IFormCollection form, [FromForm] List<IFormFile> files)
         {
             int userId = Convert.ToInt32(User.FindFirst("UserId").Value);
 

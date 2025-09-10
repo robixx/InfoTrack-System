@@ -13,5 +13,6 @@ namespace ITC.InfoTrack.Model.ViewModel
         public string Branch { get; set; }
         public DateTime UploadDate { get; set; }
         public string Comments { get; set; }
+        public string FileType { get; set; } // "image" or "video"
     }
 }

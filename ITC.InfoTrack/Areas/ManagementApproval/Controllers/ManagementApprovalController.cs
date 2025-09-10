@@ -1,8 +1,12 @@
-﻿using ITC.InfoTrack.Model.Entity;
+﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using ITC.InfoTrack.Model.Entity;
 using ITC.InfoTrack.Model.Interface;
 using ITC.InfoTrack.Model.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Security.Claims;
 
 namespace ITC.InfoTrack.Areas.ManagementApproval.Controllers
@@ -13,27 +17,35 @@ namespace ITC.InfoTrack.Areas.ManagementApproval.Controllers
     {
 
         private readonly IWorker _worker;
+        private readonly IDropDown _dropdown;
         private readonly string _imagePath;
-        public ManagementApprovalController(IWorker worker, IConfiguration configuration)
+        public ManagementApprovalController(IWorker worker, IConfiguration configuration, IDropDown dropdown)
         {
             _worker = worker;
+
             _imagePath = configuration["ImageStorage:TokenImagePath"];
+            _dropdown = dropdown;
         }
 
         [HttpGet]
-        public IActionResult LogApproval()
+        public async Task<IActionResult> LogApproval()
         {
+            ViewBag.area = new SelectList(await _dropdown.getArea(), "Id", "Name");
+            ViewBag.type = new SelectList(await _dropdown.GetTokenTypeRequest(), "Id", "Name");
             return View();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGalleryData()
+        public async Task<IActionResult> GetGalleryData(string typeId, string areaId, string divisionId, string valueTypeId)
         {
-            int userId = Convert.ToInt32(User.FindFirst("UserId").Value);
+            
+            int id = Convert.ToInt32(typeId);
+            int area = Convert.ToInt32(areaId);
+            int division = Convert.ToInt32(divisionId);
+            int valueid = Convert.ToInt32(valueTypeId);
 
-            int roleid = Convert.ToInt32(User.FindFirst("RoleId").Value);
 
-            var visitLogs = await _worker.GetGallaryDataAsync(userId, roleid);
+            var visitLogs = await _worker.GetGallaryDataAsync(id, area, division, valueid);
             // Group by DivisionName
             var result = visitLogs
                 .GroupBy(v => v.DivisionName)
@@ -52,12 +64,25 @@ namespace ITC.InfoTrack.Areas.ManagementApproval.Controllers
                                     Alt = $"Image for {img.SourceName}",
                                     Branch = img.SourceName,       // BranchName from SourceName
                                     UploadDate = img.CreateDate,
-                                    Comments=img.Comments
+                                    Comments=img.Comments,
+                                    FileType = GetFileType(img.ImageName)
                                 }).ToList()
                         )
                 }).ToList();
 
             return Ok(result);
+        }
+
+
+        private string GetFileType(string fileName)
+        {
+            var ext = Path.GetExtension(fileName)?.ToLower();
+            var imageExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+            var videoExts = new[] { ".mp4", ".avi", ".mov", ".mkv" };
+
+            if (imageExts.Contains(ext)) return "image";
+            if (videoExts.Contains(ext)) return "video";
+            return "other";
         }
 
         [HttpGet("GetImage/{fileName}")]
@@ -77,6 +102,12 @@ namespace ITC.InfoTrack.Areas.ManagementApproval.Controllers
                 ".jpg" => "image/jpeg",
                 ".jpeg" => "image/jpeg",
                 ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                ".webp" => "image/webp",
+                ".mp4" => "video/mp4",
+                ".avi" => "video/x-msvideo",
+                ".mov" => "video/quicktime",
+                ".mkv" => "video/x-matroska",
                 _ => "application/octet-stream"
             };
 

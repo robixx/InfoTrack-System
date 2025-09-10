@@ -785,13 +785,13 @@
                         Take Photo
                     </button>
                 </div>
-                <div class="col-md-4 d-none">
+                <div class="col-md-4 ">
                     <button type="button" class="btn-primary-custom w-100" id="recordVideoBtn">
                         <i class="bi bi-camera-video-fill"></i>
-                        Record Video
+                        Browse Video
                     </button>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 d-none">
                     <button type="button" class="btn-primary-custom w-100" id="selectFilesBtn">
                         <i class="bi bi-folder2-open"></i>
                         Browse Files
@@ -938,6 +938,7 @@
         // File input
         const fileInput = document.getElementById('fileInput');
         const selectFilesBtn = document.getElementById('selectFilesBtn');
+        const previewGrid = document.getElementById('previewGrid');
 
         if (fileInput) fileInput.addEventListener('change', handleFileSelect);
         if (selectFilesBtn) selectFilesBtn.addEventListener('click', () => fileInput?.click());
@@ -1043,40 +1044,93 @@
 
     // Create file preview
     function createFilePreview(file) {
-        const previewItem = document.createElement('div');
-        previewItem.className = 'preview-item';
+        // const previewItem = document.createElement('div');
+        // previewItem.className = 'preview-item';
 
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'remove-file';
-        removeBtn.innerHTML = '<i class="bi bi-x"></i>';
-        removeBtn.onclick = () => removeFile(file, previewItem);
+        // const removeBtn = document.createElement('button');
+        // removeBtn.className = 'remove-file';
+        // removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+        // removeBtn.onclick = () => removeFile(file, previewItem);
 
-        if (file.type.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.className = 'preview-image';
-            img.src = URL.createObjectURL(file);
-            img.alt = file.name;
-            previewItem.appendChild(img);
-        } else if (file.type.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.className = 'preview-video';
-            video.src = URL.createObjectURL(file);
-            video.controls = true;
-            video.muted = true;
-            previewItem.appendChild(video);
-        } else {
-            const fileDiv = document.createElement('div');
-            fileDiv.className = 'd-flex flex-column align-items-center justify-content-center h-100 text-danger p-2';
-            fileDiv.innerHTML = `
-                <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
-                <small class="text-center fw-semibold mt-1" style="font-size: 0.5rem;">${file.name}</small>
-            `;
-            previewItem.appendChild(fileDiv);
+        // if (file.type.startsWith('image/')) {
+        //     const img = document.createElement('img');
+        //     img.className = 'preview-image';
+        //     img.src = URL.createObjectURL(file);
+        //     img.alt = file.name;
+        //     previewItem.appendChild(img);
+        // } else if (file.type.startsWith('video/')) {
+        //     const video = document.createElement('video');
+        //     video.className = 'preview-video';
+        //     video.src = URL.createObjectURL(file);
+        //     video.controls = true;
+        //     video.muted = true;
+        //     previewItem.appendChild(video);
+        // } else {
+        //     const fileDiv = document.createElement('div');
+        //     fileDiv.className = 'd-flex flex-column align-items-center justify-content-center h-100 text-danger p-2';
+        //     fileDiv.innerHTML = `
+        //         <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
+        //         <small class="text-center fw-semibold mt-1" style="font-size: 0.5rem;">${file.name}</small>
+        //     `;
+        //     previewItem.appendChild(fileDiv);
+        // }
+
+        // previewItem.appendChild(removeBtn);
+        // const previewGrid = document.getElementById('previewGrid');
+        // if (previewGrid) previewGrid.appendChild(previewItem);
+          const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            previewItem.style.position = 'relative';
+            previewItem.style.margin = '5px';
+
+            // Remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-file btn btn-sm btn-danger';
+            removeBtn.style.position = 'absolute';
+            removeBtn.style.top = '5px';
+            removeBtn.style.right = '5px';
+            removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+            removeBtn.onclick = () => removeFile(file, previewItem);
+
+            // File preview
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.className = 'preview-image';
+                img.src = URL.createObjectURL(file);
+                img.alt = file.name;
+                img.style.width = '100%';
+                img.style.height = 'auto';
+                img.onload = () => URL.revokeObjectURL(img.src); // free memory
+                previewItem.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.className = 'preview-video';
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.muted = false;
+                video.style.width = '100%';
+                video.style.height = 'auto';
+                video.onloadeddata = () => URL.revokeObjectURL(video.src); // free memory
+                previewItem.appendChild(video);
+            } else {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'd-flex flex-column align-items-center justify-content-center h-100 text-danger p-2';
+                fileDiv.innerHTML = `
+                    <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
+                    <small class="text-center fw-semibold mt-1" style="font-size: 0.8rem;">${file.name}</small>
+                `;
+                previewItem.appendChild(fileDiv);
+            }
+
+            previewItem.appendChild(removeBtn);
+
+            const previewGrid = document.getElementById('previewGrid');
+        if (previewGrid) {
+                previewGrid.appendChild(previewItem);
+                // Show preview section if hidden
+                const filePreviewSection = document.getElementById('filePreview');
+                if (filePreviewSection) filePreviewSection.classList.remove('d-none');
         }
-
-        previewItem.appendChild(removeBtn);
-        const previewGrid = document.getElementById('previewGrid');
-        if (previewGrid) previewGrid.appendChild(previewItem);
     }
 
     // Remove file
@@ -1115,40 +1169,112 @@
     }
 
     // Take photo using camera
-    async function takePhoto() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' }
-            });
+    // async function takePhoto() {
+    //     try {
+    //         const stream = await navigator.mediaDevices.getUserMedia({
+    //             video: { facingMode: 'environment' }
+    //         });
 
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.play();
+    //         const video = document.createElement('video');
+    //         video.srcObject = stream;
+    //         video.play();
 
-            video.addEventListener('loadedmetadata', () => {
+    //         video.addEventListener('loadedmetadata', () => {
+    //             const canvas = document.createElement('canvas');
+    //             canvas.width = video.videoWidth;
+    //             canvas.height = video.videoHeight;
+
+    //             const ctx = canvas.getContext('2d');
+    //             ctx.drawImage(video, 0, 0);
+
+    //             canvas.toBlob(blob => {
+    //                 const file = new File([blob], `photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+    //                 selectedFiles.push(file);
+    //                 createFilePreview(file);
+    //                 updateFileCount();
+    //                 showFilePreview();
+
+    //                 // Stop camera
+    //                 stream.getTracks().forEach(track => track.stop());
+    //                 showToast('Photo captured successfully!', 'success');
+    //             }, 'image/jpeg', 0.9);
+    //         });
+    //     } catch (error) {
+    //         console.error('Camera error:', error);
+    //         showToast('Camera access denied or not available', 'danger');
+    //     }
+    // }
+
+      async function takePhoto()
+      {
+          try {
+                // Check if browser supports camera
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showToast('Camera not supported on this device/browser', 'danger');
+                    return;
+                }
+
+                // Preferred constraints: back camera if available
+                const constraints = {
+                    video: { facingMode: { ideal: 'environment' } } // 'user' for front camera
+                };
+
+                // Request camera access
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                // Create video element
+                const video = document.createElement('video');
+                video.muted = true;            // required for mobile autoplay
+                video.playsInline = true;      // required for iOS
+                video.srcObject = stream;
+                video.style.position = 'fixed'; // hide video off-screen
+                video.style.top = '-10000px';
+                document.body.appendChild(video);
+
+                await video.play();
+
+                // Wait for video metadata to load
+                await new Promise(resolve => {
+                    if (video.readyState >= 2) {
+                        resolve();
+                    } else {
+                        video.onloadedmetadata = () => resolve();
+                    }
+                });
+
+                // Capture frame to canvas
                 const canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(video, 0, 0);
 
+                // Convert canvas to blob/file
                 canvas.toBlob(blob => {
                     const file = new File([blob], `photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
                     selectedFiles.push(file);
                     createFilePreview(file);
                     updateFileCount();
                     showFilePreview();
-
-                    // Stop camera
-                    stream.getTracks().forEach(track => track.stop());
                     showToast('Photo captured successfully!', 'success');
+
+                    // Stop camera and remove video element
+                    stream.getTracks().forEach(track => track.stop());
+                    document.body.removeChild(video);
+
                 }, 'image/jpeg', 0.9);
-            });
-        } catch (error) {
-            console.error('Camera error:', error);
-            showToast('Camera access denied or not available', 'danger');
-        }
+
+          } catch (err) {
+                console.error('Camera error:', err);
+
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    showToast('Camera access denied. Please allow permissions.', 'danger');
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    showToast('No camera found on this device.', 'danger');
+                } else {
+                    showToast('Unable to access camera.', 'danger');
+                }
+         }
     }
 
     // Toggle video recording
@@ -1220,9 +1346,12 @@
             formData.append('comments', $('#comments').val());
            
 
-            // Add files
-            selectedFiles.forEach(file => formData.append('files', file));
-
+             // Add files (both images & videos)
+                selectedFiles.forEach(file => {
+                    console.log("Uploading:", file.name, file.type); // 👈 check here
+                    formData.append('files', file);
+                });
+            debugger;
             fetch('/Worker/Worker/SubmitPlanVisit',
             {
                 method: 'POST',
@@ -1245,6 +1374,7 @@
             })
             .catch(error => {
                 showToast(data.message,"danger");
+                debugger;
             });
     })
    

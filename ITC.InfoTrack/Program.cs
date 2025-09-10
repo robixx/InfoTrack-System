@@ -1,5 +1,6 @@
 using ITC.InfoTrack.Model.DataBase;
 using ITC.InfoTrack.Utility;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 
 using System.ComponentModel;
@@ -12,6 +13,11 @@ builder.Services.InjectService();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 200 * 1024 * 1024; // 200 MB
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
@@ -26,16 +32,16 @@ builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options => {
         options.LoginPath = "/login/default/index";
         options.AccessDeniedPath = "/login/default/noaccess";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.SlidingExpiration = true; // refresh cookie if user is active
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.None;
     });
 builder.Services.AddSession(options =>
 {
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 
 var app = builder.Build();

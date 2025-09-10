@@ -12,6 +12,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Data;
 using System.Drawing.Imaging;
 using System.Net.NetworkInformation;
 
@@ -80,37 +81,54 @@ namespace ITC.InfoTrack.Model.DAO
                     var fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}_{safeName}";
                     var filePath = Path.Combine(_imagePath, fileName);
 
-                    using (var image = Image.Load<Rgba32>(file.OpenReadStream()))
+
+                    if (file.ContentType.StartsWith("image/"))
                     {
-                        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        var text = $"{LoginUserName} | {timestamp}";
-                        // Set proportional font size (1/10th of image width)
-                        //float fontSize = 12f;
-                        var font = SystemFonts.CreateFont("Arial", 12, FontStyle.Regular); //new Font(fontFamily, fontSize, FontStyle.Bold);
-                        var textOptions = new TextOptions(font)
+                        using (var image = Image.Load<Rgba32>(file.OpenReadStream()))
                         {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Bottom
-                        };
+                            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            var text = $"{LoginUserName} | {timestamp}";
+                            // Set proportional font size (1/10th of image width)
+                            //float fontSize = 12f;
+                            var font = SystemFonts.CreateFont("Arial", 12, FontStyle.Regular); //new Font(fontFamily, fontSize, FontStyle.Bold);
+                            var textOptions = new TextOptions(font)
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Bottom
+                            };
 
 
-                       
-                        var textSize = TextMeasurer.MeasureSize(text, textOptions);
-                        var position = new PointF(10, image.Height - textSize.Height - 10);
 
-                        // Draw timestamp
-                        image.Mutate(ctx =>
+                            var textSize = TextMeasurer.MeasureSize(text, textOptions);
+                            var position = new PointF(10, image.Height - textSize.Height - 10);
+
+                            // Draw timestamp
+                            image.Mutate(ctx =>
+                            {
+                                // Optional: add shadow for better visibility
+                                ctx.DrawText(text, font, Color.Black, new PointF(position.X + 2, position.Y + 2));
+                                ctx.DrawText(text, font, Color.Yellow, position);
+                            });
+
+
+                            await image.SaveAsync(filePath);
+                        }
+                    }
+                    else if (file.ContentType.StartsWith("video/"))
+                    {
+                        // Just save the video as is (no watermark support here)
+                        using (var stream = new FileStream(filePath, FileMode.Create))
                         {
-                            // Optional: add shadow for better visibility
-                            ctx.DrawText(text, font, Color.Black, new PointF(position.X + 2, position.Y + 2));
-                            ctx.DrawText(text, font, Color.Yellow, position);
-                        });
-
-                       
-                        await image.SaveAsync(filePath);
+                            await file.CopyToAsync(stream);
+                        }
+                    }
+                    else
+                    {
+                        // Unsupported type - skip or log
+                        continue;
                     }
 
-                    
+
                     var imageRecord = new VisitLogDetails
                     {
                         VisitLogId = visitdata.VisitLogId,
@@ -187,35 +205,53 @@ namespace ITC.InfoTrack.Model.DAO
                     var fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}_{safeName}";
                     var filePath = Path.Combine(_imagePath, fileName);
 
-                    using (var image = Image.Load<Rgba32>(file.OpenReadStream()))
+
+                    if (file.ContentType.StartsWith("image/"))
                     {
-                        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        var text = $"{LoginUserName} | {timestamp}";
-                        // Set proportional font size (1/10th of image width)
-                        //float fontSize = 12f;
-                        var font = SystemFonts.CreateFont("Arial", 12, FontStyle.Regular); //new Font(fontFamily, fontSize, FontStyle.Bold);
-                        var textOptions = new TextOptions(font)
+                        using (var image = Image.Load<Rgba32>(file.OpenReadStream()))
                         {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Bottom
-                        };
+                            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            var text = $"{LoginUserName} | {timestamp}";
+                            // Set proportional font size (1/10th of image width)
+                            //float fontSize = 12f;
+                            var font = SystemFonts.CreateFont("Arial", 12, FontStyle.Regular); //new Font(fontFamily, fontSize, FontStyle.Bold);
+                            var textOptions = new TextOptions(font)
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Bottom
+                            };
 
 
 
-                        var textSize = TextMeasurer.MeasureSize(text, textOptions);
-                        var position = new PointF(10, image.Height - textSize.Height - 10);
+                            var textSize = TextMeasurer.MeasureSize(text, textOptions);
+                            var position = new PointF(10, image.Height - textSize.Height - 10);
 
-                        // Draw timestamp
-                        image.Mutate(ctx =>
-                        {
-                            // Optional: add shadow for better visibility
-                            ctx.DrawText(text, font, Color.Black, new PointF(position.X + 2, position.Y + 2));
-                            ctx.DrawText(text, font, Color.Yellow, position);
-                        });
+                            // Draw timestamp
+                            image.Mutate(ctx =>
+                            {
+                                // Optional: add shadow for better visibility
+                                ctx.DrawText(text, font, Color.Black, new PointF(position.X + 2, position.Y + 2));
+                                ctx.DrawText(text, font, Color.Yellow, position);
+                            });
 
 
-                        await image.SaveAsync(filePath);
+                            await image.SaveAsync(filePath);
+                        }
                     }
+                    else if (file.ContentType.StartsWith("video/"))
+                    {
+                        // Just save the video as is (no watermark support here)
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+                    }
+                    else
+                    {
+                        // Unsupported type - skip or log
+                        continue;
+                    }
+
 
 
                     var imageRecord = new VisitLogDetails
@@ -313,12 +349,23 @@ namespace ITC.InfoTrack.Model.DAO
             }
         }
 
-        public async Task<List<VisitLogGallarayDto>> GetGallaryDataAsync(int userId, int RoleId)
+        public async Task<List<VisitLogGallarayDto>> GetGallaryDataAsync(int typeId, int areaId, int divisionId, int valueTypeId)
         {
             try
             {
+
+                var parameters = new[]
+               {
+                    new NpgsqlParameter("p_type", SqlDbType.Int) { Value = typeId},
+                    new NpgsqlParameter("p_division", SqlDbType.Int) { Value = divisionId},
+                    new NpgsqlParameter("p_valueid", SqlDbType.Int) { Value = valueTypeId }
+                    
+
+                };
+
+
                 var visitLogs = await _connection.VisitLogGallarayDto
-                           .FromSqlRaw("Select * from public.get_gallery_data()") // or use your SQL query
+                           .FromSqlRaw("Select * from public.get_gallery_data({0},{1},{2})", parameters) // or use your SQL query
                            .ToListAsync();
 
                

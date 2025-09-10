@@ -21,7 +21,7 @@
 }
 
 <style>
-    body{
+    body {
         background-color: #f8f9fa;
     }
 
@@ -88,75 +88,130 @@
     /* Modal for the all images view */
     #imageModal .modal-content {
         border-radius: 1rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     }
 
     #imageModal .modal-body {
-        padding: 1rem;
+        padding: 1.5rem;
     }
 
-    #imageModal .image-container {
+    /* Thumbnail list on the left */
+    .thumbnail-sidebar {
+        padding-right: 1.5rem;
+        border-right: 1px solid #e9ecef;
+        margin-top: 10px;
+    }
+
+    .thumbnail-item {
+        cursor: pointer;
+        width: 130px;
+        height: 80px;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        border: 2px solid transparent;
+        flex-shrink: 0; /* Prevents thumbnails from shrinking in horizontal list */
+    }
+
+        .thumbnail-item:hover,
+        .thumbnail-item.active {
+            transform: scale(1.05);
+            border-color: var(--bs-primary);
+        }
+
+        .thumbnail-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    /* Main image display on the right */
+    .main-image-display {
+        padding-left: 1.5rem;
+    }
+
+    .main-image-container {
         border-radius: 1rem;
         overflow: hidden;
         background-color: #f1f1f1;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-        #imageModal .image-container img {
+        .main-image-container img {
             width: 100%;
-            height: 200px;
-            object-fit: cover;
-            display: block;
+            height: auto;
+            max-height: 600px;
+            object-fit: contain;
         }
 
-    #imageModal .image-caption {
-        padding: 0.75rem;
-        text-align: center;
+    .image-details {
+        padding: 0.75rem 0;
     }
 
-        #imageModal .image-caption h6 {
+        .image-details h6 {
             font-weight: 600;
             margin-bottom: 0.25rem;
         }
 
-        #imageModal .image-caption p {
+        .image-details p {
             margin: 0;
             font-size: 0.875rem;
             color: #6c757d;
         }
 
-   
+    .btn-custom {
+        background: #ced6d7;
+        border: 1px solid #ced6d7;
+        color: black;
+    }
+
+        .btn-custom:hover {
+            background: #ced6d7;
+            border: 1px solid #ced6d7;
+            color: black;
+        }
 
 </style>
 <link href="~/css/planvisit.css" rel="stylesheet" />
 
 
-<div class="row">
+<div class="card">
     <h3 class="text-center fw-bold mb-3">Our Image Gallery</h3>
     <p class="text-center text-muted mb-4">Browse images by division and branch.</p>
 
-    <!-- Search bar -->
-    <div class="input-group mb-4">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" id="searchInput" class="form-control" placeholder="Search for a division or branch...">
+    <div class="text-center">
+        <button class="btn btn-custom mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterControls" aria-expanded="false" aria-controls="filterControls">
+            Filter Data <i class="bi bi-caret-down-fill"></i>
+        </button>
     </div>
 
-    <div id="galleryContainer">
-        <!-- Division and branch sections will be dynamically inserted here -->
-    </div>
-</div>
 
-
-<!-- All Images Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-top modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">Branch Images</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="modalImageGrid" class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
-                    <!-- All images for the branch will be inserted here -->
+    <div class="collapse" id="filterControls">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-3">
+                    <label class="form-label">
+                        Select Area
+                    </label>
+                    @Html.DropDownList("AreaId", ViewBag.area as SelectList, "Select Area", new { @class = "form-control select2", @id = "AreaId", onchange = "AreaWiseDataLoad(this)" })
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">
+                        Select Division
+                    </label>
+                    @Html.DropDownList("DivisionId", new SelectList(Enumerable.Empty<SelectListItem>()), "Select Division", new { @class = "form-control select2", @id = "DivisionId", onchange="onChanageDivision()" })
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">
+                        Select Type
+                    </label>
+                    @Html.DropDownList("TypeId", ViewBag.type as SelectList, "Select Type", new { @class = "form-control select2", @id = "TypeId", onchange = "TypeWiseSource()" })
+                </div>
+                <div class="col-12 col-md-3">
+                    <label for="metaelementTitle" class="form-label" id="typelevel">Type Name<span class="text-danger">*</span></label>
+                    <select class="form-control select2 w-100" name="typename" id="typename" onchange="SourceLoadData()">
+                        <option value="0">Select Type Name</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -164,64 +219,218 @@
 </div>
 
 
+<!-- Search bar -->
+<div class="input-group mb-4 " style="display:none;">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <input type="text" id="searchInput" class="form-control" placeholder="Search for a division or branch...">
+</div>
+
+<div id="galleryContainer">
+    <!-- Division and branch sections will be dynamically inserted here -->
+</div>
+
+
+
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-top modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Branch Images / Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left side: Thumbnails menu -->
+                    <div class="col-12 col-md-2 thumbnail-sidebar">
+                        <h6 class="text-muted fw-bold d-none d-md-block mb-3">All Photos</h6>
+                        <div id="thumbnailContainer" class="d-flex flex-md-column overflow-x-auto flex-nowrap gap-2">
+                            <!-- Thumbnails will be injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Right side: Main image and details -->
+                    <div class="col-12 col-md-10 main-image-display">
+                        <div id="mainImageContainer" class="main-image-container">
+                            <img id="mainImage" src="" alt="">
+                        </div>
+                        <div id="imageDetails" class="image-details text-center text-md-start">
+                            <!-- Image details will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 @section scripts {
     <!-- apexcharts -->
-    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
-    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
-    <!-- Required datatable js -->
     <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
     <!-- Buttons examples -->
     <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
     <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
-    <script src="~/libs/jszip/jszip.min.js"></script>
-    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
-    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
-    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
-    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
-    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
-    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <script src="~/libs/select2/js/select2.min.js"></script>
+    <script src="~/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/libs/spectrum-colorpicker2/spectrum.min.js"></script>
+    <script src="~/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="~/libs/admin-resources/bootstrap-filestyle/bootstrap-filestyle.min.js"></script>
+    <script src="~/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+    <script src="~/js/pages/form-advanced.init.js"></script>
+    <script src="~/js/app.js"></script>
     <!-- Responsive examples -->
     <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
     <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
     <!-- Datatable init js -->
     <script src="~/js/pages/datatables.init.js"></script>
-    <script src="~/js/app.js"></script>
 
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 
-<script>  
+<script>
+      const galleryData = {};
 
-    document.addEventListener('DOMContentLoaded', () => {
+     $('#AreaId').on('change', function () {
+        AreaWiseDataLoad(this);
+    });
+
+    function AreaWiseDataLoad(dropdown)
+    {
+
+         var typeid = dropdown.value;
+        $('#DivisionId').empty().append('<option>Loading...</option>');
+
+        $.ajax({
+            url: '/Corporate/Corporate/TypeWiseDivision',
+            type: 'GET',
+            data: { typeid: typeid },
+            dataType: 'json',
+            success: function (res) {
+                
+                $('#DivisionId').empty().append('<option>Select Division</option>');
+                $.each(res.data, function (i, item) {
+                    $('#DivisionId').append($('<option>', {
+                        value: item.id, // use lowercase if using JsonResult without property casing fix
+                        text: item.name
+                    }));
+                });                
+
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching branches:', error);
+            }
+        });
+
+    }
+
+    function onChanageDivision()
+    {
+         loadDataFunction();
+    }
+
+    function SourceLoadData(){
+         loadDataFunction();
+    }
+
+
+    function TypeWiseSource()
+    {
+          let typeId=$('#TypeId').val();
+          let areaid =$('#AreaId').val();
+          let divisionid =$('#DivisionId').val();
+          let typeText = $('#TypeId option:selected').text();
+          const typeNameLevel= document.getElementById('typelevel');
+         $('#typelevel').html(`${typeText} Name <span class="text-danger">*</span>`);
+
+         $.ajax({
+                 url: '/Corporate/Corporate/getDataElementData',
+                 type: 'GET',
+                 data: {typeId:typeId,areaid:areaid,divisionId:divisionid},
+                 success: function (res) {
+                      if(res.status){
+                           const dropdown = $('#typename');
+                           dropdown.empty();
+                           dropdown.append('<option value="0">Select Type Name </option>');
+                           res.data.forEach(item => {
+                              // const selected = item.value == selectedGroupId ? 'selected' : '';
+                               dropdown.append(`<option value="${item.id}">${item.name}</option>`);
+                           });
+                      }else{
+                           const dropdown = $('#typename');
+                           dropdown.empty();
+                           dropdown.append('<option value="0"> Select Type Name </option>');
+                      }
+
+                      
+
+                 },
+                   error: function (err) {
+                    alert('Error while saving.');
+                 }
+         });
+    }
+
+
+
+
+            function  loadDataFunction()
+            {
+                var typeId = $('#TypeId').val()===null? 0 :$('#TypeId').val();
+                var areaId = $('#AreaId').val()===null? 0 :$('#AreaId').val();
+                var divisionId = $('#DivisionId').val()===null? 0 :$('#DivisionId').val();
+                var valueTypeId= $('#typename').val()===null? 0 :$('#ValueTypeId').val();
+                //const galleryData = {};
+
+                 $.ajax({
+                        url: '/ManagementApproval/ManagementApproval/GetGalleryData',
+                        type: 'GET',
+                        dataType: 'json',
+                        data:{typeId:typeId, areaId:areaId,divisionId:divisionId,valueTypeId:valueTypeId},
+                        success: function (data) {
+
+                   
+                             for (let key in galleryData) {
+                                delete galleryData[key];
+                             }
+
+                            data.forEach(function (division) {
+                       
+                                galleryData[division.divisionName] = division.branches;
+                            });
+
+                            // Initial render
+                            renderGalleries('');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error loading gallery data:", error);
+                            galleryContainer.innerHTML = `
+                                <div class="text-center text-danger p-5">
+                                    Failed to load data from server.
+                                </div>`;
+                        }
+                 });
+            }
+
+
+    
             const galleryContainer = document.getElementById('galleryContainer');
             const searchInput = document.getElementById('searchInput');
+            const thumbnailContainer = document.getElementById('thumbnailContainer');
+            const mainImage = document.getElementById('mainImage');
+            const imageDetails = document.getElementById('imageDetails');
             const modalImageGrid = document.getElementById('modalImageGrid');
             const imageModalLabel = document.getElementById('imageModalLabel');
             const imageCarouselInner = document.querySelector('#imageCarousel .carousel-inner');
-            const galleryData = {};
-            
-             fetch('/ManagementApproval/ManagementApproval/GetGalleryData')
-                .then(response => response.json())
-                .then(data => {
-                    
-                    data.forEach(division => {
-                        galleryData[division.divisionName] = division.branches;
-                    });
+          
 
-                    // Initial render
-                    renderGalleries('');
-                })
-                .catch(err => {
-                    console.error("Error loading gallery data:", err);
-                    galleryContainer.innerHTML = `
-                        <div class="text-center text-danger p-5">
-                            Failed to load data from server.
-                        </div>`;
-                });
 
+            loadDataFunction();
 
                 const formatDate = (dateStr) => {
                     if (!dateStr) return 'N/A';
@@ -236,7 +445,7 @@
                     str = str.toLowerCase(); // convert all letters to lowercase
                     return str.charAt(0).toUpperCase() + str.slice(1);
                 };
-            
+
 
             const renderDivisionSection = (divisionName, branchesToRender) => {
                 const divisionSection = document.createElement('div');
@@ -251,24 +460,38 @@
                     <h3 class="fw-bold mb-3">${divisionName}</h3>
                     <div class="row g-4 branch-grid"></div>
                 `;
-               
+
                 const branchGrid = divisionSection.querySelector('.branch-grid');
-               
+
                 initialBranches.forEach(branchName => {
-                    const branchImages = branchesToRender[branchName];
-                    const photoCount = branchImages.length;
-                    if (photoCount > 0) {
-                       
-                        const latestImage = branchImages[0];
-                        const formattedDate =formatDate(latestImage.uploadDate);                                    
+                    const branchFiles = branchesToRender[branchName];
+                    const fileCount = branchFiles.length;
+                    if (fileCount > 0) {
+
+                        const latestFile = branchFiles[0];
+                        const formattedDate = formatDate(latestFile.uploadDate);
                         const formattedBranchName = capitalizeFirstLetter(branchName);
-                               
+
+                        // Decide whether to show image or video
+                        let mediaElement = '';
+                        if (latestFile.src.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                            mediaElement = `<img src="${latestFile.src}" alt="${latestFile.alt}" class="w-100 h-100 object-fit-cover">`;
+                        } else if (latestFile.src.match(/\.(mp4|mov|avi|mkv)$/i)) {
+                            mediaElement = `<video src="${latestFile.src}" controls class="w-100 h-100 object-fit-cover"></video>`;
+                        } else {
+                            mediaElement = `
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                                    <i class="bi bi-file-earmark" style="font-size:2rem;"></i>
+                                    <small>${latestFile.alt}</small>
+                                </div>`;
+                        }
+
                         const col = document.createElement('div');
                         col.className = 'col-12 col-sm-12 col-md-4 col-lg-3';
                         col.innerHTML = `
                             <div class="branch-card" data-branch-name="${branchName}">
-                                <img src="${latestImage.src}" alt="${latestImage.alt}">
-                                <span class="photo-count-badge">${photoCount} photo${photoCount > 1 ? 's' : ''}</span>
+                                ${mediaElement}
+                                <span class="photo-count-badge">${fileCount} file${fileCount > 1 ? 's' : ''}</span>
                                 <div class="branch-card-body">
                                     <h5 class="mb-1" style="font-size:15px;">${formattedBranchName}</h5>
                                     <p style="font-size:11px;">Last Uploaded: ${formattedDate}</p>
@@ -289,18 +512,34 @@
                     hiddenBranchesGrid.className = 'row g-4 mt-3';
 
                     hiddenBranches.forEach(branchName => {
-                        const branchImages = branchesToRender[branchName];
-                        const photoCount = branchImages.length;
-                        if (photoCount > 0) {
-                            const latestImage = branchImages[0];
-                            const formattedDate =formatDate(latestImage.uploadDate);
+                        const branchFiles = branchesToRender[branchName];
+                        const fileCount = branchFiles.length;
+
+                        if (fileCount > 0) {
+                            const latestFile = branchFiles[0];
+                            const formattedDate = formatDate(latestFile.uploadDate);
                             const formattedBranchName = capitalizeFirstLetter(branchName);
+
+                            // Decide image/video/other
+                            let mediaElement = '';
+                            if (latestFile.src.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                                mediaElement = `<img src="${latestFile.src}" alt="${latestFile.alt}" class="w-100 h-100 object-fit-cover">`;
+                            } else if (latestFile.src.match(/\.(mp4|mov|avi|mkv)$/i)) {
+                                mediaElement = `<video src="${latestFile.src}" controls class="w-100 h-100 object-fit-cover"></video>`;
+                            } else {
+                                mediaElement = `
+                                    <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                                        <i class="bi bi-file-earmark" style="font-size:2rem;"></i>
+                                        <small>${latestFile.alt}</small>
+                                    </div>`;
+                            }
+
                             const col = document.createElement('div');
                             col.className = 'col-12 col-sm-12 col-md-4 col-lg-3';
                             col.innerHTML = `
                                 <div class="branch-card" data-branch-name="${branchName}">
-                                    <img src="${latestImage.src}" alt="${latestImage.alt}">
-                                    <span class="photo-count-badge">${photoCount} photo${photoCount > 1 ? 's' : ''}</span>
+                                    ${mediaElement}
+                                    <span class="photo-count-badge">${fileCount} file${fileCount > 1 ? 's' : ''}</span>
                                     <div class="branch-card-body">
                                         <h5 class="mb-1" style="font-size:15px;">${formattedBranchName}</h5>
                                         <p style="font-size:11px;">Last Uploaded: ${formattedDate}</p>
@@ -353,36 +592,81 @@
                 });
             };
 
+            const displayImage = (index, mediaFiles) => {
+                if (mediaFiles.length === 0) return;
+
+                const file = mediaFiles[index];
+                const uploadDate = formatDate(file.uploadDate);
+                const formattedBranchName = capitalizeFirstLetter(file.branch);
+
+                 mainImageContainer.innerHTML = '';
+
+                if (file.src.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                    const img = document.createElement('img');
+                    img.src = file.src;
+                    img.alt = file.alt;
+                    img.className = 'w-100 h-auto';
+                    mainImageContainer.appendChild(img);
+                } else if (file.src.match(/\.(mp4|mov|avi|mkv)$/i)) {
+                    const video = document.createElement('video');
+                    video.src = file.src;
+                    video.controls = true;
+                    video.autoplay = false;
+                    video.className = 'w-100 h-auto';
+                    mainImageContainer.appendChild(video);
+                } else {
+                    mainImageContainer.innerHTML = `<p class="text-muted">Cannot display this file type.</p>`;
+                }
+
+                imageDetails.innerHTML = `
+                    <h6 class="mb-1">${formattedBranchName}</h6>
+                    <p class="mb-1 text-primary fw-bold">File ${index + 1} of ${mediaFiles.length}</p>
+                    <p>Uploaded: ${uploadDate}</p>
+                    <p class="text-secondary">${file.comments}</p>
+                `;
+            };
+
+
+
          const renderModalContent = (images) => {
-                modalImageGrid.innerHTML = '';
+                thumbnailContainer.innerHTML = '';
                 const totalImages = images.length;
 
                 if (totalImages === 0) {
-                     modalImageGrid.innerHTML = `<div class="col-12 p-5 text-center text-muted">No images to display.</div>`;
-                     imageModalLabel.textContent = "Branch Images";
-                     return;
+                    imageModalLabel.textContent = "Branch Images";
+                    thumbnailContainer.innerHTML = `<p class="text-muted text-center py-5">No images to display.</p>`;
+                    mainImage.src = "";
+                    mainImage.alt = "";
+                    imageDetails.innerHTML = "";
+                    return;
                 }
 
-                imageModalLabel.textContent = `Images for ${images[0].branch} (${totalImages} photos)`;
+                imageModalLabel.textContent = `Images for ${images[0].branch}`;
 
                 images.forEach((image, index) => {
-                     const uploadDate = formatDate(image.uploadDate);
-                      const formattedBranchName = capitalizeFirstLetter(image.branch);
-                    const col = document.createElement('div');
-                    col.className = 'col';
-                    col.innerHTML = `
-                        <div class="image-container">
-                            <img src="${image.src}" alt="${image.alt}">
-                            <div class="image-caption">
-                                <h6>${formattedBranchName}</h6>
-                                <p class="mb-1 text-primary fw-bold">Image ${index + 1} of ${totalImages}</p>
-                                <p>Uploaded: ${uploadDate}</p>
-                                <p class="text-secondary">${image.comments}</p>
-                            </div>
-                        </div>
-                    `;
-                    modalImageGrid.appendChild(col);
+                    const thumbnail = document.createElement('div');
+                    thumbnail.className = 'thumbnail-item';
+                    thumbnail.setAttribute('data-index', index);
+                    if (image.src.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                        thumbnail.innerHTML = `<img src="${image.src}" alt="${image.alt}">`;
+                    } else if (image.src.match(/\.(mp4|mov|avi|mkv)$/i)) {
+                        thumbnail.innerHTML = `<video src="${image.src}" muted class="w-100 h-auto"></video>`;
+                    } else {
+                        thumbnail.innerHTML = `<div class="text-muted text-center p-2">Unsupported</div>`;
+                    }
+
+                    thumbnail.addEventListener('click', () => {
+                        document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('active'));
+                        thumbnail.classList.add('active');
+                        displayImage(index, images);
+                    });
+
+                    thumbnailContainer.appendChild(thumbnail);
                 });
+
+                // Select the first thumbnail and display the first image by default
+                document.querySelector('.thumbnail-item').classList.add('active');
+                displayImage(0, images);
             };
 
 
@@ -395,6 +679,7 @@
                 let resultsFound = false;
 
                 Object.keys(galleryData).forEach(divisionName => {
+                  
                     const branchesInDivision = galleryData[divisionName];
                     const lowerCaseDivisionName = divisionName.toLowerCase();
                     const matchingBranches = {};
@@ -456,34 +741,7 @@
                 }
             });
 
-
-            // Event listener for image clicks
-            // galleryContainer.addEventListener('click', (e) => {
-            //     const branchCard = e.target.closest('.branch-card');
-            //     if (branchCard) {
-            //         const branchName = branchCard.getAttribute('data-branch-name');
-
-            //         let allImagesInBranch = [];
-            //         // Find the images for the clicked branch across all divisions
-            //         Object.values(galleryData).forEach(division => {
-            //             if (division[branchName]) {
-            //                 allImagesInBranch = division[branchName];
-            //             }
-            //         });
-
-            //         // We only want to show the slider if there's more than one image
-            //         if (allImagesInBranch.length > 1) {
-            //             renderCarousel(allImagesInBranch);
-            //             const imageSliderModal = new bootstrap.Modal(document.getElementById('imageSliderModal'));
-            //             imageSliderModal.show();
-            //         } else if (allImagesInBranch.length === 1) {
-            //             // If there's only one image, show a message instead of the slider
-            //             alert("There are no more images to display for this branch.");
-            //         }
-            //     }
-            // });
-
             // Initial render of the gallery
             renderGalleries('');
-    });
+ 
 </script>

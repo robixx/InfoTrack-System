@@ -14,6 +14,6 @@ namespace ITC.InfoTrack.Model.Interface
         Task<(string message, bool status)> SaveWithoutScheduleLogAsync(VisitLogInsertDto model, List<IFormFile> files, string LoginUserName, int UserId);
         Task<List<DataMappingDto>> getDataMapAsync(int Id);
         Task<(string message, bool status)> SaveDataMapAsync(int divisionId, List<DataMappingDto> dto);
-        Task<List<VisitLogGallarayDto>> GetGallaryDataAsync(int userId, int RoleId);
+        Task<List<VisitLogGallarayDto>> GetGallaryDataAsync(int typeId, int areaId, int divisionId, int valueTypeId);
     }
 }
