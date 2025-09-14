@@ -14,7 +14,7 @@ namespace ITC.InfoTrack.Model.Entity
 
         public string UserName { get; set; }
 
-        public long CorpId { get; set; }
+        public string Email { get; set; }
 
         public string LoginName { get; set; }
         public string EncriptedPassword { get; set; }
@@ -37,5 +37,7 @@ namespace ITC.InfoTrack.Model.Entity
         public int? UpdatedBy { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+        public string PhoneNumber { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

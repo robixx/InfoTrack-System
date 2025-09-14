@@ -28,17 +28,43 @@ namespace ITC.InfoTrack.Model.DAO
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public async Task<LoginResponse> ApiLoginAsync(LoginRequest loginRequest)
+        {
+            try
+            {
+                var encrepted = PasswordHelper.HashPassword(loginRequest.Password);
+                var parameters = new[]
+                    {
+                            new NpgsqlParameter("p_login", loginRequest.UserName ?? (object)DBNull.Value),
+                            new NpgsqlParameter("p_password", encrepted ?? (object)DBNull.Value),
+                        };
+
+                var data = await _connection.LoginResponse
+                    .FromSqlRaw("SELECT * FROM login_user(@p_login, @p_password)", parameters)
+                    .ToListAsync();
+
+
+                return data.FirstOrDefault();
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<LoginResponse> LoginAsync(LoginRequest login)
         {
             try
             {
                 if (login != null)
                 {
-
+                    var encrepted = PasswordHelper.HashPassword(login.Password);
                     var parameters = new[]
                         {
                             new NpgsqlParameter("p_login", login.UserName ?? (object)DBNull.Value),
-                            new NpgsqlParameter("p_password", login.Password ?? (object)DBNull.Value),
+                            new NpgsqlParameter("p_password", encrepted ?? (object)DBNull.Value),
                         };
 
                     var data = await _connection.LoginResponse

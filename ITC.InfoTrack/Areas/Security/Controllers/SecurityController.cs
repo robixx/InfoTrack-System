@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
+using System.Threading.Tasks;
 
 namespace ITC.InfoTrack.Areas.Security.Controllers
 {
@@ -16,12 +17,16 @@ namespace ITC.InfoTrack.Areas.Security.Controllers
         private readonly IDropDown _dropdown;
         private readonly IRole _role;
         private readonly IMenuSet _menuSet;
-        public SecurityController(IMetaData metadata, IDropDown dropdown, IRole role, IMenuSet menuSet)
+        private readonly IUser _user;
+        private readonly string _imagePath;
+        public SecurityController(IMetaData metadata, IDropDown dropdown, IRole role, IMenuSet menuSet, IUser user, IConfiguration configuration)
         {
             _metadata = metadata;
             _dropdown = dropdown;
             _role = role;
             _menuSet = menuSet;
+            _user = user;
+            _imagePath = configuration["ImageStorage:TokenImagePath"]; 
         }
         [HttpGet]
         public async Task<IActionResult> MetadataConfigure()
@@ -101,10 +106,74 @@ namespace ITC.InfoTrack.Areas.Security.Controllers
 
 
         [HttpGet]
-        public IActionResult UserList()
+        public async Task<IActionResult> UserList()
         {
-            return View();
+            var result = await _user.getUserList();
+            foreach (var product in result)
+            {
+                if (product.ImageUrl != null && product.ImageUrl.Any())
+                {
+                    product.ImageUrl = $"/getimages/{product.ImageUrl}";
+                }
+                else
+                {
+                    // Optional: default image if none uploaded
+                    product.ImageUrl = "/images/default.png";
+                }
+            }
+            return View(result);
         }
+
+
+        [HttpGet("getimages/{fileName:regex(.+)}")]
+        public IActionResult Shows(string fileName)
+        {
+            string fullPath;
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                // Use default image if filename is null or empty
+                fullPath = Path.Combine(_imagePath, "default.png");
+            }
+            else
+            {
+                fullPath = Path.Combine(_imagePath, fileName);
+                // If file doesn't exist, use default image
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    fullPath = Path.Combine(_imagePath, "default.png");
+                }
+            }
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound(); // in case even default image is missing
+
+            var fileExt = Path.GetExtension(fullPath).ToLower();
+            var contentType = fileExt switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream"
+            };
+
+            var bytes = System.IO.File.ReadAllBytes(fullPath);
+            return File(bytes, contentType);
+        }
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> UserCreate([FromForm] CreateUserDto dto)
+        {
+            var result= await _user.saveUserData(dto);
+
+            return Json(new { message= result.message, status=result.status});
+        }
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> RoleCreate()
@@ -159,6 +228,34 @@ namespace ITC.InfoTrack.Areas.Security.Controllers
         {
             var result = await _menuSet.SaveRoleWisePagePer(model);
             return Json(new { message = result.message, status = result.status });
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> UserProfile(int loginId=0)
+        {
+            if (loginId == 0)
+            {
+                loginId = Convert.ToInt32(User.FindFirst("UserId")?.Value ?? "0");
+            }
+            
+
+            var result_value = await _user.getUserList();
+            var result = result_value.FirstOrDefault(i => i.UserId == loginId);
+            
+          
+                if (result.ImageUrl != null && result.ImageUrl.Any())
+                {
+                result.ImageUrl = $"/getimages/{result.ImageUrl}";
+                }
+                else
+                {
+                // Optional: default image if none uploaded
+                result.ImageUrl = "/images/default.png";
+                }
+           
+            return View(result);
         }
     }
 }

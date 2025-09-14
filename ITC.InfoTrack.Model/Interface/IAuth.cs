@@ -9,6 +9,7 @@ namespace ITC.InfoTrack.Model.Interface
 {
     public interface IAuth
     {
-        Task<LoginResponse> LoginAsync(LoginRequest login); 
+        Task<LoginResponse> LoginAsync(LoginRequest login);
+        Task<LoginResponse> ApiLoginAsync(LoginRequest loginRequest);
     }
 }

@@ -47,7 +47,7 @@ namespace ITC.InfoTrack.Model.DAO
                     .FirstOrDefaultAsync(i => i.ScheduleId == model.ScheduleId);
 
                 var division = await _connection.DataMapping
-                   .FirstOrDefaultAsync(i => i.SourceId == model.SourceId && i.ElementTypeId == model.Elementid);
+                   .FirstOrDefaultAsync(i => i.SourceId == model.SourceId);
 
                 if (datetyime == null)
                     return ("Schedule not found", false);

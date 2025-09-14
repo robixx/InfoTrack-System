@@ -20,6 +20,8 @@ namespace ITC.InfoTrack.Utility
             services.AddScoped<ICategoryData, CategoryWiseDataDAO>();
             services.AddScoped<IDashboard, DashboardSummaryDAO>();
             services.AddScoped<IWorker, WorkerServiceDAO>();
+            services.AddScoped<IUser, UserDAO>();
+            services.AddScoped<JwtConfig>();
             
         }
     }

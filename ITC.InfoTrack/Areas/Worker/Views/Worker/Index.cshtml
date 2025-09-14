@@ -1110,7 +1110,9 @@
                 // Create video element
                 const video = document.createElement('video');
                 video.muted = true;            // required for mobile autoplay
-                video.playsInline = true;      // required for iOS
+                //video.playsInline = true;      // required for iOS
+                video.setAttribute('playsinline', '');     // ✅ correct way for iOS
+                video.setAttribute('autoplay', '');
                 video.srcObject = stream;
                 video.style.position = 'fixed'; // hide video off-screen
                 video.style.top = '-10000px';
@@ -1224,7 +1226,7 @@
     $('#submitBtn').on('click', function(){
          const urlParams = new URLSearchParams(window.location.search);
          let scheduleId = urlParams.get('scheduleId');
-        debugger;
+        
             const formData = new FormData();
             formData.append('BankId', $('#BankId').val());
             formData.append('DristictId', $('#DristictId').val());

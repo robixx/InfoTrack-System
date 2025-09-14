@@ -1225,7 +1225,9 @@
                 // Create video element
                 const video = document.createElement('video');
                 video.muted = true;            // required for mobile autoplay
-                video.playsInline = true;      // required for iOS
+                //video.playsInline = true;      // required for iOS
+                video.setAttribute('playsinline', '');     // ✅ correct way for iOS
+                video.setAttribute('autoplay', '');        // ✅ helps on some mobile browsers
                 video.srcObject = stream;
                 video.style.position = 'fixed'; // hide video off-screen
                 video.style.top = '-10000px';

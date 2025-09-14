@@ -1,9 +1,12 @@
-﻿@{
+﻿@model List<ITC.InfoTrack.Model.Entity.User>
+
+
+@{
     ViewBag.pTitle = "User Data";
     ViewBag.pageTitle = "InfoTrack";
     ViewBag.Title = "User Information";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    
+
 }
 @section styles {
     <!-- jquery.vectormap css -->
@@ -40,19 +43,216 @@
         padding: 6px;
         font-size: 12px;
     }
+
+
+    .registration-card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #6c757d;
+    }
+
+    .profile-picture-container {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 1.5rem auto;
+        position: relative;
+    }
+
+    .profile-picture {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #e0e0e0;
+    }
+
+    .image-upload-icon {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background-color: #007bff;
+        color: white;
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+    }
+
+        .image-upload-icon input {
+            display: none;
+        }
+
 </style>
 <div class="row">
     <div class="col-xl-12">
         <div class="card">
             <div class="card-header">
-                <h5>Info Track User Information</h5>
+                <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center">
+                    <h5 class="mb-2 mb-md-0 text-center text-md-start">Info Track User Information</h5>
+                    <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fa fa-plus me-1"></i> Add New User
+                    </a>
+                </div>
             </div>
             <div class="card-body">
+                <div class="table-responsive" style="overflow-x:auto;">
+                    <table class="table" style="white-space: nowrap;">
+                        <thead>
+                            <tr>
+                                <th>Profile Image</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="@user.ImageUrl" alt="Profile Image" width="40" height="40" style="border-radius:50%;" />
+                                    </td>
+                                    <td>
+                                        <a href="/Security/Security/UserProfile?loginId=@user.UserId"> @user.UserName</a>
+
+                                    </td>
+                                    <td>@user.Email</td>
+                                    @{
+                                        var statususer = user.UserStatus == 1 ? "Active" : "InActive";
+                                    }
+                                    <td>
+                                        <span class="badge bg-primary">   @statususer</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
         <!-- end row -->
     </div>
 </div>
+
+
+<!--Modal Create -->
+
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="registration-card">
+                            <div class="text-center mb-4">
+                                <h3>Create Your Account</h3>
+                                <p class="text-muted">Fill in your information to register.</p>
+                            </div>
+                            <form id="registration-form">
+                                <!-- Profile Image Upload -->
+                                <div class="text-center mb-4">
+                                    <div class="profile-picture-container">
+                                        <img src="https://placehold.co/150x150/e0e0e0/ffffff?text=User" alt="Profile Picture" class="profile-picture" id="profileImagePreview">
+                                        <label class="image-upload-icon">
+                                            <i class="fas fa-camera"></i>
+                                            <input type="file" id="imageUpload" accept="image/*">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="firstName" placeholder="John" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="lastName" placeholder="Doe" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" placeholder="john.doe@example.com" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="loginName" class="form-label">Login Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                        <input type="text" class="form-control" id="loginName" placeholder="johndoe123" required>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label for="password" class="form-label">Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" class="form-control" id="password" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" class="form-control" id="confirmPassword" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <small id="password-feedback" class="form-text"></small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="mobileNumber" class="form-label">Mobile Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+                                        <input type="tel" class="form-control" id="mobileNumber" placeholder="(123) 456-7890">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <!-- Corrected form attribute to match the form element's ID -->
+                <button type="submit" form="registration-form" class="btn btn-primary">Save User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 @section scripts {
     <!-- apexcharts -->
@@ -81,6 +281,112 @@
     <script src="~/js/app.js"></script>
 
 
-    }
+}
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registration-form');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const passwordFeedback = document.getElementById('password-feedback');
+        const imageUpload = document.getElementById('imageUpload');
+        const profileImagePreview = document.getElementById('profileImagePreview');
+
+
+          password.addEventListener('input', checkPasswordMatch);
+          confirmPassword.addEventListener('input', checkPasswordMatch);
+
+        function checkPasswordMatch() {
+            if (confirmPassword.value === "") {
+                feedback.textContent = "";
+                confirmPassword.classList.remove('is-valid', 'is-invalid');
+                return;
+            }
+
+            if (password.value === confirmPassword.value) {
+                feedback.textContent = "Passwords match ✅";
+                feedback.style.color = "green";
+                confirmPassword.classList.add('is-valid');
+                confirmPassword.classList.remove('is-invalid');
+            } else {
+                feedback.textContent = "Passwords do not match ❌";
+                feedback.style.color = "red";
+                confirmPassword.classList.add('is-invalid');
+                confirmPassword.classList.remove('is-valid');
+            }
+        }
+
+
+        // Image Preview Functionality
+        imageUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profileImagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Password Match Validation
+        function validatePasswords() {
+            if (password.value === confirmPassword.value) {
+                passwordFeedback.textContent = 'Passwords match.';
+                passwordFeedback.style.color = 'green';
+                confirmPassword.setCustomValidity('');
+            } else {
+                passwordFeedback.textContent = 'Passwords do not match.';
+                passwordFeedback.style.color = 'red';
+                confirmPassword.setCustomValidity('Passwords do not match.');
+            }
+        }
+
+        password.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+
+        // Form Submission Handler
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            validatePasswords();
+
+            if (form.checkValidity() === false) {
+                event.stopPropagation();
+                console.error("Form is invalid. Please check all fields.");
+            } else {
+
+                const imageFile = document.getElementById('imageUpload').files[0];
+                const formData = new FormData();
+                formData.append('firstName', document.getElementById('firstName').value);
+                formData.append('lastName', document.getElementById('lastName').value);
+                formData.append('email', document.getElementById('email').value);
+                formData.append('loginName', document.getElementById('loginName').value);
+                formData.append('mobileNumber', document.getElementById('mobileNumber').value);
+                formData.append('password', password);
+
+                if (imageFile) {
+                    formData.append('profileImage', imageFile);
+                }
+                fetch('/Security/Security/UserCreate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status){
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+                // You might want to close the modal after a successful submission.
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                modal.hide();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+</script>

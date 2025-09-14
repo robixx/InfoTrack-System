@@ -1,0 +1,214 @@
+﻿@model ITC.InfoTrack.Model.Entity.User
+
+@{
+    ViewBag.pTitle = "User Profile";
+    ViewBag.pageTitle = "InfoTrack";
+    ViewBag.Title = "User Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@section styles {
+    <!-- jquery.vectormap css -->
+    <link href="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+
+    <!-- DataTables -->
+    <link href="~/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+}
+<style>
+    .card {
+        margin-bottom: 0.4rem;
+    }
+
+    .card-header {
+        background-color: white !important;
+    }
+
+    .bg-color {
+        background-color: #5664d2;
+    }
+
+        .bg-color:hover {
+            background-color: #5664d2;
+            color: white;
+        }
+
+
+    table#datatable > tbody > tr > td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+
+    .registration-card {
+        background-color: #fffcfc;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #6c757d;
+    }
+
+    .profile-picture-container {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 1.5rem auto;
+        position: relative;
+    }
+
+    .profile-picture {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #e0e0e0;
+    }
+
+    .image-upload-icon {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background-color: #007bff;
+        color: white;
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+    }
+
+        .image-upload-icon input {
+            display: none;
+        }
+
+</style>
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center">
+                    <h5 class="mb-2 mb-md-0 text-center text-md-start">User Information</h5>
+                 
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="registration-card">
+                            <div class="text-center mb-4">
+                                <h3>User Profile</h3>
+                                <p class="text-muted">Fill in your information to register.</p>
+                            </div>
+                            <form id="registration-form">
+                                <!-- Profile Image Upload -->
+                                <div class="text-center mb-4">
+                                    <div class="profile-picture-container">
+                                        <img src="@Model.ImageUrl"  alt="Profile Picture" class="profile-picture" id="profileImagePreview">
+                                        <label class="image-upload-icon d-none">
+                                            <i class="fas fa-camera"></i>
+                                            <input type="file" id="imageUpload" accept="image/*">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                   
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="firstName" value="@Model.UserName" placeholder="John" disabled>
+                                        </div>                                   
+                                   
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" value="@Model.Email" placeholder="john.doe@example.com" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="loginName" class="form-label">Login Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                        <input type="text" class="form-control" id="loginName" value="@Model.LoginName" placeholder="johndoe123" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label for="password" class="form-label">Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" class="form-control" value="**********" id="password" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" class="form-control" value="**********" id="confirmPassword" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <small id="password-feedback" class="form-text"></small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="mobileNumber" class="form-label">Mobile Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+                                        <input type="tel" class="form-control" id="mobileNumber" value="@Model.PhoneNumber" placeholder="(123) 456-7890" disabled>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+</div>
+
+@section scripts {
+    <!-- apexcharts -->
+    <!-- jquery.vectormap map -->
+    <script src="~/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="~/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+    <!-- Required datatable js -->
+    <script src="~/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Buttons examples -->
+    <script src="~/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/libs/jszip/jszip.min.js"></script>
+    <script src="~/libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="~/libs/pdfmake/build/vfs_fonts.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="~/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <!-- Responsive examples -->
+    <script src="~/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="~/js/pages/datatables.init.js"></script>
+    <script src="~/js/app.js"></script>
+
+
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
